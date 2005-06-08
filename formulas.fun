@@ -1,0 +1,14 @@
+sin(sqrt((x-2)^2+(y-2)^2))+sin(sqrt((x+2)^2+(y+2)^2))
+exp(-(x^2+y^2)/11)*7-5
+sin(x)+cos(y)
+(x^2-y^2)/9+sin(y)+cos(x)
+(x^2-y^2)/9
+-(x^2+y^2)/9+3
+-(|x|+|y|)+6
+sin(sqrt(x^2+y^2))+exp(-(x^2+y^2)/5)*7-3
+sqrt(81-(x^2+y^2))-6
+x*y/9
+x*y/9+sin(y)+cos(x)
+sin(sqrt(x^2+y^2))*(x^2+y^2)/32+exp(-(x^2+y^2)/9)*4
+(x^3-y^3)/100
+ln(sin(x)*cos(y))

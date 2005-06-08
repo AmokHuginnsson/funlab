@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso8859-2"?>
+<resource>
+  <object class="wxToolBar" name="TOOLBAR">
+    <object class="tool" name="ID_OPEN">
+      <bitmap stock_id="wxART_FILE_OPEN"></bitmap>
+    </object>
+    <object class="tool" name="ID_SAVE">
+      <bitmap stock_id="wxART_FILE_SAVE"></bitmap>
+    </object>
+    <style>wxTB_DOCKABLE</style>
+    <object class="tool" name="ID_EXIT">
+      <bitmap stock_id="wxART_CROSS_MARK"></bitmap>
+    </object>
+    <object class="tool" name="ID_ABOUT">
+      <bitmap stock_id="wxART_HELP_BOOK"></bitmap>
+    </object>
+  </object>
+  <object class="wxFrame" name="FRAME">
+    <title>funlab</title>
+    <size>560,320</size>
+    <object class="wxListCtrl" name="LISTCTRL_FORMULAS"/>
+    <style></style>
+  </object>
+  <object class="wxMenuBar" name="MENU_MAIN">
+    <object class="wxMenu" name="MENU_FILE">
+      <label>File</label>
+      <object class="wxMenuItem" name="ID_OPEN">
+        <label>&amp;Open</label>
+        <accel>CTRL-o</accel>
+        <help>Open formulas file.</help>
+      </object>
+      <object class="wxMenuItem" name="ID_EXIT">
+        <label>E&amp;xit</label>
+        <accel>ALT-x</accel>
+        <help>Quit this program</help>
+      </object>
+    </object>
+    <object class="wxMenu" name="MENU_HELP">
+      <label>&amp;Help</label>
+      <object class="wxMenuItem" name="ID_ABOUT">
+        <label>&amp;About</label>
+        <help>Display information about this application.</help>
+      </object>
+    </object>
+  </object>
+</resource>

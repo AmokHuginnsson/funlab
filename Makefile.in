@@ -1,0 +1,222 @@
+# $CVSHeader$
+# 
+#---       `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski      ---
+#
+#	Makefile - this file is integral part of `funlab' project.
+#
+#	i.  You may not $(MAKE) any changes in Copyright information.
+#	ii. You must attach Copyright information to any part of every copy
+#	    of this software.
+#
+#Copyright:
+#
+# You are free to use this program as is, you can redistribute binary
+# package freely but:
+#  1. You can not use any part of sources of this software.
+#  2. You can not redistribute any part of sources of this software.
+#  3. No reverse engineering is allowed.
+#  4. If you want redistribute binary package you can not demand any fees
+#     for this software.
+#     You can not even demand cost of the carrier (CD for example).
+#  5. You can not include it to any commercial enterprise (for example 
+#     as a free add-on to payed software or payed newspaper).
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
+
+SHELL					= /bin/sh
+FUNLABNAME				= funlab
+VERSION				= 0
+SUBVERSION		= 0
+EXTRAVERSION	= 0
+RELEASE 			= $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
+export DIR_ROOT	?= $(CURDIR)
+DIR_BUILD			= $(DIR_ROOT)/build
+VPATH					= $(DIR_ROOT)/src
+DIR_DEST 			=
+prefix				= $(DIR_DEST)/usr/bin
+doc						= $(DIR_DEST)/usr/share/doc
+LIBS					= wx_gtk_xrc-2.4 hcore hconsole hdata dbwrapper tools
+TARGET				= 1exec
+ifdef NODEBUG
+	TARGET = $(FUNLABNAME)
+endif
+CL						:= $(shell tput cr;tput dl1)
+HL						:= $(shell tput bold; tput setaf 1)
+HS = .h
+SS = .c
+OS = .o
+CTAGS	= @CTAGS@
+FIND	= find
+.SUFFIXES:
+.SUFFIXES: $(SS) $(OS) $(HS)
+CXX ?= g++
+CXX := $(subst -x c++ -x c++,-x c++,$(subst colorgcc,colorgcc -x c++,$(CXX)))
+DXX ?= $(CXX)
+DXX := $(subst -x c++,,$(subst colorgcc,g++,$(DXX)))
+LXX ?= g++
+ARFLAGS = r
+CWARNING_FLAGS =	\
+						@PEDANTIC_ERRORS@\
+						@EXTRA_WARNINGS@\
+						-Wall\
+						-Wcast-align\
+						-Wcast-qual\
+						-Wconversion\
+						-Wendif-labels\
+						-Werror\
+						-Winline\
+						-Wlarger-than-4096\
+						-Wlong-long\
+						-Wmissing-noreturn\
+						-Wpointer-arith\
+						-Wredundant-decls\
+						@WARN_SHADOW@\
+						-Wsign-compare\
+						-Wundef\
+						-Wwrite-strings
+#						-Wbad-function-cast\
+						-Wmissing-declarations\
+						-Wmissing-prototypes\
+						-Wnested-externs\
+						-Wstrict-prototypes\
+						-Wtraditional\ #C only
+#						-Wmissing-format-attribute\
+						-Wunreachable-code\ # too much warrnings
+#						-Waggregate-return\ # useless for C++
+CXXWARNING_FLAGS		=	\
+						-Weffc++\
+						-Wsign-promo
+#						-Wold-style-cast\ # lots of warrnings from libc headers
+#						-Woverloaded-virtual\ # too much unecessary warrnings
+ifeq ($(HD),1)
+	DB = -D__DEBUGGER_BABUNI__
+endif
+COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
+																-D_GNU_SOURCE @DEFS@ -march=i486
+ifdef NODEBUG
+	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
+else
+	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -gstabs+ -pg -fno-inline \
+																-D__DEBUG__ $(DB)
+endif
+COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I$(DIR_BUILD) \
+																-I/usr/local/include
+COMPILER_WX_FLAGS							= $(shell wx-config --cxxflags)
+LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib
+LINKER_PRIME_FLAGS						= \
+								@SPECIAL_LINKER_FLAGS@\
+								-Wl,--fatal-warnings\
+								-Wl,--demangle\
+
+LINKER_WX_FLAGS								= $(shell wx-config --libs) $(shell wx-config --gl-libs)
+
+CXXFLAGS			= $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
+								$(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) \
+								$(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS) \
+								$(COMPILER_WX_FLAGS)
+LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS) $(LINKER_WX_FLAGS)
+
+STATICLIBS = $(patsubst %, ~/lib/lib%.a, $(LIBS))
+LIBS := $(patsubst %, -l%, $(LIBS))
+
+STATICLIBS += -rdynamic -ldl
+STATICLIBS += -lncurses
+#STATICLIBS += -lccmalloc
+
+ifeq ($(CURDIR),$(DIR_BUILD))
+HDRS = $(strip $(sort $(shell cd $(DIR_ROOT)/src && $(FIND) . -name "*.h")))
+SRCS = $(strip $(sort $(shell cd $(DIR_ROOT)/src && $(FIND) . -name "*.c")))
+OBJS = $(patsubst %.c,%.o,$(SRCS))
+endif
+
+# implict pattern rule
+
+%.o: %.c
+	@echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... "; \
+	echo -n "$(@:.o=.d) " > $(@:.o=.d); \
+	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) | grep -v '^#' >> $(@:.o=.d); \
+	$(CXX) $(CXXFLAGS) $(<) -c -o $(@) 2>&1 | tee -a make.log; \
+	echo -n "done.$(CL)"
+
+#------------------------------------------------------------------------
+
+.DEFAULT:
+	@if [ "$(suffix $(<))" != ".d" ] ; then \
+	echo -n "$(HL)"; \
+	echo "Lack of \`$(<)'." | tee -a make.log; \
+	tput sgr0; fi
+
+#phony targets
+.PHONY: all dep static clean tags mrproper purge bin install
+
+ifneq ($(CURDIR),$(DIR_BUILD))
+all: $(DIR_BUILD)
+	@$(MAKE) --no-print-directory -C $(DIR_BUILD) -f ../Makefile
+else
+all: $(TARGET)
+endif
+
+$(DIR_BUILD):
+	@/bin/mkdir -p $(@); \
+	echo "Program version $(RELEASE)-`date +%Y%m%d`."; \
+	echo "#define VER \"$(RELEASE)-`date +%Y%m%d`\"" > $(DIR_BUILD)/version.h
+
+$(FUNLABNAME).info : src/$(FUNLABNAME).texinfo
+	@makeinfo src/$(FUNLABNAME).texinfo
+
+$(TARGET): $(OBJS)
+	@echo -n "Linking \`$@' ... "
+	@$(LXX) $(LINKER_FLAGS) -o $(TARGET) $(OBJS) $(LIBS) 2>&1 | tee -a make.log
+ifdef NODEBUG
+	@strip $(TARGET)
+endif
+	@echo "done."
+
+static:
+	@$(MAKE) LIBS="$(STATICLIBS)"
+
+clean-dep:
+	@$(FIND) . -name '*.d' | xargs /bin/rm -f
+
+clean: clean-dep
+	@/bin/rm -f *~ *.out .*~ .*.swp *.bak *.log *.info .depend
+	@/bin/rm -f core $(TARGET).core 1exec.core
+	@/bin/rm -f src/core src/$(TARGET).core src/1exec.core
+	@/bin/rm -f $(OBJS)
+	@/bin/rm -f $(TARGET)
+	@cln .
+
+mrproper: clean
+	@echo -n "Purging ... "; \
+	/bin/rm -f $(FUNLABNAME) version.h src/.gt_* src/tags 1exec.core; \
+	/bin/rm -rf src/1exec.core $(DIR_BUILD); \
+	$(FIND) . -name 'tags' -or -name '.depend' -or -name '*.a' \
+| xargs /bin/rm -f; \
+	echo "done."
+
+purge: mrproper
+	/bin/rm -rf autom4te.cache config.cache config.status configure.lineno; \
+	/bin/rm -rf configure Makefile config.h config.log
+
+bin:
+	@( export NODEBUG="true"; $(MAKE) -e executable )
+
+install: $(TARGET)
+	@echo "i: you need to become root to do this"
+	@install -c -g root -o root -m=u=rwx,g=rx,o=rx $(FUNLABNAME) $(prefix)
+#	@install -D -g root -o root -m=u=rwx,g=rx,o=rx README COPYRIGHT $(doc)/$(FUNLABNAME)
+#	@install -D -g root -o root -m=u=rwx,g=rx,o=rx .$(FUNLABNAME)rc $(doc)/$(FUNLABNAME)/examples
+	@echo "i: now if you wish you can suid $(TARGET)"
+
+tags: $(SRCS) $(HDRS)
+	@echo -n "Rehashing tags ... "; \
+	$(CTAGS)	-R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" \
+						--c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" \
+						--extra="+f+q"; \
+	echo "done."
+
+ifeq ($(CURDIR),$(DIR_BUILD))
+-include $(OBJS:.o=.d)
+endif
+

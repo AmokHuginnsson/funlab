@@ -1,0 +1,2 @@
+?package(funlab):needs=text|vc section=Apps/Net\
+  title="funlab" command="/usr/bin/funlab"

@@ -1,0 +1,247 @@
+/*
+---       `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski         ---
+
+	rc_options.c - this file is integral part of `funlab' project.
+
+	i.  You may not make any changes in Copyright information.
+	ii. You must attach Copyright information to any part of every copy
+	    of this software.
+
+Copyright:
+
+ You are free to use this program as is, you can redistribute binary
+ package freely but:
+  1. You can not use any part of sources of this software.
+  2. You can not redistribute any part of sources of this software.
+  3. No reverse engineering is allowed.
+  4. If you want redistribute binary package you can not demand any fees
+     for this software.
+     You can not even demand cost of the carrier (CD for example).
+  5. You can not include it to any commercial enterprise (for example 
+     as a free add-on to payed software or payed newspaper).
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
+*/
+
+/* declarations */
+
+/* headers */
+
+/* For compilers that support precompilation, includes "wx/wx.h". */
+#include <wx/wxprec.h>
+
+/* for all others, include the necessary headers (this file is usually all you
+ * need because it includes almost all "standard" wxWindows headers) */
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
+/* resources */
+#include <wx/xrc/xmlres.h>
+
+/* stdhapi */
+#include <stdhapi.h>
+
+/* the application icon (under Windows and OS/2 it is in resources) */
+#if defined(__WXGTK__) || defined(__WXMOTIF__) || defined(__WXMAC__) || defined(__WXMGL__) || defined(__WXX11__)
+#include "funlab.xpm"
+#endif
+
+#include "version.h"
+
+using namespace stdhapi::hcore;
+
+int gui_start ( int a_iArgc, char * a_ppcArgv [ ] )
+	{
+	M_PROLOG
+	return ( wxEntry ( a_iArgc, a_ppcArgv ) );
+	M_EPILOG
+	}
+
+/* private classes */
+
+/* Define a new frame type: this is going to be our main frame */
+class HFrame : public wxFrame
+	{
+public:
+	/*{*/
+	void layout ( void );
+
+	/*}*/
+protected:
+	/*{*/
+	void open ( const HString & );
+	/*}*/
+private:
+	/*{*/
+	/* event handlers (these functions should _not_ be virtual) */
+	void on_open ( wxCommandEvent & );
+	void on_quit ( wxCommandEvent & );
+	void on_about ( wxCommandEvent & );
+
+	/*}*/
+private:
+	/*{*/
+	/* any class wishing to process wxWindows events must use this macro */
+	DECLARE_EVENT_TABLE ( );
+	DECLARE_DYNAMIC_CLASS ( HFrame );
+	/*}*/
+	};
+IMPLEMENT_DYNAMIC_CLASS ( HFrame,  wxFrame );
+
+/* Define a new application type, each program should derive a class from wxApp */
+class HApp : public wxApp
+	{
+protected:
+	/*{*/
+	HFrame * f_poFrame;
+	/*}*/
+public:
+	/*{*/
+	HApp ( void );
+	virtual ~HApp ( void );
+	/* override base class virtuals
+	 * ----------------------------
+	 *  this one is called on application startup and is a good place for the app
+	 *  initialization (doing it here and not in the ctor allows to have an error
+	 *  return: if OnInit() returns false, the application terminates) */
+
+	virtual bool OnInit ( void );
+	/*}*/
+private:
+	/*{*/
+	HApp ( const HApp & );
+	HApp & operator = ( const HApp & );
+	/*}*/
+	};
+
+/* event tables and other macros for wxWindows */
+
+/* the event tables connect the wxWindows events with the functions (event
+ * handlers) which process them. It can be also done at run-time, but for the
+ * simple menu events like this the static method is much simpler. */
+
+BEGIN_EVENT_TABLE ( HFrame, wxFrame )
+	EVT_MENU ( XRCID ( "ID_OPEN" ),  HFrame::on_open )
+	EVT_MENU ( XRCID ( "ID_EXIT" ),  HFrame::on_quit )
+	EVT_MENU ( XRCID ( "ID_ABOUT" ), HFrame::on_about )
+END_EVENT_TABLE ( );
+
+/* Create a new application object: this macro will allow wxWindows to create
+ * the application object during program execution (it's better than using a
+ * static object for many reasons) and also implements the accessor function
+ * wxGetApp() which will return the reference of the right type (i.e. HApp and
+ * not wxApp) */
+
+IMPLEMENT_APP_NO_MAIN ( HApp );
+IMPLEMENT_WX_THEME_SUPPORT
+
+/* implementation */
+
+/* the application class */
+
+HApp::HApp ( void ) : f_poFrame ( NULL )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HApp::~HApp ( void )
+	{
+	M_PROLOG
+/*	if ( f_poFrame )
+		delete f_poFrame; */
+	f_poFrame = NULL;
+	return;
+	M_EPILOG
+	}
+
+/* 'Main program' equivalent: the program execution "starts" here */
+bool HApp::OnInit ( void )
+	{
+	M_PROLOG
+	/* load resources */
+	wxXmlResource::Get ( )->InitAllHandlers ( );
+	wxXmlResource::Get ( )->Load ( "funlab.xrc");
+	
+	/* create the main application window */
+	f_poFrame = new HFrame ( );
+	f_poFrame->layout ( );
+
+	/* success: wxApp::OnRun() will be called which will enter the main message
+	 * loop and the application will run. If we returned FALSE here, the
+	 * application would exit immediately. */
+	return TRUE;
+	M_EPILOG
+	}
+
+void HFrame::layout ( void )
+	{
+	M_PROLOG
+	wxXmlResource::Get ( )->LoadFrame ( this, NULL, "FRAME" );
+	
+	/* and show it (the frames, unlike simple controls, are not shown when
+	 * created initially) */
+	
+	/* set the frame icon */
+	SetIcon ( wxICON ( g_ppcFunlabIcon ) );
+
+	/* set menu */
+	SetMenuBar ( wxXmlResource::Get ( )->LoadMenuBar ( "MENU_MAIN" ) );
+	/* set toolbar */
+	SetToolBar ( wxXmlResource::Get ( )->LoadToolBar ( this,  "TOOLBAR" ) );
+
+	Layout ( );
+
+	/* create a status bar just for fun (by default with 1 pane only) */
+	CreateStatusBar ( 2 );
+	SetStatusText ( _ ( "Welcome to funlab " VER ) );
+	Show ( TRUE );
+	return;
+	M_EPILOG
+	}
+
+/* event handlers */
+void HFrame::on_open ( wxCommandEvent & )
+	{
+	M_PROLOG
+	wxFileDialog l_oOpenDialog ( this, _ ( "Select formulas file ..." ), "", "", _ ( "Formulas files (*.fun)|*.fun" ) );
+//	l_oOpenDialog.SetWildcard ( _ ( "Formulas files (*.fun)|*.fun" ) );
+	l_oOpenDialog.SetStyle ( wxOPEN | wxHIDE_READONLY );
+	if ( l_oOpenDialog.ShowModal ( ) == wxID_OK )
+		open ( reinterpret_cast < char const * > ( l_oOpenDialog.GetPath ( ).c_str ( ) ) );
+	return;
+	M_EPILOG
+	}
+
+void HFrame::on_quit ( wxCommandEvent & )
+	{
+	/* TRUE is to force the frame to close */
+	wxMessageBox ( "Good bye!" );
+	Close ( TRUE );
+	return;
+	}
+
+void HFrame::on_about ( wxCommandEvent & )
+	{
+	HString l_oMsg;
+	l_oMsg.format ( _ ( "The funlab program, very fancy GUI application that\n"
+				"can be used for rendering function surfaces.\n"
+				"Welcome to funlab %s" ), VER );
+
+	wxMessageBox ( static_cast < char * > ( l_oMsg ),
+			_ ( "About funlab" ), wxOK | wxICON_INFORMATION, this );
+	return;
+	}
+
+void HFrame::open ( const HString & a_oPath )
+	{
+	M_PROLOG
+	if ( a_oPath.is_empty ( ) )
+		M_THROW ( _ ( "Empty path." ), g_iErrNo );
+	wxMessageBox ( static_cast < char * > ( a_oPath ) );
+	return;
+	M_EPILOG
+	}
