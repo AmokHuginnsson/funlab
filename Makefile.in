@@ -36,7 +36,7 @@ VPATH					= $(DIR_ROOT)/src
 DIR_DEST 			=
 prefix				= $(DIR_DEST)/usr/bin
 doc						= $(DIR_DEST)/usr/share/doc
-LIBS					= wx_gtk_xrc-2.4 hcore hconsole hdata dbwrapper tools
+LIBS					= SDL wx_gtk_xrc-2.4 hcore hconsole hdata dbwrapper tools
 TARGET				= 1exec
 ifdef NODEBUG
 	TARGET = $(FUNLABNAME)

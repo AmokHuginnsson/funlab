@@ -28,13 +28,14 @@ Copyright:
 
 /* headers */
 
-/* For compilers that support precompilation, includes "wx/wx.h". */
+/* For compilers that support precompilation, includes "wx/wxprec.h". */
 #include <wx/wxprec.h>
 
 /* for all others, include the necessary headers (this file is usually all you
  * need because it includes almost all "standard" wxWindows headers) */
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
+#include <wx/listctrl.h>
 #endif
 
 /* resources */
@@ -45,10 +46,11 @@ Copyright:
 
 /* the application icon (under Windows and OS/2 it is in resources) */
 #if defined(__WXGTK__) || defined(__WXMOTIF__) || defined(__WXMAC__) || defined(__WXMGL__) || defined(__WXX11__)
-#include "funlab.xpm"
+#include "res/funlab.xpm"
 #endif
 
 #include "version.h"
+#include "renderer.h"
 
 using namespace stdhapi::hcore;
 
@@ -62,30 +64,43 @@ int gui_start ( int a_iArgc, char * a_ppcArgv [ ] )
 /* private classes */
 
 /* Define a new frame type: this is going to be our main frame */
+class HEvtHandler;
 class HFrame : public wxFrame
 	{
+protected:
+	/*{*/
+	wxListCtrl * f_poList;
+	HEvtHandler * f_poHandler;
+	/*}*/
 public:
 	/*{*/
+	HFrame ( void );
+	virtual ~HFrame ( void );
 	void layout ( void );
-
 	/*}*/
 protected:
 	/*{*/
 	void open ( const HString & );
+	void save ( const HString & );
+	void resize_list ( void );
 	/*}*/
 private:
 	/*{*/
 	/* event handlers (these functions should _not_ be virtual) */
+	void on_size ( wxSizeEvent& );
+	void on_new ( wxCommandEvent & );
 	void on_open ( wxCommandEvent & );
+	void on_save ( wxCommandEvent & );
 	void on_quit ( wxCommandEvent & );
 	void on_about ( wxCommandEvent & );
-
 	/*}*/
 private:
 	/*{*/
 	/* any class wishing to process wxWindows events must use this macro */
 	DECLARE_EVENT_TABLE ( );
 	DECLARE_DYNAMIC_CLASS ( HFrame );
+	HFrame ( const HFrame & );
+	HFrame & operator = ( const HFrame & );
 	/*}*/
 	};
 IMPLEMENT_DYNAMIC_CLASS ( HFrame,  wxFrame );
@@ -106,7 +121,6 @@ public:
 	 *  this one is called on application startup and is a good place for the app
 	 *  initialization (doing it here and not in the ctor allows to have an error
 	 *  return: if OnInit() returns false, the application terminates) */
-
 	virtual bool OnInit ( void );
 	/*}*/
 private:
@@ -116,6 +130,33 @@ private:
 	/*}*/
 	};
 
+
+class HEvtHandler : public wxEvtHandler
+	{
+protected:
+	/*{*/
+	wxListCtrl * f_poList;
+	/*}*/
+public:
+	/*{*/
+	HEvtHandler ( wxListCtrl * );
+	/*}*/
+protected:
+	/*{*/
+	void on_key_press ( wxKeyEvent & );
+	/*}*/
+private:
+	/*{*/
+	HEvtHandler ( const HEvtHandler & );
+	HEvtHandler & operator = ( const HEvtHandler & );
+	DECLARE_EVENT_TABLE ( );
+	/*}*/
+	};
+
+BEGIN_EVENT_TABLE ( HEvtHandler, wxEvtHandler )
+	EVT_CHAR ( HEvtHandler::on_key_press )
+END_EVENT_TABLE ( );
+
 /* event tables and other macros for wxWindows */
 
 /* the event tables connect the wxWindows events with the functions (event
@@ -123,9 +164,12 @@ private:
  * simple menu events like this the static method is much simpler. */
 
 BEGIN_EVENT_TABLE ( HFrame, wxFrame )
-	EVT_MENU ( XRCID ( "ID_OPEN" ),  HFrame::on_open )
-	EVT_MENU ( XRCID ( "ID_EXIT" ),  HFrame::on_quit )
-	EVT_MENU ( XRCID ( "ID_ABOUT" ), HFrame::on_about )
+	EVT_MENU ( XRCID ( "ID_NEW" ),		HFrame::on_new )
+	EVT_MENU ( XRCID ( "ID_OPEN" ),		HFrame::on_open )
+	EVT_MENU ( XRCID ( "ID_SAVE" ),		HFrame::on_save )
+	EVT_MENU ( XRCID ( "ID_EXIT" ),		HFrame::on_quit )
+	EVT_MENU ( XRCID ( "ID_ABOUT" ),	HFrame::on_about )
+	EVT_SIZE ( HFrame::on_size )
 END_EVENT_TABLE ( );
 
 /* Create a new application object: this macro will allow wxWindows to create
@@ -163,8 +207,9 @@ bool HApp::OnInit ( void )
 	{
 	M_PROLOG
 	/* load resources */
+	wxImage::AddHandler ( new wxXPMHandler );
 	wxXmlResource::Get ( )->InitAllHandlers ( );
-	wxXmlResource::Get ( )->Load ( "funlab.xrc");
+	wxXmlResource::Get ( )->Load ( "res/funlab.xrc");
 	
 	/* create the main application window */
 	f_poFrame = new HFrame ( );
@@ -174,6 +219,25 @@ bool HApp::OnInit ( void )
 	 * loop and the application will run. If we returned FALSE here, the
 	 * application would exit immediately. */
 	return TRUE;
+	M_EPILOG
+	}
+
+HFrame::HFrame ( void ) : wxFrame ( ), f_poList ( NULL ), f_poHandler ( NULL )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HFrame::~HFrame ( void )
+	{
+	M_PROLOG
+/*
+	if ( f_poHandler )
+		delete f_poHandler;
+*/
+	f_poHandler = NULL;
+	return;
 	M_EPILOG
 	}
 
@@ -193,6 +257,12 @@ void HFrame::layout ( void )
 	/* set toolbar */
 	SetToolBar ( wxXmlResource::Get ( )->LoadToolBar ( this,  "TOOLBAR" ) );
 
+	f_poList = XRCCTRL ( * this, "LISTCTRL_FORMULAS", wxListCtrl );
+	M_ENSURE ( f_poList );
+	f_poList->InsertColumn ( 0, _ ( "Formulas" ), wxLIST_FORMAT_LEFT, 550 );
+	resize_list ( );
+	f_poHandler = new HEvtHandler ( f_poList );
+	f_poList->PushEventHandler ( f_poHandler );
 	Layout ( );
 
 	/* create a status bar just for fun (by default with 1 pane only) */
@@ -204,6 +274,14 @@ void HFrame::layout ( void )
 	}
 
 /* event handlers */
+void HFrame::on_new ( wxCommandEvent & )
+	{
+	M_PROLOG
+	f_poList->DeleteAllItems ( );
+	return;
+	M_EPILOG
+	}
+
 void HFrame::on_open ( wxCommandEvent & )
 	{
 	M_PROLOG
@@ -211,7 +289,22 @@ void HFrame::on_open ( wxCommandEvent & )
 //	l_oOpenDialog.SetWildcard ( _ ( "Formulas files (*.fun)|*.fun" ) );
 	l_oOpenDialog.SetStyle ( wxOPEN | wxHIDE_READONLY );
 	if ( l_oOpenDialog.ShowModal ( ) == wxID_OK )
+		{
+		f_poList->DeleteAllItems ( );
 		open ( reinterpret_cast < char const * > ( l_oOpenDialog.GetPath ( ).c_str ( ) ) );
+		}
+	return;
+	M_EPILOG
+	}
+
+void HFrame::on_save ( wxCommandEvent & )
+	{
+	M_PROLOG
+	wxFileDialog l_oOpenDialog ( this, _ ( "Enter file name to save ..." ), "", "", _ ( "Formulas files (*.fun)|*.fun" ) );
+//	l_oOpenDialog.SetWildcard ( _ ( "Formulas files (*.fun)|*.fun" ) );
+	l_oOpenDialog.SetStyle ( wxSAVE | wxHIDE_READONLY );
+	if ( l_oOpenDialog.ShowModal ( ) == wxID_OK )
+		save ( reinterpret_cast < char const * > ( l_oOpenDialog.GetPath ( ).c_str ( ) ) );
 	return;
 	M_EPILOG
 	}
@@ -241,7 +334,126 @@ void HFrame::open ( const HString & a_oPath )
 	M_PROLOG
 	if ( a_oPath.is_empty ( ) )
 		M_THROW ( _ ( "Empty path." ), g_iErrNo );
-	wxMessageBox ( static_cast < char * > ( a_oPath ) );
+	int l_iIndex = 0;
+	HString l_oLine;
+	HFile l_oFile;
+	l_oFile.open ( a_oPath );
+	if ( l_oFile )
+		{
+		while ( l_oFile.read_line ( l_oLine, true ) >= 0 )
+			f_poList->InsertItem ( l_iIndex ++, static_cast < char * > ( l_oLine ) );
+		l_oFile.close ( );
+		}
+	f_poList->SetFocus ( );
+	if ( l_iIndex )
+		f_poList->SetItemState ( 0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED,
+				wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED );
 	return;
 	M_EPILOG
 	}
+
+void HFrame::save ( const HString & a_oPath )
+	{
+	M_PROLOG
+	if ( a_oPath.is_empty ( ) )
+		M_THROW ( _ ( "Empty path." ), g_iErrNo );
+	int l_iIndex = 0, l_iCount = f_poList->GetItemCount ( );
+	HFile l_oFile ( D_WRITING );
+	if ( l_iCount )
+		{
+		l_oFile.open ( a_oPath );
+		if ( l_oFile )
+			{
+			for ( l_iIndex = 0; l_iIndex < l_iCount ; l_iIndex ++ )
+				l_oFile << f_poList->GetItemText ( l_iIndex ) << endl;
+			l_oFile.close ( );
+			}
+		}
+	return;
+	M_EPILOG
+	}
+
+void HFrame::resize_list ( void )
+	{
+	M_PROLOG
+	int l_iWidth = 0;
+	GetClientSize ( & l_iWidth, NULL );
+	f_poList->SetColumnWidth ( 0, l_iWidth - 16 );
+	return;
+	M_EPILOG
+	}
+
+void HFrame::on_size ( wxSizeEvent & a_roEvent )
+	{
+	M_PROLOG
+	OnSize ( a_roEvent );
+	resize_list ( );
+	return;
+	M_EPILOG
+	}
+
+HEvtHandler::HEvtHandler ( wxListCtrl * a_poListCtrl ) : f_poList ( a_poListCtrl )
+	{
+	M_PROLOG
+	M_ASSERT ( f_poList );
+	return;
+	M_EPILOG
+	}
+
+void HEvtHandler::on_key_press ( wxKeyEvent & a_roEvent )
+	{
+	M_PROLOG
+	int l_iItem = 0, l_iCount = 0;
+	l_iCount = f_poList->GetItemCount ( );
+	switch ( a_roEvent.GetKeyCode ( ) )
+		{
+		case ( WXK_INSERT ):
+			{
+			f_poList->InsertItem ( l_iCount, "" );
+			f_poList->EnsureVisible ( l_iCount );
+			f_poList->SetItemState ( l_iCount, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
+			break;
+			}
+		case ( WXK_DELETE ):
+			{
+			l_iItem = f_poList->GetNextItem ( - 1,
+					wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED );
+			if ( l_iItem >= 0 )
+				{
+				f_poList->DeleteItem ( l_iItem );
+				l_iCount --;
+				if ( l_iCount )
+					{
+					if ( l_iItem >= l_iCount )
+						l_iItem --;
+					f_poList->SetItemState ( l_iItem, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
+					}
+				}
+			break;
+			}
+		case ( WXK_RETURN ):
+			{
+			l_iItem = f_poList->GetNextItem ( - 1,
+					wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED );
+			if ( l_iItem >= 0 )
+				f_poList->EditLabel ( l_iItem );
+			break;
+			}
+		case ( WXK_SPACE ):
+			{
+			l_iItem = f_poList->GetNextItem ( - 1,
+					wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED );
+			if ( l_iItem >= 0 )
+				show ( f_poList->GetItemText ( l_iItem ).c_str ( ) );
+			break;
+			}
+		default :
+			{
+			a_roEvent.Skip ( );
+			break;
+			}
+		}
+	return;
+	M_EPILOG
+	}
+

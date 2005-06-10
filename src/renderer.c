@@ -27,6 +27,12 @@ Copyright:
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <SDL/SDL.h>
+
+#include <stdhapi.h>
+
+using namespace stdhapi::hcore;
+using namespace stdhapi::tools;
 
 #define D_LAND_SIZE 32
 
@@ -45,7 +51,7 @@ void createtabl()
 	ptrtrygo = &trygo[ 0 ];
 	return ;
 	}
-	
+
 float sinq( unsigned int kat )
 	{
 	kat &= 4095;
@@ -58,12 +64,12 @@ float sinq( unsigned int kat )
 	if ( kat > 1023 ) kat = 2047-kat;
 	return ( *( ptrtrygo + kat ) );
 	}
-	
+
 float cosq( unsigned int kat )
 	{
 	return ( sinq( kat + 1024 ) );
 	}
-	
+
 void T( float _x, float _y, float _z, float _xr, float _yr, float _zr, int _alfa, int _beta, int _gamma, float _fov, int & _c, int & _r )
 	{
 	float x_, y_, z_, A, B, C, sa, sb, sg, ca, cb, cg;
@@ -103,7 +109,9 @@ void T( float _x, float _y, float _z, float _xr, float _yr, float _zr, int _alfa
 	_r += 240;
 	return ;
 	}
-	
+
+HAnalyser g_oRenderer;
+
 void makeland( float H, float & _hx, float & _hy, float & N, float & W )
 	{
 	int i, j;
@@ -119,27 +127,190 @@ void makeland( float H, float & _hx, float & _hy, float & N, float & W )
 	for ( j = 0; j < D_LAND_SIZE; j++ )
 		{
 		x = W;
+		g_oRenderer [ 'Y' ] = j;
 		for ( i = 0; i < D_LAND_SIZE; i++ )
 			{
-//			land[ i ][ j ] = f( x, y );
+			g_oRenderer [ 'X' ] = i;
+			land[ i ][ j ] = g_oRenderer.count ( );
 			x += _hx;
 			}
 		y += _hy;
 		}
 	return ;
 	}
-	
-void show( void )
+
+
+/*
+ * Return the pixel value at (x, y)
+ * NOTE: The surface must be locked before calling this!
+ */
+Uint32 getpixel(SDL_Surface *surface, int x, int y)
 	{
+	int bpp = surface->format->BytesPerPixel;
+	/* Here p is the address to the pixel we want to retrieve */
+	Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+	switch(bpp)
+		{
+		case 1:
+		return *p;
+
+		case 2:
+		return *(Uint16 *)p;
+
+		case 3:
+		if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+			return p[0] << 16 | p[1] << 8 | p[2];
+		else
+			return p[0] | p[1] << 8 | p[2] << 16;
+
+		case 4:
+		return *(Uint32 *)p;
+
+		default:
+		return 0;       /* shouldn't happen, but avoids warnings */
+		}
+	}
+
+/*
+ * Set the pixel at (x, y) to the given value
+ * NOTE: The surface must be locked before calling this!
+ */
+void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+	{
+	int bpp = surface->format->BytesPerPixel;
+	/* Here p is the address to the pixel we want to set */
+	Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+	switch(bpp)
+		{
+		case 1:
+		*p = pixel;
+		break;
+
+		case 2:
+		*(Uint16 *)p = pixel;
+		break;
+
+		case 3:
+		if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+			{
+			p[0] = (pixel >> 16) & 0xff;
+			p[1] = (pixel >> 8) & 0xff;
+			p[2] = pixel & 0xff;
+			} else {
+				p[0] = pixel & 0xff;
+				p[1] = (pixel >> 8) & 0xff;
+				p[2] = (pixel >> 16) & 0xff;
+			}
+		break;
+
+		case 4:
+		*(Uint32 *)p = pixel;
+		break;
+		}
+	}
+
+void line ( SDL_Surface *surface, double x1, double y1, double x2, double y2, unsigned long color )
+	{
+	double dx = x2 - x1;
+	double dy = y2 - x1;
+	double a = 0;
+	if ( dx < 0 )
+		{
+		dx = x1;
+		x1 = x2;
+		x2 = dx;
+		dx = y1;
+		y1 = y2;
+		y2 = dx;
+		}
+	if ( dx )
+		{
+		a = dy / dx;
+		while ( x1 <= x2 )
+			{
+			y1 = a * x1;
+			if ( ( x1 >= 0 ) && ( x1 < 640 ) && ( y1 >= 0 ) && ( y1 < 480 ) )
+				putpixel ( surface, static_cast < int > ( x1 ), static_cast < int > ( y1 ), color );
+			x1 ++;
+			}
+		}
+	else
+		{
+		if ( dy < 0 )
+			{
+			dy = y1;
+			y1 = y2;
+			y2 = dy;
+			}
+		while ( y1 <= y2 )
+			{
+			if ( ( x1 >= 0 ) && ( x1 < 640 ) && ( y1 >= 0 ) && ( y1 < 480 ) )
+				putpixel ( surface, static_cast < int > ( x1 ), static_cast < int > ( y1 ), color );
+			y1 ++;
+			}
+		}
+	return;
+	}
+
+/**/
+void show ( const HString & a_roFormula )
+	{
+	M_PROLOG
+		if ( ! a_roFormula )
+			return;
+	SDL_Surface *screen;
+
+	/* Initialize the SDL library */
+	if( SDL_Init(SDL_INIT_VIDEO) < 0 )
+		{
+		fprintf(stderr,
+				"Couldn't initialize SDL: %s\n", SDL_GetError());
+		exit(1);
+		}
+
+	/* Clean up on exit */
+	atexit(SDL_Quit);
+
+	/*
+	 * Initialize the display in a 640x480 8-bit palettized mode,
+	 * requesting a software surface
+	 */
+
+	/*************/
+
+	/* Have a preference for 8-bit, but accept any depth */
+	screen = SDL_SetVideoMode(640, 480, 8, SDL_SWSURFACE|SDL_ANYFORMAT);
+	if ( screen == NULL )
+		{
+		fprintf(stderr, "Couldn't set 640x480x8 video mode: %s\n",
+				SDL_GetError());
+		exit(1);
+		}
+	printf("Set 640x480 at %d bits-per-pixel mode\n",
+			screen->format->BitsPerPixel);
+
+
+
+
+
+	fprintf ( stderr, "%s\n", static_cast < char * > ( a_roFormula ) );
+	g_oRenderer.analyse ( a_roFormula );
+
+
+	
 	int mx, my, kl, zn = 0;
 	createtabl();
 //	mouse_setposition_6d( 320, 239, 0, 0, 0, 0, MOUSE_2DIM );
 //	refresh();
 //	gl_clearscreen( 0 );
-	int i, j, kx = 0, ky = 0, kz = 0, o = 240, d = -15, c, r, oc = 0, oldr = 0, col = 9, hor = 1, ver = 1;
+	int i, j = 0, kx = 0, ky = 0, kz = 0, o = 240, d = -15, c, r, oc = 0, oldr = 0, col = 9, hor = 1, ver = 1;
 	float hx, hy, x, y, N, W, dz = 10;
+	unsigned long int color;
 	makeland( 10, hx, hy, N, W );
-	while ( zn != 'q' )
+	goto odswiez;
+//	while ( zn != 'q' )
 		{
 //		zn = gl_kbhit();
 		if ( zn == ' ' )
@@ -181,9 +352,9 @@ void show( void )
 			else if ( ( mx != 330 ) || ( my != 310 ) )
 				{
 //				mouse_setposition_6d( 320, 240, 0, 0, 0, 0, 0 /* MOUSE_2DIM */ );
-				continue;
+//				continue;
 				}
-			else continue;
+//			else continue;
 			}
 		else if ( kl == 1 /* MOUSE_LEFTBUTTON */ )
 			{
@@ -203,9 +374,9 @@ void show( void )
 			else if ( ( mx != 320 ) || ( my != 240 ) )
 				{
 //				mouse_setposition_6d( 320, 240, 0, 0, 0, 0, MOUSE_2DIM );
-				continue;
+//				continue;
 				}
-			else continue;
+//			else continue;
 			}
 		else if ( kl == 2 /* ( MOUSE_LEFTBUTTON | MOUSE_RIGHTBUTTON ) */ )
 			{
@@ -226,8 +397,17 @@ void show( void )
 			kx += 60;
 //			mouse_setposition_6d( 320, 240, 0, 0, 0, 0, MOUSE_2DIM );
 			}
-		else continue;
+//		else continue;
 odswiez: ;
+if ( SDL_MUSTLOCK(screen) )
+	{
+	if ( SDL_LockSurface(screen) < 0 )
+		{
+		fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+		return;
+	}
+}
+color = SDL_MapRGB ( screen->format,  0xff,  0xff,  0x00);
 		x = W; y = N;
 		for ( j = 0; j < D_LAND_SIZE; j++ )
 			{
@@ -240,8 +420,9 @@ odswiez: ;
 				    ( ( ( c < 640 ) && ( node[ 0 ][ i ] < 640 ) ) && ( ( r < 480 ) && ( node[ 1 ][ i ] < 480 ) ) )
 				)
 					{
-//					if ( ( j > 0 ) && ( ver ) ) gl_line( c, r, ( int ) node[ 0 ][ i ], ( int ) node[ 1 ][ i ], 0xffffff );
-//					if ( ( i > 0 ) && ( hor ) ) gl_line( oc, oldr, c, r, 0xffffff );
+					if ( ( j > 0 ) && ( ver ) ) line( screen, c, r, ( int ) node[ 0 ][ i ], ( int ) node[ 1 ][ i ], color );
+					if ( ( i > 0 ) && ( hor ) )
+						line( screen, oc, oldr, c, r, color );
 					}
 				node[ 0 ][ i ] = c;
 				node[ 1 ][ i ] = r;
@@ -251,10 +432,21 @@ odswiez: ;
 				}
 			y += hy;
 			}
+
+//for ( i = 0; i < 640; i ++ )
+//	line( screen, 0, 0, i, 479, color );
+
 //		refresh();
 //		gl_clearscreen( 0 );
+if ( SDL_MUSTLOCK(screen) )
+	{
+	SDL_UnlockSurface(screen);
+}
+/* Update just the part of the display that we've changed */
+SDL_UpdateRect(screen, 0, 0, 640, 480);
+SDL_UpdateRect(screen, 0, 0, 640, 480);
 		}
-	return ;
+	return;
+	M_EPILOG
 	}
-	
-	
+
