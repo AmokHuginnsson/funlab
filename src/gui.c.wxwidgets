@@ -130,7 +130,6 @@ private:
 	/*}*/
 	};
 
-
 class HEvtHandler : public wxEvtHandler
 	{
 protected:
