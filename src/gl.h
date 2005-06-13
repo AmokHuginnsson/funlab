@@ -43,16 +43,19 @@ public:
 	int init ( int, int, int = 32 );
 	void down ( void );
 	void refresh ( void );
+	void clear ( void );
 	unsigned long int get_pixel ( int, int );
 	void put_pixel ( int, int, unsigned long int );
 	void line ( double, double, double, double, unsigned long int );
 	unsigned long int RGB ( int, int, int );
+	static int surface_count ( void );
 	/*}*/
 protected:
 	/*{*/
 	/*}*/
 private:
 	/*{*/
+	static int f_iActiveSurfaces;
 	HSurface ( const HSurface & );
 	HSurface & operator = ( const HSurface & );
 	/*}*/

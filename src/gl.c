@@ -35,17 +35,29 @@ using namespace stdhapi;
 using namespace stdhapi::hcore;
 using namespace stdhapi::tools;
 
+int HSurface::f_iActiveSurfaces = 0;
+
+int HSurface::surface_count ( void )
+	{
+	return ( f_iActiveSurfaces );
+	}
+
 HSurface::HSurface ( void )
 	: f_iWidth ( 0 ), f_iHeight ( 0 ), f_iBpp ( 0 ), f_pvHandler ( NULL )
 	{
 	M_PROLOG
 	int l_iError = 0;
 	HString l_oMessage;
-	if( ( l_iError = SDL_Init ( SDL_INIT_VIDEO ) ) < 0 )
+	if ( f_iActiveSurfaces < 1 )
 		{
-		l_oMessage = _ ( "Couldn't initialize SDL: " );
-		l_oMessage += SDL_GetError ( );
-		M_THROW ( l_oMessage, l_iError );
+		hcore::log << _ ( "Initializing SDL library " );
+		if( ( l_iError = SDL_Init ( SDL_INIT_VIDEO ) ) < 0 )
+			{
+			l_oMessage = _ ( "Couldn't initialize SDL: " );
+			l_oMessage += SDL_GetError ( );
+			M_THROW ( l_oMessage, l_iError );
+			}
+		hcore::log << _ ( "ok." ) << endl;
 		}
 	return;
 	M_EPILOG
@@ -56,7 +68,8 @@ HSurface::~HSurface ( void )
 	M_PROLOG
 	if ( f_pvHandler )
 		down ( );
-	SDL_Quit ( );
+	if ( f_iActiveSurfaces < 1 )
+		SDL_Quit ( );
 	return;
 	M_EPILOG
 	}
@@ -64,10 +77,15 @@ HSurface::~HSurface ( void )
 void HSurface::down ( void )
 	{
 	M_PROLOG
+	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
+	M_ASSERT ( f_iActiveSurfaces > 0 );
 	if ( ! f_pvHandler )
 		M_THROW ( _ ( "surface not initialized" ), g_iErrNo );
+	if ( SDL_MUSTLOCK ( l_psSurface ) )
+		SDL_UnlockSurface ( l_psSurface );
 	SDL_FreeSurface ( static_cast < SDL_Surface * > ( f_pvHandler ) );
 	f_pvHandler = NULL;
+	f_iActiveSurfaces --;
 	M_EPILOG
 	}
 
@@ -89,11 +107,24 @@ int HSurface::init ( int a_iWidth, int a_iHeight, int a_iBpp )
 		l_oMessage +=	SDL_GetError ( );
 		M_THROW ( l_oMessage, l_iError );
 		}
+	if ( l_psSurface->flags != ( SDL_HWSURFACE | SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_NOFRAME ) )
+		{
+		hcore::log << _ ( "Requested video settings not satisfied: " ) << l_psSurface->flags;
+		hcore::log << " (" << SDL_HWSURFACE << '|' << SDL_ANYFORMAT << '|' << SDL_DOUBLEBUF << '|' << SDL_NOFRAME << ")" << endl;
+		}
 	f_pvHandler = l_psSurface;
 	f_iBpp = l_psSurface->format->BitsPerPixel;
 	if ( f_iBpp != a_iBpp )
 		hcore::log << "BPP downgrade: " << a_iBpp << " -> " << f_iBpp << endl;
 	hcore::log << "Set " << f_iWidth << 'x' << f_iHeight << " at " << f_iBpp << " bits-per-pixel mode" << endl;
+	if ( SDL_MUSTLOCK ( l_psSurface ) )
+		{
+		hcore::log << "Locking surface ";
+		if ( SDL_LockSurface ( l_psSurface ) < 0 )
+			hcore::log << "failed: " << SDL_GetError ( ) << endl;
+		else hcore::log << "ok." << endl;
+		}
+	f_iActiveSurfaces ++;
 	return ( 0 );
 	M_EPILOG
 	}
@@ -104,8 +135,8 @@ void HSurface::refresh ( void )
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
 	if ( SDL_MUSTLOCK ( l_psSurface ) )
 		SDL_UnlockSurface ( l_psSurface );
-	SDL_Flip ( l_psSurface );
-/*	SDL_UpdateRect ( l_psSurface, 0, 0, f_iWidth, f_iHeight); */
+	while ( SDL_Flip ( l_psSurface ) )
+		;
 	if ( SDL_MUSTLOCK ( l_psSurface ) )
 		{
 		if ( SDL_LockSurface ( l_psSurface ) < 0 )
@@ -121,30 +152,38 @@ void HSurface::refresh ( void )
  */
 unsigned long int HSurface::get_pixel ( int x, int y )
 	{
+	unsigned char * l_pcRawMemory = NULL;
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
-	/* Here p is the address to the pixel we want to retrieve */
-	Uint8 *p = (Uint8 *)l_psSurface->pixels + y * l_psSurface->pitch + x * f_iBpp;
+	
+	if ( ( x < 0 ) || ( y < 0 ) || ( x >= f_iWidth ) || ( y >= f_iHeight ) )
+		return ( static_cast < unsigned long int > ( - 1 ) );
+	
+	/* Here l_pcRawMemory is the address to the pixel we want to retrieve */
+	l_pcRawMemory = (unsigned char *)l_psSurface->pixels + y * l_psSurface->pitch + x * l_psSurface->format->BytesPerPixel;
 
-	switch(f_iBpp)
+	switch ( l_psSurface->format->BytesPerPixel )
 		{
-		case 1:
-		return *p;
-
-		case 2:
-		return *(Uint16 *)p;
-
-		case 3:
-		if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-			return p[0] << 16 | p[1] << 8 | p[2];
-		else
-			return p[0] | p[1] << 8 | p[2] << 16;
-
-		case 4:
-		return *(unsigned long int *)p;
-
-		default:
-		return 0;       /* shouldn't happen, but avoids warnings */
+		case ( 1 ):
+			{
+			return *l_pcRawMemory;
+			}
+		case ( 2 ):
+			{
+			return *(Uint16 *)l_pcRawMemory;
+			}
+		case ( 3 ):
+			{
+			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN )
+				return ( l_pcRawMemory [ 0 ] << 16 | l_pcRawMemory [ 1 ] << 8 | l_pcRawMemory [ 2 ] );
+			else
+				return ( l_pcRawMemory [ 0 ] | l_pcRawMemory [ 1 ] << 8 | l_pcRawMemory [ 2 ] << 16 );
+			}
+		case ( 4 ):
+			{
+			return *(unsigned long int *)l_pcRawMemory;
+			}
 		}
+	return ( 0 );       /* shouldn't happen, but avoids warnings */
 	}
 
 /*
@@ -153,77 +192,117 @@ unsigned long int HSurface::get_pixel ( int x, int y )
  */
 void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 	{
+	unsigned char * l_pcRawMemory = NULL;
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
-	/* Here p is the address to the pixel we want to set */
-	Uint8 *p = (Uint8 *)l_psSurface->pixels + y * l_psSurface->pitch + x * f_iBpp;
 
-	switch(f_iBpp)
+	if ( ( x < 0 ) || ( y < 0 ) || ( x >= f_iWidth ) || ( y >= f_iHeight ) )
+		return;
+
+	/* Here l_pcRawMemory is the address to the pixel we want to set */
+	l_pcRawMemory = (unsigned char *)l_psSurface->pixels + y * l_psSurface->pitch + x * l_psSurface->format->BytesPerPixel;
+
+	switch ( l_psSurface->format->BytesPerPixel )
 		{
-		case 1:
-		*p = pixel;
-		break;
-
-		case 2:
-		*(Uint16 *)p = pixel;
-		break;
-
-		case 3:
-		if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+		case ( 1 ):
 			{
-			p[0] = (pixel >> 16) & 0xff;
-			p[1] = (pixel >> 8) & 0xff;
-			p[2] = pixel & 0xff;
-			} else {
-				p[0] = pixel & 0xff;
-				p[1] = (pixel >> 8) & 0xff;
-				p[2] = (pixel >> 16) & 0xff;
+			*l_pcRawMemory = pixel;
+			break;
 			}
-		break;
-
-		case 4:
-		*(unsigned long int *)p = pixel;
-		break;
+		case ( 2 ):
+			{
+			*(Uint16 *)l_pcRawMemory = pixel;
+			break;
+			}
+		case ( 3 ):
+			{
+			if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+				{
+				l_pcRawMemory [ 0 ] = ( pixel >> 16 ) & 0xff;
+				l_pcRawMemory [ 1 ] = ( pixel >> 8 ) & 0xff;
+				l_pcRawMemory [ 2 ] = pixel & 0xff;
+				}
+			else
+				{
+				l_pcRawMemory [ 0 ] = pixel & 0xff;
+				l_pcRawMemory [ 1 ] = ( pixel >> 8 ) & 0xff;
+				l_pcRawMemory [ 2 ] = ( pixel >> 16 ) & 0xff;
+				}
+			break;
+			}
+		case ( 4 ):
+			{
+			*(unsigned long int *)l_pcRawMemory = pixel;
+			break;
+			}
 		}
+	return;
 	}
 
-void HSurface::line ( double x1, double y1, double x2, double y2, unsigned long int color )
+void HSurface::line ( double x0, double y0, double x1, double y1, unsigned long int color )
 	{
-	double dx = x2 - x1;
-	double dy = y2 - x1;
-	double a = 0;
+	/*
+	 * Implementation ripped from http://www.cs.unc.edu/~mcmillan/comp136/Lecture6/Lines.html
+	 * Line-Drawing Algorithms
+	 */
+
+	double dy = y1 - y0;
+	double dx = x1 - x0;
+	double stepx = 0, stepy = 0, fraction = 0;
+
+	if ( dy < 0 )
+		{
+		dy = - dy;
+		stepy = - 1;
+		}
+	else
+		{
+		stepy = 1;
+		}
 	if ( dx < 0 )
 		{
-		dx = x1;
-		x1 = x2;
-		x2 = dx;
-		dx = y1;
-		y1 = y2;
-		y2 = dx;
+		dx = - dx;
+		stepx = - 1;
 		}
-	if ( dx )
+	else
 		{
-		a = dy / dx;
-		while ( x1 <= x2 )
+		stepx = 1;
+		}
+
+	dy *= 2;
+	dx *= 2;
+
+	if ( ( x0 >= 0 ) && ( x0 < f_iWidth ) && ( y0 >= 0 ) && ( y0 < f_iHeight ) )
+		put_pixel ( static_cast < int > ( x0 ), static_cast < int > ( y0 ), color );
+	if ( dx > dy )
+		{
+		fraction = dy - ( dx / 2 );
+		while ( ( ( stepx > 0 ) && ( x0 <= x1 ) ) || ( ( stepx < 0 ) && ( x0 >= x1 ) ) )
 			{
-			y1 = a * x1;
-			if ( ( x1 >= 0 ) && ( x1 < 640 ) && ( y1 >= 0 ) && ( y1 < 480 ) )
-				put_pixel ( static_cast < int > ( x1 ), static_cast < int > ( y1 ), color );
-			x1 ++;
+			if ( fraction >= 0 )
+				{
+				y0 += stepy;
+				fraction -= dx;
+				}
+			x0 += stepx;
+			fraction += dy;
+			if ( ( x0 >= 0 ) && ( x0 < f_iWidth ) && ( y0 >= 0 ) && ( y0 < f_iHeight ) )
+				put_pixel ( static_cast < int > ( x0 ), static_cast < int > ( y0 ), color );
 			}
 		}
 	else
 		{
-		if ( dy < 0 )
+		fraction = dx - ( dy / 2 );
+		while ( ( ( stepy > 0 ) && ( y0 <= y1 ) ) || ( ( stepy < 0 ) && ( y0 >= y1 ) ) )
 			{
-			dy = y1;
-			y1 = y2;
-			y2 = dy;
-			}
-		while ( y1 <= y2 )
-			{
-			if ( ( x1 >= 0 ) && ( x1 < 640 ) && ( y1 >= 0 ) && ( y1 < 480 ) )
-				put_pixel ( static_cast < int > ( x1 ), static_cast < int > ( y1 ), color );
-			y1 ++;
+			if ( fraction >= 0 )
+				{
+				x0 += stepx;
+				fraction -= dy;
+				}
+			y0 += stepy;
+			fraction += dx;
+			if ( ( x0 >= 0 ) && ( x0 < f_iWidth ) && ( y0 >= 0 ) && ( y0 < f_iHeight ) )
+				put_pixel ( static_cast < int > ( x0 ), static_cast < int > ( y0 ), color );
 			}
 		}
 	return;
@@ -231,7 +310,16 @@ void HSurface::line ( double x1, double y1, double x2, double y2, unsigned long 
 
 unsigned long int HSurface::RGB ( int a_iRed, int a_iGreen, int a_iBlue )
 	{
-	return ( SDL_MapRGB ( static_cast < SDL_Surface * > ( f_pvHandler )->format,
-				a_iRed, a_iGreen, a_iBlue ) );
+	unsigned long int l_ulValue = 0;
+	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
+	l_ulValue = SDL_MapRGB ( l_psSurface->format, a_iRed, a_iGreen, a_iBlue );
+	return ( l_ulValue );
+	}
+
+void HSurface::clear ( void )
+	{
+	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
+	SDL_FillRect ( l_psSurface, NULL, RGB ( 0, 0, 0 ) );
+	return;
 	}
 

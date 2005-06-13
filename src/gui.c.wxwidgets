@@ -268,6 +268,7 @@ void HFrame::layout ( void )
 	CreateStatusBar ( 2 );
 	SetStatusText ( _ ( "Welcome to funlab " VER ) );
 	Show ( TRUE );
+	f_poList->SetFocus ( );
 	return;
 	M_EPILOG
 	}
