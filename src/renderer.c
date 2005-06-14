@@ -144,12 +144,13 @@ void show ( const HString & a_roFormula )
 	bool valid = false, oldvalid = false;
 	int i = 0, j = 0, kx = 0, ky = 0, kz = 0, c = 0, r = 0, oldc = 0, oldr = 0;
 	float hx = 0, hy = 0, x = 0, y = 0, N = 0, W = 0;
-	unsigned long int blue;
+	unsigned long int blue, yellow;
 	createtabl();
 	makeland( 10, hx, hy, N, W );
 	if ( ! HSurface::surface_count ( ) )
 		g_oSurface.init ( 640, 480 );
 	blue = g_oSurface.RGB ( 0, 0xff, 0xff );
+	yellow = g_oSurface.RGB ( 0xff, 0xff, 0 );
 	g_oSurface.clear ( );
 
 	for ( j = 0; j < 3; j++ )
@@ -162,13 +163,22 @@ void show ( const HString & a_roFormula )
 		for ( i = 0; i < D_LAND_SIZE; i++ )
 			{
 			valid = T( x, y, land [ i ] [ j ], 0, - 15.0, 0, kx, ky, kz, 240.0, c, r );
-			if ( valid && oldvalid && node [ 2 ] [ i ]
-					&& ( ( c < 640 ) && ( c >= 0 ) && ( r < 480 ) && ( r >= 0 ) ) )
+			if ( valid && oldvalid )
 				{
-				if ( j > 0 )
-					g_oSurface.line( c, r, node[ 0 ][ i ], node[ 1 ][ i ], blue );
-				if ( i > 0 )
-					g_oSurface.line( oldc, oldr, c, r, blue );
+				if ( ( c >= 0 ) && ( c < 640 ) && ( r >= 0 ) && ( r < 480 )
+					&& ( oldc >= 0 ) && ( oldc < 640 ) && ( oldr >= 0 ) && ( oldr < 480 ) )
+					{
+					if ( i > 0 )
+						g_oSurface.line( oldc, oldr, c, r, yellow );
+					}
+				if ( node [ 2 ] [ i ]
+					&& ( c >= 0 ) && ( c < 640 ) && ( r >= 0 ) && ( r < 480 )
+					&& ( node [ 0 ] [ i ] >= 0 ) && ( node [ 0 ] [ i ] < 640 )
+					&& ( node [ 1 ] [ i ] >= 0 ) && ( node [ 1 ] [ i ] < 480 ) )
+					{
+					if ( j > 0 )
+						g_oSurface.line( c, r, node [ 0 ] [ i ], node [ 1 ] [ i ], blue );
+					}
 				}
 			node [ 0 ] [ i ] = c;
 			node [ 1 ] [ i ] = r;
@@ -181,7 +191,7 @@ void show ( const HString & a_roFormula )
 		y += hy;
 		}
 	usleep ( 100000 );
-	g_oSurface.refresh();
+	g_oSurface.refresh ( );
 	return;
 	M_EPILOG
 	}
