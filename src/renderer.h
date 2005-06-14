@@ -24,10 +24,68 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#ifndef __RENDERER_H
+#define __RENDERER_H
 
-#ifndef __GUI_H
-#define __GUI_H
+#include <hthread.h>
 
-void show ( const stdhapi::hcore::HString & );
+class stdhapi::tools::HAnalyser;
+class HSurface;
 
-#endif /* not __GUI_H */
+class HRenderer : public stdhapi::hcore::HThread
+	{
+protected:
+	/*{*/
+	int * f_ppiNode [ 3 ];
+	double f_dLowerXEdge;
+	double f_dLowerYEdge;
+	double f_dSize;
+	double f_dResolution;
+	double f_dAngleX;
+	double f_dAngleY;
+	double f_dAngleZ;
+	double f_dDX;
+	double f_dDY;
+	double f_dDZ;
+	double f_dFOV;
+	double * f_pdXVariable;
+	double * f_pdYVariable;
+	double * *	f_ppdLand;
+	stdhapi::tools::HAnalyser * f_poAnalyser;
+	HSurface *	f_poSurface;
+	/*}*/
+public:
+	/*{*/
+	HRenderer ( void );
+	virtual ~HRenderer ( void );
+	void render_surface ( char const * );
+	void draw_frame ( void );
+	/*}*/
+protected:
+	/*{*/
+	int run ( void ) __attribute__ ( ( __noreturn__ ) );
+	void makeland ( void );
+	void precount ( void );
+	double sinq( unsigned int );
+	double cosq( unsigned int );
+	bool T( double, double, double, int & _c, int & _r );
+	/*}*/
+private:
+	/*{*/
+	unsigned long int f_ulColor;
+	double f_dCosAlpha;
+	double f_dSinAlpha;
+	double f_dCosBeta;
+	double f_dSinBeta;
+	double f_dCosGamma;
+	double f_dSinGamma;
+	double f_dPrecountA;
+	double f_dPrecountB;
+	double f_dPrecountC;
+	double * f_pdTrygo;
+	HRenderer ( const HRenderer & );
+	HRenderer & operator = ( const HRenderer & );
+	/*}*/
+	};
+
+#endif /* not __RENDERER_H */

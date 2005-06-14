@@ -135,6 +135,7 @@ class HEvtHandler : public wxEvtHandler
 protected:
 	/*{*/
 	wxListCtrl * f_poList;
+	HRenderer f_oRenderer;
 	/*}*/
 public:
 	/*{*/
@@ -146,6 +147,7 @@ protected:
 	/*}*/
 private:
 	/*{*/
+	friend class HFrame;
 	HEvtHandler ( const HEvtHandler & );
 	HEvtHandler & operator = ( const HEvtHandler & );
 	DECLARE_EVENT_TABLE ( );
@@ -392,7 +394,7 @@ void HFrame::on_size ( wxSizeEvent & a_roEvent )
 	M_EPILOG
 	}
 
-HEvtHandler::HEvtHandler ( wxListCtrl * a_poListCtrl ) : f_poList ( a_poListCtrl )
+HEvtHandler::HEvtHandler ( wxListCtrl * a_poListCtrl ) : f_poList ( a_poListCtrl ), f_oRenderer ( )
 	{
 	M_PROLOG
 	M_ASSERT ( f_poList );
@@ -444,7 +446,7 @@ void HEvtHandler::on_key_press ( wxKeyEvent & a_roEvent )
 			l_iItem = f_poList->GetNextItem ( - 1,
 					wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED );
 			if ( l_iItem >= 0 )
-				show ( f_poList->GetItemText ( l_iItem ).c_str ( ) );
+				f_oRenderer.render_surface ( f_poList->GetItemText ( l_iItem ).c_str ( ) );
 			break;
 			}
 		default :

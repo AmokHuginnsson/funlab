@@ -152,6 +152,7 @@ void HSurface::refresh ( void )
  */
 unsigned long int HSurface::get_pixel ( int x, int y )
 	{
+	M_PROLOG
 	unsigned char * l_pcRawMemory = NULL;
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
 	
@@ -184,6 +185,7 @@ unsigned long int HSurface::get_pixel ( int x, int y )
 			}
 		}
 	return ( 0 );       /* shouldn't happen, but avoids warnings */
+	M_EPILOG
 	}
 
 /*
@@ -192,6 +194,7 @@ unsigned long int HSurface::get_pixel ( int x, int y )
  */
 void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 	{
+	M_PROLOG
 	unsigned char * l_pcRawMemory = NULL;
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
 
@@ -236,10 +239,12 @@ void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 			}
 		}
 	return;
+	M_EPILOG
 	}
 
 void HSurface::line ( double x0, double y0, double x1, double y1, unsigned long int color )
 	{
+	M_PROLOG
 	/*
 	 * Implementation ripped from http://www.cs.unc.edu/~mcmillan/comp136/Lecture6/Lines.html
 	 * Line-Drawing Algorithms
@@ -306,20 +311,32 @@ void HSurface::line ( double x0, double y0, double x1, double y1, unsigned long 
 			}
 		}
 	return;
+	M_EPILOG
 	}
 
 unsigned long int HSurface::RGB ( int a_iRed, int a_iGreen, int a_iBlue )
 	{
+	M_PROLOG
 	unsigned long int l_ulValue = 0;
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
 	l_ulValue = SDL_MapRGB ( l_psSurface->format, a_iRed, a_iGreen, a_iBlue );
 	return ( l_ulValue );
+	M_EPILOG
 	}
 
 void HSurface::clear ( void )
 	{
+	M_PROLOG
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
 	SDL_FillRect ( l_psSurface, NULL, RGB ( 0, 0, 0 ) );
 	return;
+	M_EPILOG
+	}
+
+bool HSurface::is_valid ( void )
+	{
+	M_PROLOG
+	return ( f_pvHandler ? true : false );
+	M_EPILOG
 	}
 

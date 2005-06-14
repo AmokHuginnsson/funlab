@@ -48,6 +48,7 @@ public:
 	void put_pixel ( int, int, unsigned long int );
 	void line ( double, double, double, double, unsigned long int );
 	unsigned long int RGB ( int, int, int );
+	bool is_valid ( void );
 	static int surface_count ( void );
 	/*}*/
 protected:
