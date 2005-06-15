@@ -45,12 +45,14 @@ using namespace stdhapi::tools;
 #define D_LAND_SIZE 32
 
 HRenderer::HRenderer ( void )
-	: f_dLowerXEdge ( 0 ), f_dLowerYEdge ( 0 ), f_dSize ( 0 ), f_dResolution ( 0 ),
+	: f_iRed ( 0 ), f_iGreen ( 0 ), f_iBlue ( 0 ),
+	f_dLowerXEdge ( 0 ), f_dLowerYEdge ( 0 ), f_dSize ( 0 ), f_dResolution ( 0 ),
 	f_dAngleX ( 0 ), f_dAngleY ( 0 ), f_dAngleZ ( 0 ),
 	f_dDX ( 0 ), f_dDY ( 0 ), f_dDZ ( 0 ), f_dFOV ( 0 ),
 	f_pdXVariable ( NULL ), f_pdYVariable ( NULL ),
-	f_ppdLand ( NULL ), f_poAnalyser ( NULL ), f_poSurface ( NULL ), f_ulColor ( 0 ),
-	f_dCosAlpha ( 0 ), f_dSinAlpha ( 0 ), f_dCosBeta ( 0 ), f_dSinBeta ( 0 ),
+	f_ppdLand ( NULL ), f_poAnalyser ( NULL ), f_poSurface ( NULL ), f_bBusy ( false ),
+	f_ulColor ( 0 ), f_dCosAlpha ( 0 ), f_dSinAlpha ( 0 ),
+	f_dCosBeta ( 0 ), f_dSinBeta ( 0 ),
 	f_dCosGamma ( 0 ), f_dSinGamma ( 0 ),
 	f_dPrecountA ( 0 ), f_dPrecountB ( 0 ), f_dPrecountC ( 0 ), f_pdTrygo ( NULL )
 	{
@@ -111,11 +113,10 @@ void HRenderer::makeland( void )
 	{
 	M_PROLOG
 	int i, j;
-	double E, S, x, y;
+	double E, x, y;
 	f_dLowerXEdge = - f_dSize;
 	f_dLowerYEdge = - f_dSize;
 	E = f_dSize;
-	S = f_dSize;
 	f_dResolution = ( E - f_dLowerYEdge ) / ( double ) D_LAND_SIZE;
 	y = f_dLowerXEdge;
 	for ( j = 0; j < D_LAND_SIZE; j ++ )
@@ -145,7 +146,7 @@ void HRenderer::precount ( void )
 	f_dPrecountA = f_dCosAlpha * f_dSinGamma;
 	f_dPrecountB = f_dSinAlpha * f_dSinBeta;
 	f_dPrecountC = f_dCosAlpha * f_dCosGamma;
-	f_ulColor = f_poSurface->RGB ( 0, 0xff, 0xff );
+	f_ulColor = f_poSurface->RGB ( f_iRed, f_iGreen, f_iBlue );
 	return;
 	}
 
@@ -198,10 +199,9 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 void HRenderer::draw_frame ( void )
 	{
 	M_PROLOG
-	static bool l_bBusy = false;
-	if ( l_bBusy )
+	if ( f_bBusy )
 		return;
-	l_bBusy = true;
+	f_bBusy = true;
 	bool valid = false, oldvalid = false;
 	int i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
 	double x = 0, y = 0;
@@ -209,9 +209,9 @@ void HRenderer::draw_frame ( void )
 		for ( i = 0; i < D_LAND_SIZE; i++ )
 			f_ppiNode [ j ] [ i ] = 0;
 	y = f_dLowerXEdge;
-	f_dDY = - 15.0;
 	f_dFOV = 240.0;
 	f_poSurface->clear ( );
+	precount ( );
 	for ( j = 0; j < D_LAND_SIZE; j++ )
 		{
 		x = f_dLowerYEdge;
@@ -245,10 +245,9 @@ void HRenderer::draw_frame ( void )
 			}
 		y += f_dResolution;
 		}
-	M_LOG ( "ooo" );
-	usleep ( 100000 );
+	usleep ( 1000 );
 	f_poSurface->refresh ( );
-	l_bBusy = false;
+	f_bBusy = false;
 	M_EPILOG
 	}
 
@@ -262,17 +261,20 @@ void HRenderer::render_surface ( char const * a_pcFormula )
 	l_pdVariables = f_poAnalyser->analyse ( a_pcFormula );
 	if ( ! l_pdVariables )
 		return;
+	f_dSize = 10;
+	f_dDY = - 15.0;
+	f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
+	f_pdYVariable = ( l_pdVariables + 'Y' ) - 'A';
+	f_iRed = 8;
+	f_iGreen = 8;
+	f_iBlue = 0xf8;
+	makeland ( );
 	if ( ! HSurface::surface_count ( ) )
 		{
 		f_poSurface->init ( D_X_RES, D_Y_RES );
 		spawn ( );
 		}
-	f_dSize = 10;
-	f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
-	f_pdYVariable = ( l_pdVariables + 'Y' ) - 'A';
-	makeland ( );
-	precount ( );
-//	draw_frame ( );
+	SDL_WarpMouse ( D_X_RES >> 1, D_Y_RES >> 1 );
 	return;
 	M_EPILOG
 	}
@@ -280,17 +282,134 @@ void HRenderer::render_surface ( char const * a_pcFormula )
 int HRenderer::run ( void )
 	{
 	M_PROLOG
+	int dx = 0, dy = 0;
 	SDL_Event l_uEvent;
 	while ( 1 )
 		{
-		if ( SDL_PollEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
+		if ( SDL_WaitEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
 			{
-			if ( l_uEvent.type == SDL_MOUSEMOTION )
+			switch ( l_uEvent.type )
 				{
-				f_dAngleZ += l_uEvent.motion.xrel;
-				f_dAngleX -= l_uEvent.motion.yrel;
-				draw_frame ( );
+				case ( SDL_MOUSEMOTION ):
+					{
+					dx = l_uEvent.motion.xrel > 0 ? l_uEvent.motion.xrel : - l_uEvent.motion.xrel;
+					dy = l_uEvent.motion.yrel > 0 ? l_uEvent.motion.yrel : - l_uEvent.motion.yrel;
+					if ( ( dx < ( D_X_RES >> 1 ) ) && ( dy < ( D_Y_RES >> 1 ) ) )
+						{
+						switch ( l_uEvent.motion.state )
+							{
+							case ( SDL_BUTTON ( 1 ) ):
+								{
+								f_dAngleZ += l_uEvent.motion.xrel << 2;
+								f_dAngleX -= l_uEvent.motion.yrel << 2;
+								break;
+								}
+							case ( SDL_BUTTON ( 2 ) ):
+								{
+								f_dSize += l_uEvent.motion.xrel;
+								makeland ( );
+								break;
+								}
+							case ( SDL_BUTTON ( 3 ) ):
+								{
+								f_dAngleY += l_uEvent.motion.xrel << 2;
+								break;
+								}
+							default:
+								{
+								break;
+								}
+							}
+						}
+					break;
+					}
+				case ( SDL_MOUSEBUTTONDOWN ):
+					{
+					switch ( l_uEvent.button.button )
+						{
+						case ( 4 ):
+							{
+							f_dDY ++;
+							break;
+							}
+						case ( 5 ):
+							{
+							f_dDY --;
+							break;
+							}
+						default:
+							{
+							break;
+							}
+						}
+					break;
+					}
+				case ( SDL_KEYUP ):
+					{
+					switch ( l_uEvent.key.keysym.sym )
+						{
+						case ( 'f' ):
+							{
+							f_poSurface->toggle_fullscreen ( );
+							break;
+							}
+						case ( 'r' ):
+							{
+							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
+								{
+								f_iRed += 240;
+								f_iRed %= 256;
+								}
+							else
+								{
+								f_iRed += 16;
+								f_iRed %= 256;
+								}
+							break;
+							}
+						case ( 'g' ):
+							{
+							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
+								{
+								f_iGreen += 240;
+								f_iGreen %= 256;
+								}
+							else
+								{
+								f_iGreen += 16;
+								f_iGreen %= 256;
+								}
+							break;
+							}
+						case ( 'b' ):
+							{
+							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
+								{
+								f_iBlue += 240;
+								f_iBlue %= 256;
+								}
+							else
+								{
+								f_iBlue += 16;
+								f_iBlue %= 256;
+								}
+							break;
+							}
+						default:
+							{
+							break;
+							}
+						}
+					break;
+					}
+				default:
+					{
+					break;
+					}
 				}
+			draw_frame ( );
+			while ( SDL_PollEvent ( & l_uEvent ) )
+				;
 			}
 		listen ( );
 		}

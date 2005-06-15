@@ -340,3 +340,11 @@ bool HSurface::is_valid ( void )
 	M_EPILOG
 	}
 
+void HSurface::toggle_fullscreen ( void )
+	{
+	M_PROLOG
+	SDL_WM_ToggleFullScreen ( static_cast < SDL_Surface * > ( f_pvHandler ) );
+	return;
+	M_EPILOG
+	}
+

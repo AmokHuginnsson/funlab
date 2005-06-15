@@ -36,6 +36,9 @@ class HRenderer : public stdhapi::hcore::HThread
 	{
 protected:
 	/*{*/
+	int f_iRed;
+	int f_iGreen;
+	int f_iBlue;
 	int * f_ppiNode [ 3 ];
 	double f_dLowerXEdge;
 	double f_dLowerYEdge;
@@ -72,6 +75,7 @@ protected:
 	/*}*/
 private:
 	/*{*/
+	bool f_bBusy;
 	unsigned long int f_ulColor;
 	double f_dCosAlpha;
 	double f_dSinAlpha;

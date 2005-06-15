@@ -49,6 +49,7 @@ public:
 	void line ( double, double, double, double, unsigned long int );
 	unsigned long int RGB ( int, int, int );
 	bool is_valid ( void );
+	void toggle_fullscreen ( void );
 	static int surface_count ( void );
 	/*}*/
 protected:
