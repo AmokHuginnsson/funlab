@@ -37,9 +37,9 @@ using namespace stdhapi::hcore;
 
 OVariable g_psVars [ ] =
 	{
-		{ D_TYPE_HSTRING, "log_file", & g_oLogPath },
-		{ D_TYPE_HSTRING, "icon_file", & g_oIconPath },
-		{ D_TYPE_HSTRING, "resource_file", & g_oResourcePath },
+		{ D_TYPE_HSTRING, "log_path", & g_oLogPath },
+		{ D_TYPE_HSTRING, "icon_path", & g_oIconPath },
+		{ D_TYPE_HSTRING, "resource_path", & g_oResourcePath },
 		{ 0, NULL, NULL }
 	};
 

@@ -27,8 +27,6 @@ Copyright:
 #ifndef __VARIABLES_H
 #define __VARIABLES_H
 
-#include <hstring.h>
-
 extern int g_iWantQuiet;			/* --quiet, --silent */
 extern int g_iWantVerbose;			/* --verbose */
 extern char * g_pcProgramName;
