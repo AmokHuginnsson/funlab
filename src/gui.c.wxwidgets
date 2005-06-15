@@ -44,12 +44,8 @@ Copyright:
 /* stdhapi */
 #include <stdhapi.h>
 
-/* the application icon (under Windows and OS/2 it is in resources) */
-#if defined(__WXGTK__) || defined(__WXMOTIF__) || defined(__WXMAC__) || defined(__WXMGL__) || defined(__WXX11__)
-#include "res/funlab.xpm"
-#endif
-
 #include "version.h"
+#include "variables.h"
 #include "renderer.h"
 
 using namespace stdhapi::hcore;
@@ -134,6 +130,7 @@ class HEvtHandler : public wxEvtHandler
 	{
 protected:
 	/*{*/
+	bool	f_bRendererActive;
 	wxListCtrl * f_poList;
 	HRenderer f_oRenderer;
 	/*}*/
@@ -144,6 +141,7 @@ public:
 protected:
 	/*{*/
 	void on_key_press ( wxKeyEvent & );
+	void on_list_item_select ( wxListEvent & );
 	/*}*/
 private:
 	/*{*/
@@ -156,6 +154,7 @@ private:
 
 BEGIN_EVENT_TABLE ( HEvtHandler, wxEvtHandler )
 	EVT_CHAR ( HEvtHandler::on_key_press )
+	EVT_LIST_ITEM_SELECTED ( XRCID ( "LISTCTRL_FORMULAS" ), HEvtHandler::on_list_item_select )
 END_EVENT_TABLE ( );
 
 /* event tables and other macros for wxWindows */
@@ -210,7 +209,7 @@ bool HApp::OnInit ( void )
 	/* load resources */
 	wxImage::AddHandler ( new wxXPMHandler );
 	wxXmlResource::Get ( )->InitAllHandlers ( );
-	wxXmlResource::Get ( )->Load ( "res/funlab.xrc");
+	wxXmlResource::Get ( )->Load ( static_cast < char * > ( g_oResourcePath ) );
 	
 	/* create the main application window */
 	f_poFrame = new HFrame ( );
@@ -251,7 +250,9 @@ void HFrame::layout ( void )
 	 * created initially) */
 	
 	/* set the frame icon */
-	SetIcon ( wxICON ( g_ppcFunlabIcon ) );
+	wxIcon l_oIcon ( static_cast < char * > ( g_oIconPath ), wxBITMAP_TYPE_XPM );
+	if ( l_oIcon.Ok ( ) )
+		SetIcon ( l_oIcon );
 
 	/* set menu */
 	SetMenuBar ( wxXmlResource::Get ( )->LoadMenuBar ( "MENU_MAIN" ) );
@@ -394,7 +395,8 @@ void HFrame::on_size ( wxSizeEvent & a_roEvent )
 	M_EPILOG
 	}
 
-HEvtHandler::HEvtHandler ( wxListCtrl * a_poListCtrl ) : f_poList ( a_poListCtrl ), f_oRenderer ( )
+HEvtHandler::HEvtHandler ( wxListCtrl * a_poListCtrl )
+	: f_bRendererActive ( false ), f_poList ( a_poListCtrl ), f_oRenderer ( )
 	{
 	M_PROLOG
 	M_ASSERT ( f_poList );
@@ -446,7 +448,10 @@ void HEvtHandler::on_key_press ( wxKeyEvent & a_roEvent )
 			l_iItem = f_poList->GetNextItem ( - 1,
 					wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED );
 			if ( l_iItem >= 0 )
+				{
 				f_oRenderer.render_surface ( f_poList->GetItemText ( l_iItem ).c_str ( ) );
+				f_bRendererActive = true;
+				}
 			break;
 			}
 		default :
@@ -454,6 +459,20 @@ void HEvtHandler::on_key_press ( wxKeyEvent & a_roEvent )
 			a_roEvent.Skip ( );
 			break;
 			}
+		}
+	return;
+	M_EPILOG
+	}
+
+void HEvtHandler::on_list_item_select ( wxListEvent & a_roEvent )
+	{
+	M_PROLOG
+	int l_iItem = 0;
+	if ( f_bRendererActive )
+		{
+		l_iItem = a_roEvent.GetIndex ( );
+		if ( l_iItem >= 0 )
+			f_oRenderer.render_surface ( f_poList->GetItemText ( l_iItem ).c_str ( ) );
 		}
 	return;
 	M_EPILOG

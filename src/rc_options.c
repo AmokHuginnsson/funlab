@@ -37,7 +37,9 @@ using namespace stdhapi::hcore;
 
 OVariable g_psVars [ ] =
 	{
-		{ D_TYPE_CHAR_POINTER, "logfile", & g_pcLogFileName },
+		{ D_TYPE_HSTRING, "log_file", & g_oLogPath },
+		{ D_TYPE_HSTRING, "icon_file", & g_oIconPath },
+		{ D_TYPE_HSTRING, "resource_file", & g_oResourcePath },
 		{ 0, NULL, NULL }
 	};
 
@@ -51,7 +53,7 @@ bool set_variables ( HString & a_roOption, HString & a_roValue )
 int process_funlabrc_file ( void )
 	{
 	rc_file::process_rc_file ( "funlab", NULL, g_psVars, NULL );
-	if ( ! g_pcLogFileName )
-		g_pcLogFileName = xstrdup ( "funlab.log" );
+	if ( ! g_oLogPath )
+		g_oLogPath = "funlab.log";
 	return ( 0 );
 	}

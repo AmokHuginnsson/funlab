@@ -27,10 +27,14 @@ Copyright:
 #ifndef __VARIABLES_H
 #define __VARIABLES_H
 
+#include <hstring.h>
+
 extern int g_iWantQuiet;			/* --quiet, --silent */
 extern int g_iWantVerbose;			/* --verbose */
 extern char * g_pcProgramName;
-extern char * g_pcLogFileName;
 extern struct option const * g_sLongOptions;
+extern stdhapi::hcore::HString g_oLogPath;
+extern stdhapi::hcore::HString g_oResourcePath;
+extern stdhapi::hcore::HString g_oIconPath;
 
 #endif /* __VARIABLES_H */
