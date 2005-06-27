@@ -449,7 +449,42 @@ void HEvtHandler::on_key_press ( wxKeyEvent & a_roEvent )
 					wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED );
 			if ( l_iItem >= 0 )
 				{
-				f_oRenderer.render_surface ( f_poList->GetItemText ( l_iItem ).c_str ( ) );
+				HString l_oFormula = f_poList->GetItemText ( l_iItem ).c_str ( );
+				if ( f_oRenderer.render_surface ( l_oFormula ) )
+					{
+					int index = 0, position = f_oRenderer.error_position ( );
+					HString l_oError, l_oArrow;
+					for ( index = 0; index < position; index ++ )
+						l_oArrow += '-';
+					l_oArrow += 'v';
+					char const l_pcSpace [ ] = "                                                       ";
+					l_oArrow += l_pcSpace;
+					l_oFormula += l_pcSpace;
+					l_oError.format ( "%s at this place:%s\n\n%s\n%s",
+							static_cast < char const * > ( f_oRenderer.error ( ) ),
+							l_pcSpace,
+							static_cast < char * > ( l_oArrow ),
+							static_cast < char * > ( l_oFormula ) );
+					wxMessageDialog l_oInfo ( NULL,
+							static_cast < char * > ( l_oError ),
+							_ ( "Formula syntax error ..." ), wxOK );
+					wxFont * l_poFont = & f_poList->GetFont ( );
+					if ( l_poFont );
+						l_oInfo.SetFont ( * l_poFont );
+					wxWindowList * l_poList = & l_oInfo.GetChildren ( );
+					if ( l_poList )
+						{
+						wxWindowListNode * l_poNode = l_poList->GetFirst ( );
+					  while  ( l_poNode )
+							{
+							wxWindow * l_poWindow = l_poNode->GetData ( );
+							if ( l_poWindow )
+								l_poWindow->SetFont ( * l_poFont );
+							l_poNode = l_poNode->GetNext ( );
+							}
+						}
+					l_oInfo.ShowModal ( );
+					}
 				f_bRendererActive = true;
 				}
 			break;

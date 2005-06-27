@@ -61,8 +61,10 @@ public:
 	/*{*/
 	HRenderer ( void );
 	virtual ~HRenderer ( void );
-	void render_surface ( char const * );
+	bool render_surface ( char const * );
 	void draw_frame ( void );
+	char const * error ( void ) const;
+	int error_position ( void ) const;
 	/*}*/
 protected:
 	/*{*/

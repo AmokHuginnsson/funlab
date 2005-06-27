@@ -26,7 +26,7 @@
       <font>
         <size>14</size>
         <style>default</style>
-        <weight>normal</weight>
+        <weight>bold</weight>
         <family>bold</family>
         <underlined>0</underlined>
         <face>fixed</face>
@@ -51,7 +51,7 @@
       <object class="wxMenuItem" name="ID_SAVE">
         <label>&amp;Save</label>
         <accel>CTRL-s</accel>
-        <help>Sace formulas to file.</help>
+        <help>Save formulas to file.</help>
       </object>
       <object class="wxMenuItem" name="ID_EXIT">
         <label>E&amp;xit</label>

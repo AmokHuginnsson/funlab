@@ -260,16 +260,16 @@ void HRenderer::draw_frame ( void )
 	M_EPILOG
 	}
 
-void HRenderer::render_surface ( char const * a_pcFormula )
+bool HRenderer::render_surface ( char const * a_pcFormula )
 	{
 	M_PROLOG
 	if ( ! a_pcFormula )
-		return;
+		return ( true );
 
 	double * l_pdVariables = NULL;
 	l_pdVariables = f_poAnalyser->analyse ( a_pcFormula );
 	if ( ! l_pdVariables )
-		return;
+		return ( true );
 	f_dSize = 10;
 	f_dDY = - 15.0;
 	f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
@@ -284,7 +284,7 @@ void HRenderer::render_surface ( char const * a_pcFormula )
 		spawn ( );
 		}
 	SDL_WarpMouse ( g_iResolutionX >> 1, g_iResolutionY >> 1 );
-	return;
+	return ( false );
 	M_EPILOG
 	}
 
@@ -422,6 +422,20 @@ int HRenderer::run ( void )
 			}
 		listen ( );
 		}
+	M_EPILOG
+	}
+
+char const * HRenderer::error ( void ) const
+	{
+	M_PROLOG
+	return ( f_poAnalyser->get_error ( ) );
+	M_EPILOG
+	}
+
+int HRenderer::error_position ( void ) const
+	{
+	M_PROLOG
+	return ( f_poAnalyser->get_error_token ( ) );
 	M_EPILOG
 	}
 

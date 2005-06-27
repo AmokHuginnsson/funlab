@@ -44,7 +44,7 @@ OVariable g_psVars [ ] =
 		{ D_INT, "resolution_y", & g_iResolutionY },
 		{ D_INT, "density", & g_iDensity },
 		{ D_BOOL, "stereo", & g_bStereo },
-		{ 0, NULL, NULL }
+		{ D_NONE, NULL, NULL }
 	};
 
 bool set_variables ( HString & a_roOption, HString & a_roValue )
