@@ -30,6 +30,10 @@ Copyright:
 extern int g_iWantQuiet;			/* --quiet, --silent */
 extern int g_iWantVerbose;			/* --verbose */
 extern char * g_pcProgramName;
+extern bool g_bStereo;
+extern int g_iDensity;
+extern int g_iResolutionX;
+extern int g_iResolutionY;
 extern struct option const * g_sLongOptions;
 extern stdhapi::hcore::HString g_oLogPath;
 extern stdhapi::hcore::HString g_oResourcePath;

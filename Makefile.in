@@ -121,7 +121,7 @@ STATICLIBS = $(patsubst %, ~/lib/lib%.a, $(LIBS))
 LIBS := $(patsubst %, -l%, $(LIBS))
 
 STATICLIBS += -rdynamic -ldl
-STATICLIBS += -lncurses
+STATICLIBS += -lncurses -lSDL -lwx_gtk_xrc-2.4 $(LINKER_WX_FLAGS)
 #STATICLIBS += -lccmalloc
 
 ifeq ($(CURDIR),$(DIR_BUILD))

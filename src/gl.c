@@ -245,39 +245,93 @@ void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 void HSurface::line ( double x0, double y0, double x1, double y1, unsigned long int color )
 	{
 	M_PROLOG
-	/*
-	 * Implementation ripped from http://www.cs.unc.edu/~mcmillan/comp136/Lecture6/Lines.html
-	 * Line-Drawing Algorithms
-	 */
+/*
+ * Implementation ripped from http://www.cs.unc.edu/~mcmillan/comp136/Lecture6/Lines.html
+ * Line-Drawing Algorithms
+ */
 
-	double dy = y1 - y0;
-	double dx = x1 - x0;
-	double stepx = 0, stepy = 0, fraction = 0;
+/*
+ *  1001 | 1000 | 1010
+ * ------+------+------
+ *  0001 | 0000 | 0010
+ * ------+------+------
+ *  0101 | 0100 | 0110
+ *
+ */
+	
+#define D_EDGE_LEFT		1
+#define D_EDGE_TOP		8
+#define D_EDGE_RIGHT	2
+#define D_EDGE_BOTTOM	4
 
-	if ( dy < 0 )
+	double dx = 0, dy = 0, stepx = 0, stepy = 0, fraction = 0, cx = 0, cy = 0;
+
+	int l_iEdges0 = 0, l_iEdges1 = 0, l_iEdges = 0;
+
+	do
 		{
-		dy = - dy;
-		stepy = - 1;
+		l_iEdges0 = l_iEdges1 = l_iEdges = 0;
+		l_iEdges0 |= ( x0 < 0 ) ? D_EDGE_LEFT : 0;
+		l_iEdges0 |= ( y0 < 0 ) ? D_EDGE_TOP : 0;
+		l_iEdges0 |= ( x0 >= f_iWidth ) ? D_EDGE_RIGHT : 0;
+		l_iEdges0 |= ( y0 >= f_iHeight ) ? D_EDGE_BOTTOM : 0;
+		l_iEdges1 |= ( x1 < 0 ) ? D_EDGE_LEFT : 0;
+		l_iEdges1 |= ( y1 < 0 ) ? D_EDGE_TOP : 0;
+		l_iEdges1 |= ( x1 >= f_iWidth ) ? D_EDGE_RIGHT : 0;
+		l_iEdges1 |= ( y1 >= f_iHeight ) ? D_EDGE_BOTTOM : 0;
+		if ( l_iEdges0 & l_iEdges1 )
+			return;
+		if ( l_iEdges0 )
+			l_iEdges = l_iEdges0;
+		else if ( l_iEdges1 )
+			l_iEdges = l_iEdges1;
+		else break;
+		if ( l_iEdges & D_EDGE_LEFT )
+			{
+	    cx = 0;
+			cy = y0 + ( y1 - y0 ) * ( 0 - x0 ) / ( x1 - x0 );
+			}
+		else if ( l_iEdges & D_EDGE_TOP )
+			{
+			cx = x0 + ( x1 - x0 ) * ( 0 - y0 ) / ( y1 - y0 );
+	    cy = 0;
+			}
+		else if ( l_iEdges & D_EDGE_RIGHT )
+			{
+	    cx = f_iWidth - 1;
+			cy = y0 + ( y1 - y0 ) * ( cx - x0 ) / ( x1 - x0 );
+			}
+		else if ( l_iEdges & D_EDGE_BOTTOM )
+			{
+	    cy = f_iHeight - 1;
+			cx = x0 + ( x1 - x0 ) * ( cy - y0 ) / ( y1 - y0 );
+			}
+		if ( l_iEdges0 )
+			x0 = cx, y0 = cy;
+		else
+			x1 = cx, y1 = cy;
 		}
-	else
-		{
-		stepy = 1;
-		}
+	while ( l_iEdges0 | l_iEdges1 );
+	
+	dx = x1 - x0;
+	dy = y1 - y0;
+
 	if ( dx < 0 )
-		{
-		dx = - dx;
-		stepx = - 1;
-		}
+		dx = - dx, stepx = - 1;
 	else
-		{
 		stepx = 1;
-		}
+	if ( dy < 0 )
+		dy = - dy, stepy = - 1;
+	else
+		stepy = 1;
 
-	dy *= 2;
 	dx *= 2;
+	dy *= 2;
 
 	if ( ( x0 >= 0 ) && ( x0 < f_iWidth ) && ( y0 >= 0 ) && ( y0 < f_iHeight ) )
 		put_pixel ( static_cast < int > ( x0 ), static_cast < int > ( y0 ), color );
+	else
+		return;
 	if ( dx > dy )
 		{
 		fraction = dy - ( dx / 2 );
@@ -292,6 +346,8 @@ void HSurface::line ( double x0, double y0, double x1, double y1, unsigned long 
 			fraction += dy;
 			if ( ( x0 >= 0 ) && ( x0 < f_iWidth ) && ( y0 >= 0 ) && ( y0 < f_iHeight ) )
 				put_pixel ( static_cast < int > ( x0 ), static_cast < int > ( y0 ), color );
+			else
+				return;
 			}
 		}
 	else
@@ -308,6 +364,8 @@ void HSurface::line ( double x0, double y0, double x1, double y1, unsigned long 
 			fraction += dx;
 			if ( ( x0 >= 0 ) && ( x0 < f_iWidth ) && ( y0 >= 0 ) && ( y0 < f_iHeight ) )
 				put_pixel ( static_cast < int > ( x0 ), static_cast < int > ( y0 ), color );
+			else
+				return;
 			}
 		}
 	return;

@@ -43,11 +43,14 @@ using namespace stdhapi::hcore;
 
 void usage ( int a_iStatus )
 	{
-	printf ( "%s - \
-does very much usefull things ... really \n", g_pcProgramName );
-	printf ( "Usage: %s [OPTION]... [FILE]...\n", g_pcProgramName );
+	printf ( "%s - renders three dimensional function surfaces.\n", g_pcProgramName );
+	printf ( "Usage: %s [OPTION]...\n", g_pcProgramName );
 	printf (
 "Options:\n"
+"  -X, --resolution-x         set x resolution\n"
+"  -Y, --resolution-y         set y resolution\n"
+"  -D, --density              set graph density\n"
+"  -S, --stereo               generate stereo picture\n"
 "  -q, --quiet, --silent      inhibit usual output\n"
 "  --verbose                  print more information\n"
 "  -h, --help                 display this help and exit\n"
@@ -60,14 +63,41 @@ int decode_switches ( int a_iArgc, char ** a_ppcArgv )
 	int l_c;
 	hcore::log << "Decoding switches ... ";
 	while ( ( l_c = getopt_long ( a_iArgc, a_ppcArgv, 
-					"q"	   /* quiet or silent                                       */
-					"v"	   /* verbose                                               */
-					"h"	   /* help                                                  */
-					"V",	 /* version                                               */
+					"q"	 /* quiet or silent */
+					"v"	 /* verbose */
+					"h"	 /* help    */
+					"V"	 /* version */
+					"X:" /**/
+					"Y:" /**/
+					"D:" /* density */
+					"S", /* stereo */
 					g_sLongOptions, ( int * ) 0 ) ) != EOF )
 		{
 		switch ( l_c )
 			{
+			case ( 'X' ):
+				{
+				if ( optarg )
+					g_iResolutionX = strtol ( optarg, NULL, 10 );
+				break;
+				}
+			case ( 'Y' ):
+				{
+				if ( optarg )
+					g_iResolutionY = strtol ( optarg, NULL, 10 );
+				break;
+				}
+			case ( 'D' ):
+				{
+				if ( optarg )
+					g_iDensity = strtol ( optarg, NULL, 10 );
+				break;
+				}
+			case ( 'S' ):
+				{
+				g_bStereo = true;
+				break;
+				}
 			case ( 'q' ):	 /* --quiet, --silent                                     */
 				{
 				g_iWantQuiet = 1;

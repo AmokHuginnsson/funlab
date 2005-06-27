@@ -35,14 +35,11 @@ Copyright:
 
 #include "renderer.h"
 #include "gl.h"
+#include "variables.h"
 
 using namespace stdhapi;
 using namespace stdhapi::hcore;
 using namespace stdhapi::tools;
-
-#define D_X_RES	640
-#define D_Y_RES	480
-#define D_LAND_SIZE 32
 
 HRenderer::HRenderer ( void )
 	: f_iRed ( 0 ), f_iGreen ( 0 ), f_iBlue ( 0 ),
@@ -58,11 +55,11 @@ HRenderer::HRenderer ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	f_ppdLand = xcalloc ( D_LAND_SIZE, double * );
-	for ( l_iCtr = 0; l_iCtr < D_LAND_SIZE; l_iCtr ++ )
-		f_ppdLand [ l_iCtr ] = xcalloc ( D_LAND_SIZE, double );
+	f_ppdLand = xcalloc ( g_iDensity, double * );
+	for ( l_iCtr = 0; l_iCtr < g_iDensity; l_iCtr ++ )
+		f_ppdLand [ l_iCtr ] = xcalloc ( g_iDensity, double );
 	for ( l_iCtr = 0; l_iCtr < 3; l_iCtr ++ )
-		f_ppiNode [ l_iCtr ] = xcalloc ( D_LAND_SIZE, int );
+		f_ppiNode [ l_iCtr ] = xcalloc ( g_iDensity, int );
 	f_pdTrygo = xcalloc ( 1024, double );
 	for ( l_iCtr = 0; l_iCtr < 1024; l_iCtr ++ )
 		f_pdTrygo [ l_iCtr ] = sin( ( ( double ) l_iCtr * M_PI ) / 2048. );
@@ -96,7 +93,7 @@ HRenderer::~HRenderer ( void )
 			xfree ( f_ppiNode [ l_iCtr ] );
 		f_ppiNode [ l_iCtr ] = NULL;
 		}
-	for ( l_iCtr = 0; l_iCtr < D_LAND_SIZE; l_iCtr ++ )
+	for ( l_iCtr = 0; l_iCtr < g_iDensity; l_iCtr ++ )
 		{
 		if ( f_ppdLand [ l_iCtr ] )
 			xfree ( f_ppdLand [ l_iCtr ] );
@@ -117,13 +114,13 @@ void HRenderer::makeland( void )
 	f_dLowerXEdge = - f_dSize;
 	f_dLowerYEdge = - f_dSize;
 	E = f_dSize;
-	f_dResolution = ( E - f_dLowerYEdge ) / ( double ) D_LAND_SIZE;
+	f_dResolution = ( E - f_dLowerYEdge ) / ( double ) g_iDensity;
 	y = f_dLowerXEdge;
-	for ( j = 0; j < D_LAND_SIZE; j ++ )
+	for ( j = 0; j < g_iDensity; j ++ )
 		{
 		x = f_dLowerYEdge;
 		( * f_pdYVariable ) = y;
-		for ( i = 0; i < D_LAND_SIZE; i ++ )
+		for ( i = 0; i < g_iDensity; i ++ )
 			{
 			( * f_pdXVariable ) = x;
 			f_ppdLand [ i ] [ j ] = f_poAnalyser->count ( );
@@ -182,6 +179,15 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 	x += f_dDX;
 	y += f_dDY;
 	z += f_dDZ;
+
+	if ( g_bStereo )
+		{
+		int alpha = ( f_dDX > 0 ) ? 3 : - 3;
+		double ox = x;
+		x = x * cosq ( alpha ) - y * sinq ( alpha );
+		y = y * cosq ( alpha ) + ox * sinq ( alpha );
+		}
+	
 	if ( y > 0 )
 		return ( false );
 	if ( y == 0 )
@@ -189,9 +195,9 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 	_c = ( int ) ( -( x * f_dFOV ) / y );
 	_r = ( int ) ( -( z * f_dFOV ) / y );
 	_c = -_c;
-	_c += 320;
+	_c += ( g_iResolutionX >> 1 );
 	_r = -_r;
-	_r += 240;
+	_r += ( g_iResolutionY >> 1 );
 	return ( true );
 	M_EPILOG
 	}
@@ -203,47 +209,50 @@ void HRenderer::draw_frame ( void )
 		return;
 	f_bBusy = true;
 	bool valid = false, oldvalid = false;
-	int i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
+	int f = 0, i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
 	double x = 0, y = 0;
+	unsigned long int l_iRed = 0, l_iBlue = 0;
 	for ( j = 0; j < 3; j++ )
-		for ( i = 0; i < D_LAND_SIZE; i++ )
+		for ( i = 0; i < g_iDensity; i++ )
 			f_ppiNode [ j ] [ i ] = 0;
-	y = f_dLowerXEdge;
 	f_dFOV = 240.0;
 	f_poSurface->clear ( );
 	precount ( );
-	for ( j = 0; j < D_LAND_SIZE; j++ )
+	if ( g_bStereo )
 		{
-		x = f_dLowerYEdge;
-		for ( i = 0; i < D_LAND_SIZE; i++ )
+		l_iRed = f_poSurface->RGB ( 0xff, 0, 0 );
+		l_iBlue = f_poSurface->RGB ( 0, 0, 0xff );
+		}
+	for ( f = 0; f < ( g_bStereo ? 2 : 1 ); f ++ )
+		{
+		f_dDX = g_bStereo ? ( f ? - 4 : 4 ) : 0;
+		y = f_dLowerXEdge;
+		for ( j = 0; j < g_iDensity; j ++ )
 			{
-			valid = T( x, y, f_ppdLand [ i ] [ j ], c, r );
-			if ( valid && oldvalid )
+			x = f_dLowerYEdge;
+			for ( i = 0; i < g_iDensity; i ++ )
 				{
-				if ( ( c >= 0 ) && ( c < D_X_RES ) && ( r >= 0 ) && ( r < D_Y_RES )
-					&& ( oldc >= 0 ) && ( oldc < D_X_RES ) && ( oldr >= 0 ) && ( oldr < D_Y_RES ) )
+				valid = T( x, y, f_ppdLand [ i ] [ j ], c, r );
+				if ( valid && oldvalid )
 					{
 					if ( i > 0 )
-						f_poSurface->line( oldc, oldr, c, r, f_ulColor );
-					}
-				if ( f_ppiNode [ 2 ] [ i ]
-					&& ( c >= 0 ) && ( c < D_X_RES ) && ( r >= 0 ) && ( r < D_Y_RES )
-					&& ( f_ppiNode [ 0 ] [ i ] >= 0 ) && ( f_ppiNode [ 0 ] [ i ] < D_X_RES )
-					&& ( f_ppiNode [ 1 ] [ i ] >= 0 ) && ( f_ppiNode [ 1 ] [ i ] < D_Y_RES ) )
-					{
+						f_poSurface->line( oldc, oldr, c, r,
+								g_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 					if ( j > 0 )
-						f_poSurface->line( c, r, f_ppiNode [ 0 ] [ i ], f_ppiNode [ 1 ] [ i ], f_ulColor );
+						f_poSurface->line( c, r, f_ppiNode [ 0 ] [ i ],
+								f_ppiNode [ 1 ] [ i ],
+								g_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 					}
+				f_ppiNode [ 0 ] [ i ] = c;
+				f_ppiNode [ 1 ] [ i ] = r;
+				f_ppiNode [ 2 ] [ i ] = valid;
+				oldc = c;
+				oldr = r;
+				oldvalid = valid;
+				x += f_dResolution;
 				}
-			f_ppiNode [ 0 ] [ i ] = c;
-			f_ppiNode [ 1 ] [ i ] = r;
-			f_ppiNode [ 2 ] [ i ] = valid;
-			oldc = c;
-			oldr = r;
-			oldvalid = valid;
-			x += f_dResolution;
+			y += f_dResolution;
 			}
-		y += f_dResolution;
 		}
 	usleep ( 1000 );
 	f_poSurface->refresh ( );
@@ -271,10 +280,10 @@ void HRenderer::render_surface ( char const * a_pcFormula )
 	makeland ( );
 	if ( ! HSurface::surface_count ( ) )
 		{
-		f_poSurface->init ( D_X_RES, D_Y_RES );
+		f_poSurface->init ( g_iResolutionX, g_iResolutionY );
 		spawn ( );
 		}
-	SDL_WarpMouse ( D_X_RES >> 1, D_Y_RES >> 1 );
+	SDL_WarpMouse ( g_iResolutionX >> 1, g_iResolutionY >> 1 );
 	return;
 	M_EPILOG
 	}
@@ -294,7 +303,7 @@ int HRenderer::run ( void )
 					{
 					dx = l_uEvent.motion.xrel > 0 ? l_uEvent.motion.xrel : - l_uEvent.motion.xrel;
 					dy = l_uEvent.motion.yrel > 0 ? l_uEvent.motion.yrel : - l_uEvent.motion.yrel;
-					if ( ( dx < ( D_X_RES >> 1 ) ) && ( dy < ( D_Y_RES >> 1 ) ) )
+					if ( ( dx < ( g_iResolutionX >> 1 ) ) && ( dy < ( g_iResolutionY >> 1 ) ) )
 						{
 						switch ( l_uEvent.motion.state )
 							{

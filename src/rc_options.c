@@ -37,9 +37,13 @@ using namespace stdhapi::hcore;
 
 OVariable g_psVars [ ] =
 	{
-		{ D_TYPE_HSTRING, "log_path", & g_oLogPath },
-		{ D_TYPE_HSTRING, "icon_path", & g_oIconPath },
-		{ D_TYPE_HSTRING, "resource_path", & g_oResourcePath },
+		{ D_HSTRING, "log_path", & g_oLogPath },
+		{ D_HSTRING, "icon_path", & g_oIconPath },
+		{ D_HSTRING, "resource_path", & g_oResourcePath },
+		{ D_INT, "resolution_x", & g_iResolutionX },
+		{ D_INT, "resolution_y", & g_iResolutionY },
+		{ D_INT, "density", & g_iDensity },
+		{ D_BOOL, "stereo", & g_bStereo },
 		{ 0, NULL, NULL }
 	};
 
