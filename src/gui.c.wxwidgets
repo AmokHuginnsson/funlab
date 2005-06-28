@@ -407,7 +407,9 @@ HEvtHandler::HEvtHandler ( wxListCtrl * a_poListCtrl )
 void HEvtHandler::on_key_press ( wxKeyEvent & a_roEvent )
 	{
 	M_PROLOG
-	int l_iItem = 0, l_iCount = 0;
+	int l_iItem = 0, l_iCount = 0, l_iCtr = 0, l_iPosition = 0;
+	static char const l_pcSpace [ ] = "                                                       ";
+	HString l_oFormula, l_oError, l_oArrow;
 	l_iCount = f_poList->GetItemCount ( );
 	switch ( a_roEvent.GetKeyCode ( ) )
 		{
@@ -449,15 +451,13 @@ void HEvtHandler::on_key_press ( wxKeyEvent & a_roEvent )
 					wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED );
 			if ( l_iItem >= 0 )
 				{
-				HString l_oFormula = f_poList->GetItemText ( l_iItem ).c_str ( );
+				l_oFormula = f_poList->GetItemText ( l_iItem ).c_str ( );
 				if ( f_oRenderer.render_surface ( l_oFormula ) )
 					{
-					int index = 0, position = f_oRenderer.error_position ( );
-					HString l_oError, l_oArrow;
-					for ( index = 0; index < position; index ++ )
+					l_iPosition = f_oRenderer.error_position ( );
+					for ( l_iCtr = 0; l_iCtr < l_iPosition; l_iCtr ++ )
 						l_oArrow += '-';
 					l_oArrow += 'v';
-					char const l_pcSpace [ ] = "                                                       ";
 					l_oArrow += l_pcSpace;
 					l_oFormula += l_pcSpace;
 					l_oError.format ( "%s at this place:%s\n\n%s\n%s",

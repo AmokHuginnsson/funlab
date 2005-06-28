@@ -51,6 +51,7 @@ void usage ( int a_iStatus )
 "  -Y, --resolution-y         set y resolution\n"
 "  -D, --density              set graph density\n"
 "  -S, --stereo               generate stereo picture\n"
+"  -F, --formula              render specified formula\n"
 "  -q, --quiet, --silent      inhibit usual output\n"
 "  --verbose                  print more information\n"
 "  -h, --help                 display this help and exit\n"
@@ -67,10 +68,11 @@ int decode_switches ( int a_iArgc, char ** a_ppcArgv )
 					"v"	 /* verbose */
 					"h"	 /* help    */
 					"V"	 /* version */
-					"X:" /**/
-					"Y:" /**/
+					"X:" /* resolution x */
+					"Y:" /* resolution y */
 					"D:" /* density */
-					"S", /* stereo */
+					"S"  /* stereo */
+					"F:", /* formula */ 
 					g_sLongOptions, ( int * ) 0 ) ) != EOF )
 		{
 		switch ( l_c )
@@ -96,6 +98,11 @@ int decode_switches ( int a_iArgc, char ** a_ppcArgv )
 			case ( 'S' ):
 				{
 				g_bStereo = true;
+				break;
+				}
+			case ( 'F' ):
+				{
+				g_oFormula = optarg;
 				break;
 				}
 			case ( 'q' ):	 /* --quiet, --silent                                     */

@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+#include <unistd.h>
 #include <stdhapi.h> /* all hAPI headers */
 
 #include "version.h"
@@ -32,6 +34,7 @@ Copyright:
 #include "cli_options.h"
 #include "rc_options.h"
 #include "gui.h"
+#include "renderer.h"
 
 using namespace std;
 using namespace stdhapi;
@@ -45,6 +48,8 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 	M_PROLOG
 /* variables declarations for main loop: */
 	int l_iOpt = 0;
+	int l_iCtr = 0, l_iPosition = 0;
+	HString l_oArrow;
 /* end. */
 	try
 		{
@@ -56,7 +61,26 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 		hcore::log.rehash ( g_oLogPath, g_pcProgramName );
 /*		if ( ! console::is_enabled ( ) )enter_curses (); / * enabling ncurses ablilities*/
 /* *BOOM* */
-		l_iOpt = gui_start ( a_iArgc, a_ppcArgv );
+		if ( g_oFormula )
+			{
+			HRenderer l_oRenderer;
+			l_iOpt = l_oRenderer.render_surface ( g_oFormula ) ? 1 : 0;
+			if ( l_iOpt )
+				{
+				l_iPosition = l_oRenderer.error_position ( );
+				for ( l_iCtr = 0; l_iCtr < l_iPosition; l_iCtr ++ )
+					l_oArrow += '-';
+				l_oArrow += 'v';
+				fprintf ( stderr, _ ( "Formula syntax error ...\n%s at this place:\n%s\n%s\n" ),
+						static_cast < char const * > ( l_oRenderer.error ( ) ),
+						static_cast < char * > ( l_oArrow ),
+						static_cast < char * > ( g_oFormula ) );
+				}
+			while ( l_oRenderer.is_alive ( ) )
+				sleep ( 1 );
+			}
+		else
+			l_iOpt = gui_start ( a_iArgc, a_ppcArgv );
 		if ( hconsole::is_enabled ( ) )leave_curses (); /* ending ncurses sesion */
 /* ... there is the place main loop ends. :OD-OT */
 		}

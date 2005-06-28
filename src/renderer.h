@@ -68,7 +68,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	int run ( void ) __attribute__ ( ( __noreturn__ ) );
+	int run ( void );
 	void makeland ( void );
 	void precount ( void );
 	double sinq( unsigned int );
@@ -77,6 +77,7 @@ protected:
 	/*}*/
 private:
 	/*{*/
+	bool f_bLoop;
 	bool f_bBusy;
 	unsigned long int f_ulColor;
 	double f_dCosAlpha;

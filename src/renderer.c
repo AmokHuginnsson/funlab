@@ -47,7 +47,8 @@ HRenderer::HRenderer ( void )
 	f_dAngleX ( 0 ), f_dAngleY ( 0 ), f_dAngleZ ( 0 ),
 	f_dDX ( 0 ), f_dDY ( 0 ), f_dDZ ( 0 ), f_dFOV ( 0 ),
 	f_pdXVariable ( NULL ), f_pdYVariable ( NULL ),
-	f_ppdLand ( NULL ), f_poAnalyser ( NULL ), f_poSurface ( NULL ), f_bBusy ( false ),
+	f_ppdLand ( NULL ), f_poAnalyser ( NULL ), f_poSurface ( NULL ),
+	f_bLoop ( false ), f_bBusy ( false ),
 	f_ulColor ( 0 ), f_dCosAlpha ( 0 ), f_dSinAlpha ( 0 ),
 	f_dCosBeta ( 0 ), f_dSinBeta ( 0 ),
 	f_dCosGamma ( 0 ), f_dSinGamma ( 0 ),
@@ -55,6 +56,20 @@ HRenderer::HRenderer ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
+	f_poAnalyser = new ( std::nothrow ) HAnalyser;
+	M_ENSURE ( f_poAnalyser );
+	try
+		{
+		f_poSurface = new ( std::nothrow ) HSurface;
+		M_ENSURE ( f_poSurface );
+		}
+	catch ( ... )
+		{
+		if ( f_poAnalyser )
+			delete f_poAnalyser;
+		f_poAnalyser = NULL;
+		throw;
+		}
 	f_ppdLand = xcalloc ( g_iDensity, double * );
 	for ( l_iCtr = 0; l_iCtr < g_iDensity; l_iCtr ++ )
 		f_ppdLand [ l_iCtr ] = xcalloc ( g_iDensity, double );
@@ -63,10 +78,6 @@ HRenderer::HRenderer ( void )
 	f_pdTrygo = xcalloc ( 1024, double );
 	for ( l_iCtr = 0; l_iCtr < 1024; l_iCtr ++ )
 		f_pdTrygo [ l_iCtr ] = sin( ( ( double ) l_iCtr * M_PI ) / 2048. );
-	f_poAnalyser = new ( std::nothrow ) HAnalyser;
-	M_ENSURE ( f_poAnalyser );
-	f_poSurface = new ( std::nothrow ) HSurface;
-	M_ENSURE ( f_poSurface );
 	SDL_EventState ( SDL_MOUSEMOTION, SDL_ENABLE );
 	SDL_EventState ( SDL_MOUSEBUTTONDOWN, SDL_ENABLE );
 	SDL_EventState ( SDL_MOUSEBUTTONUP, SDL_ENABLE );
@@ -78,6 +89,9 @@ HRenderer::HRenderer ( void )
 HRenderer::~HRenderer ( void )
 	{
 	M_PROLOG
+	f_bLoop = false;
+	while ( f_bBusy )
+		;
 	int l_iCtr = 0;
 	if ( f_poAnalyser )
 		delete f_poAnalyser;
@@ -109,6 +123,7 @@ HRenderer::~HRenderer ( void )
 void HRenderer::makeland( void )
 	{
 	M_PROLOG
+	M_CRITICAL_SECTION ( );
 	int i, j;
 	double E, x, y;
 	f_dLowerXEdge = - f_dSize;
@@ -205,7 +220,7 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 void HRenderer::draw_frame ( void )
 	{
 	M_PROLOG
-	if ( f_bBusy )
+	if ( f_bBusy || ! is_alive ( ) )
 		return;
 	f_bBusy = true;
 	bool valid = false, oldvalid = false;
@@ -281,9 +296,12 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 	if ( ! HSurface::surface_count ( ) )
 		{
 		f_poSurface->init ( g_iResolutionX, g_iResolutionY );
+		SDL_WarpMouse ( g_iResolutionX >> 1, g_iResolutionY >> 1 );
+		f_bLoop = true;
 		spawn ( );
 		}
-	SDL_WarpMouse ( g_iResolutionX >> 1, g_iResolutionY >> 1 );
+	else
+		SDL_WarpMouse ( g_iResolutionX >> 1, g_iResolutionY >> 1 );
 	return ( false );
 	M_EPILOG
 	}
@@ -293,8 +311,9 @@ int HRenderer::run ( void )
 	M_PROLOG
 	int dx = 0, dy = 0;
 	SDL_Event l_uEvent;
-	while ( 1 )
+	while ( f_bLoop )
 		{
+		M_CRITICAL_SECTION ( );
 		if ( SDL_WaitEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
 			{
 			switch ( l_uEvent.type )
@@ -357,6 +376,15 @@ int HRenderer::run ( void )
 					{
 					switch ( l_uEvent.key.keysym.sym )
 						{
+						case ( 'q' ):
+							{
+							if ( g_oFormula )
+								{
+								f_bLoop = false;
+								f_poSurface->down ( );
+								}
+							break;
+							}
 						case ( 'f' ):
 							{
 							f_poSurface->toggle_fullscreen ( );
@@ -416,12 +444,16 @@ int HRenderer::run ( void )
 					break;
 					}
 				}
-			draw_frame ( );
-			while ( SDL_PollEvent ( & l_uEvent ) )
-				;
+			if ( f_bLoop )
+				{
+				draw_frame ( );
+				while ( SDL_PollEvent ( & l_uEvent ) )
+					;
+				}
 			}
 		listen ( );
 		}
+	return ( 0 );
 	M_EPILOG
 	}
 

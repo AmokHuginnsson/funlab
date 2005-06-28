@@ -35,6 +35,7 @@ extern int g_iDensity;
 extern int g_iResolutionX;
 extern int g_iResolutionY;
 extern struct option const * g_sLongOptions;
+extern stdhapi::hcore::HString g_oFormula;
 extern stdhapi::hcore::HString g_oLogPath;
 extern stdhapi::hcore::HString g_oResourcePath;
 extern stdhapi::hcore::HString g_oIconPath;
