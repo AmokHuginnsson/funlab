@@ -311,7 +311,7 @@ int HRenderer::run ( void )
 	M_PROLOG
 	int dx = 0, dy = 0;
 	SDL_Event l_uEvent;
-	while ( f_bLoop )
+	while ( is_alive ( ) && f_bLoop )
 		{
 		M_CRITICAL_SECTION ( );
 		if ( SDL_WaitEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
@@ -451,7 +451,6 @@ int HRenderer::run ( void )
 					;
 				}
 			}
-		listen ( );
 		}
 	return ( 0 );
 	M_EPILOG
