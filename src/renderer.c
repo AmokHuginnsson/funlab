@@ -285,7 +285,11 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 	double * l_pdVariables = NULL;
 	l_pdVariables = f_poAnalyser->analyse ( a_pcFormula );
 	if ( ! l_pdVariables )
+		{
+		if ( g_oFormula )
+			f_oCondition.signal ( );
 		return ( true );
+		}
 	f_dSize = 10;
 	f_dDY = - 15.0;
 	f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
