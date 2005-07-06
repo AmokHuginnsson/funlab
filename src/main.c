@@ -76,8 +76,6 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 						static_cast < char * > ( l_oArrow ),
 						static_cast < char * > ( g_oFormula ) );
 				}
-			while ( l_oRenderer.is_alive ( ) )
-				sleep ( 1 );
 			}
 		else
 			l_iOpt = gui_start ( a_iArgc, a_ppcArgv );

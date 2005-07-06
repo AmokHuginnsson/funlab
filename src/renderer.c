@@ -89,7 +89,8 @@ HRenderer::HRenderer ( void )
 HRenderer::~HRenderer ( void )
 	{
 	M_PROLOG
-	f_bLoop = false;
+	if ( g_oFormula )
+		f_oCondition.wait ( );
 	while ( f_bBusy )
 		;
 	int l_iCtr = 0;
@@ -311,7 +312,7 @@ int HRenderer::run ( void )
 	M_PROLOG
 	int dx = 0, dy = 0;
 	SDL_Event l_uEvent;
-	while ( is_alive ( ) && f_bLoop )
+	while ( f_bLoop && is_alive ( ) )
 		{
 		M_CRITICAL_SECTION ( );
 		if ( SDL_WaitEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
@@ -382,6 +383,7 @@ int HRenderer::run ( void )
 								{
 								f_bLoop = false;
 								f_poSurface->down ( );
+								f_oCondition.signal ( );
 								}
 							break;
 							}
