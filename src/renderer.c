@@ -318,9 +318,9 @@ int HRenderer::run ( void )
 	SDL_Event l_uEvent;
 	while ( f_bLoop && is_alive ( ) )
 		{
-		M_CRITICAL_SECTION ( );
 		if ( SDL_WaitEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
 			{
+			M_CRITICAL_SECTION ( );
 			switch ( l_uEvent.type )
 				{
 				case ( SDL_MOUSEMOTION ):
