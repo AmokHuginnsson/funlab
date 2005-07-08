@@ -205,7 +205,7 @@ purge: mrproper
 	/bin/rm -rf configure Makefile config.h config.log
 
 bin:
-	@( export NODEBUG="true"; $(MAKE) -e executable )
+	@( NODEBUG="true" $(MAKE) ; make clean )
 
 install: $(TARGET)
 	@echo "i: you need to become root to do this"
