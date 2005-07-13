@@ -160,17 +160,18 @@ unsigned long int HSurface::get_pixel ( int x, int y )
 		return ( static_cast < unsigned long int > ( - 1 ) );
 	
 	/* Here l_pcRawMemory is the address to the pixel we want to retrieve */
-	l_pcRawMemory = (unsigned char *)l_psSurface->pixels + y * l_psSurface->pitch + x * l_psSurface->format->BytesPerPixel;
+	l_pcRawMemory = static_cast < unsigned char * > ( l_psSurface->pixels )
+		+ y * l_psSurface->pitch + x * l_psSurface->format->BytesPerPixel;
 
 	switch ( l_psSurface->format->BytesPerPixel )
 		{
 		case ( 1 ):
 			{
-			return *l_pcRawMemory;
+			return ( * l_pcRawMemory );
 			}
 		case ( 2 ):
 			{
-			return *(Uint16 *)l_pcRawMemory;
+			return ( * reinterpret_cast < Uint16 * > ( l_pcRawMemory ) );
 			}
 		case ( 3 ):
 			{
@@ -181,7 +182,7 @@ unsigned long int HSurface::get_pixel ( int x, int y )
 			}
 		case ( 4 ):
 			{
-			return *(unsigned long int *)l_pcRawMemory;
+			return ( * reinterpret_cast < unsigned long int * > ( l_pcRawMemory ) );
 			}
 		}
 	return ( 0 );       /* shouldn't happen, but avoids warnings */
@@ -202,23 +203,24 @@ void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 		return;
 
 	/* Here l_pcRawMemory is the address to the pixel we want to set */
-	l_pcRawMemory = (unsigned char *)l_psSurface->pixels + y * l_psSurface->pitch + x * l_psSurface->format->BytesPerPixel;
+	l_pcRawMemory = static_cast < unsigned char * > ( l_psSurface->pixels )
+		+ y * l_psSurface->pitch + x * l_psSurface->format->BytesPerPixel;
 
 	switch ( l_psSurface->format->BytesPerPixel )
 		{
 		case ( 1 ):
 			{
-			*l_pcRawMemory = pixel;
+			( * l_pcRawMemory ) = pixel;
 			break;
 			}
 		case ( 2 ):
 			{
-			*(Uint16 *)l_pcRawMemory = pixel;
+			( * reinterpret_cast < Uint16 * > ( l_pcRawMemory ) ) = pixel;
 			break;
 			}
 		case ( 3 ):
 			{
-			if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN )
 				{
 				l_pcRawMemory [ 0 ] = ( pixel >> 16 ) & 0xff;
 				l_pcRawMemory [ 1 ] = ( pixel >> 8 ) & 0xff;
@@ -234,7 +236,7 @@ void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 			}
 		case ( 4 ):
 			{
-			*(unsigned long int *)l_pcRawMemory = pixel;
+			( * reinterpret_cast < unsigned long int * > ( l_pcRawMemory ) ) = pixel;
 			break;
 			}
 		}

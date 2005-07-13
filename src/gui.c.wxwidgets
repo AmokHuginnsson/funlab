@@ -343,7 +343,7 @@ void HFrame::open ( const HString & a_oPath )
 	l_oFile.open ( a_oPath );
 	if ( l_oFile )
 		{
-		while ( l_oFile.read_line ( l_oLine, true ) >= 0 )
+		while ( l_oFile.read_line ( l_oLine, HFile::D_STRIP_NEWLINES ) >= 0 )
 			f_poList->InsertItem ( l_iIndex ++, static_cast < char * > ( l_oLine ) );
 		l_oFile.close ( );
 		}
@@ -361,7 +361,7 @@ void HFrame::save ( const HString & a_oPath )
 	if ( a_oPath.is_empty ( ) )
 		M_THROW ( _ ( "Empty path." ), g_iErrNo );
 	int l_iIndex = 0, l_iCount = f_poList->GetItemCount ( );
-	HFile l_oFile ( D_WRITING );
+	HFile l_oFile ( HFile::D_WRITING );
 	if ( l_iCount )
 		{
 		l_oFile.open ( a_oPath );
