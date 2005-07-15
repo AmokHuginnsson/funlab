@@ -124,7 +124,6 @@ HRenderer::~HRenderer ( void )
 void HRenderer::makeland( void )
 	{
 	M_PROLOG
-	M_CRITICAL_SECTION ( );
 	int i, j;
 	double E, x, y;
 	f_dLowerXEdge = - f_dSize;
@@ -249,7 +248,7 @@ void HRenderer::draw_frame ( void )
 			for ( i = 0; i < g_iDensity; i ++ )
 				{
 				valid = T( x, y, f_ppdLand [ i ] [ j ], c, r );
-				if ( valid && oldvalid )
+				if ( valid && oldvalid && f_ppiNode [ 2 ] [ i ] )
 					{
 					if ( i > 0 )
 						f_poSurface->line( oldc, oldr, c, r,
@@ -279,6 +278,9 @@ void HRenderer::draw_frame ( void )
 bool HRenderer::render_surface ( char const * a_pcFormula )
 	{
 	M_PROLOG
+	
+		{
+	M_CRITICAL_SECTION ( );
 	if ( ! a_pcFormula )
 		return ( true );
 
@@ -298,6 +300,7 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 	f_iGreen = 8;
 	f_iBlue = 0xf8;
 	makeland ( );
+		}
 	if ( ! HSurface::surface_count ( ) )
 		{
 		f_poSurface->init ( g_iResolutionX, g_iResolutionY );
