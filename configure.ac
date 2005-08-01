@@ -92,7 +92,7 @@ AC_TRY_COMPILE([#include <stdlib.h>],[],
 							_FLAGS=["$_FLAGS -pedantic-errors"]],
 							[AC_MSG_WARN([[Can not use -pedantic-errors!]])])
 CXXFLAGS=["$CXXFLAGS -Wl,--no-undefined -Wl,--fatal-warnings"]
-AC_LINK_IFELSE([[extern int errno;int main(void){return(errno);}]],
+AC_LINK_IFELSE([[extern int my_undefined_symbol;int main(void){return(my_undefined_symbol);}]],
 				[CXXFLAGS=$CXXFLAGS_ORIG],
 				[AC_SUBST([SPECIAL_LINKER_FLAGS],
 					[[-Wl,--allow-shlib-undefined]])]

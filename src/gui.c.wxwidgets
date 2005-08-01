@@ -93,13 +93,13 @@ private:
 private:
 	/*{*/
 	/* any class wishing to process wxWindows events must use this macro */
-	DECLARE_EVENT_TABLE ( );
+	DECLARE_EVENT_TABLE ( )
 	DECLARE_DYNAMIC_CLASS ( HFrame );
 	HFrame ( const HFrame & );
 	HFrame & operator = ( const HFrame & );
 	/*}*/
 	};
-IMPLEMENT_DYNAMIC_CLASS ( HFrame,  wxFrame );
+IMPLEMENT_DYNAMIC_CLASS ( HFrame,  wxFrame )
 
 /* Define a new application type, each program should derive a class from wxApp */
 class HApp : public wxApp
@@ -148,14 +148,14 @@ private:
 	friend class HFrame;
 	HEvtHandler ( const HEvtHandler & );
 	HEvtHandler & operator = ( const HEvtHandler & );
-	DECLARE_EVENT_TABLE ( );
+	DECLARE_EVENT_TABLE ( )
 	/*}*/
 	};
 
 BEGIN_EVENT_TABLE ( HEvtHandler, wxEvtHandler )
 	EVT_CHAR ( HEvtHandler::on_key_press )
 	EVT_LIST_ITEM_SELECTED ( XRCID ( "LISTCTRL_FORMULAS" ), HEvtHandler::on_list_item_select )
-END_EVENT_TABLE ( );
+END_EVENT_TABLE ( )
 
 /* event tables and other macros for wxWindows */
 
@@ -170,7 +170,7 @@ BEGIN_EVENT_TABLE ( HFrame, wxFrame )
 	EVT_MENU ( XRCID ( "ID_EXIT" ),		HFrame::on_quit )
 	EVT_MENU ( XRCID ( "ID_ABOUT" ),	HFrame::on_about )
 	EVT_SIZE ( HFrame::on_size )
-END_EVENT_TABLE ( );
+END_EVENT_TABLE ( )
 
 /* Create a new application object: this macro will allow wxWindows to create
  * the application object during program execution (it's better than using a
@@ -178,7 +178,7 @@ END_EVENT_TABLE ( );
  * wxGetApp() which will return the reference of the right type (i.e. HApp and
  * not wxApp) */
 
-IMPLEMENT_APP_NO_MAIN ( HApp );
+IMPLEMENT_APP_NO_MAIN ( HApp )
 IMPLEMENT_WX_THEME_SUPPORT
 
 /* implementation */
