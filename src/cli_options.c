@@ -30,21 +30,21 @@ Copyright:
 
 #include <stdhapi.h>
 
-#include "define.h"
-#include "version.h"
-#include "variables.h"
 #include "cli_options.h"
+#include "version.h"
+#include "setup.h"
 
 using namespace stdhapi;
 using namespace stdhapi::hcore;
   
 /* Set all the option flags according to the switches specified.
    Return the index of the first non-option argument.                    */
-
-void usage ( int a_iStatus )
+void usage ( void ) __attribute__ ( ( __noreturn__ ) );
+void usage ( void )
 	{
-	printf ( "%s - renders three dimensional function surfaces.\n", g_pcProgramName );
-	printf ( "Usage: %s [OPTION]...\n", g_pcProgramName );
+	printf ( "%s - "
+" renders three dimensional function surfaces.\n", setup.f_pcProgramName );
+	printf ( "Usage: %s [OPTION]... [FILE]...\n", setup.f_pcProgramName );
 	printf (
 "Options:\n"
 "  -X, --resolution-x         set x resolution\n"
@@ -56,84 +56,38 @@ void usage ( int a_iStatus )
 "  --verbose                  print more information\n"
 "  -h, --help                 display this help and exit\n"
 "  -V, --version              output version information and exit\n" );
-	exit ( a_iStatus );
+	exit ( setup.f_bHelp ? 0 : 1 );
+	}
+
+void version ( void ) __attribute__ ( ( __noreturn__ ) );
+void version ( void )
+	{
+	printf ( "`funlab' %s\n", VER );
+	exit ( 0 );
 	}
 
 int decode_switches ( int a_iArgc, char ** a_ppcArgv )
 	{
 	M_PROLOG
-	int l_iChar = 0;
-	hcore::log << "Decoding switches ... ";
-	while ( ( l_iChar = getopt_long ( a_iArgc, a_ppcArgv, 
-					"q"	 /* quiet or silent */
-					"v"	 /* verbose */
-					"h"	 /* help    */
-					"V"	 /* version */
-					"X:" /* resolution x */
-					"Y:" /* resolution y */
-					"D:" /* density */
-					"S"  /* stereo */
-					"F:", /* formula */ 
-					g_sLongOptions, ( int * ) 0 ) ) != EOF )
+	int l_iUnknown = 0, l_iNonOption = 0;
+	OOption l_psOptions [ ] =
 		{
-		switch ( l_iChar )
-			{
-			case ( 'X' ):
-				{
-				if ( optarg )
-					g_iResolutionX = strtol ( optarg, NULL, 10 );
-				break;
-				}
-			case ( 'Y' ):
-				{
-				if ( optarg )
-					g_iResolutionY = strtol ( optarg, NULL, 10 );
-				break;
-				}
-			case ( 'D' ):
-				{
-				if ( optarg )
-					g_iDensity = strtol ( optarg, NULL, 10 );
-				break;
-				}
-			case ( 'S' ):
-				{
-				g_bStereo = true;
-				break;
-				}
-			case ( 'F' ):
-				{
-				g_oFormula = optarg;
-				break;
-				}
-			case ( 'q' ):	 /* --quiet, --silent                                     */
-				{
-				g_iWantQuiet = 1;
-			  break;
-				}
-			case ( 'v' ):
-				{
-				g_iWantVerbose = 1;
-				break;
-				}
-			case ( 'V' ):
-				{
-				printf ( "`funlab' %s\n", VER );
-				exit ( 0 );
-				}
-			case ( 'h' ):
-				{
-				usage ( 0 );
-				break;
-				}
-			default:
-				{
-				usage (EXIT_FAILURE);
-				}
-			}
-		}
-	hcore::log << "done" << endl;
-	return ( optind );
+			{ "resolution-x",	'X', OOption::D_REQUIRED, D_INT,			& setup.f_iResolutionX,	NULL },
+			{ "resolution-y",	'Y', OOption::D_REQUIRED, D_INT,			& setup.f_iResolutionY,	NULL },
+			{ "density",			'D', OOption::D_REQUIRED, D_INT,			& setup.f_iDensity,			NULL },
+			{ "stereo",				'S', OOption::D_NONE,			D_BOOL,			& setup.f_bStereo,			NULL },
+			{ "formula",			'F', OOption::D_REQUIRED, D_HSTRING,	& setup.f_oFormula,			NULL },
+			{ "quiet",				'q', OOption::D_NONE,			D_BOOL,			& setup.f_bQuiet,				NULL },
+			{ "silent",				'q', OOption::D_NONE,			D_BOOL,			& setup.f_bQuiet,				NULL },
+			{ "verbose",			'v', OOption::D_NONE,			D_BOOL,			& setup.f_bVerbose,			NULL },
+			{ "help",					'h', OOption::D_NONE,			D_BOOL,			& setup.f_bHelp,				usage },
+			{ "version",			'V', OOption::D_NONE,			D_NONE,			NULL,										version }
+		};
+	l_iNonOption = cl_switch::decode_switches ( a_iArgc, a_ppcArgv, l_psOptions,
+			sizeof ( l_psOptions ) / sizeof ( OOption ), & l_iUnknown );
+	if ( l_iUnknown > 0 )
+		usage ( );
+	return ( l_iNonOption );
 	M_EPILOG
 	}
 

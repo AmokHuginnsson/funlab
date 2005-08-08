@@ -45,7 +45,7 @@ Copyright:
 #include <stdhapi.h>
 
 #include "version.h"
-#include "variables.h"
+#include "setup.h"
 #include "renderer.h"
 
 using namespace stdhapi::hcore;
@@ -209,7 +209,7 @@ bool HApp::OnInit ( void )
 	/* load resources */
 	wxImage::AddHandler ( new wxXPMHandler );
 	wxXmlResource::Get ( )->InitAllHandlers ( );
-	wxXmlResource::Get ( )->Load ( static_cast < char * > ( g_oResourcePath ) );
+	wxXmlResource::Get ( )->Load ( static_cast < char * > ( setup.f_oResourcePath ) );
 	
 	/* create the main application window */
 	f_poFrame = new HFrame ( );
@@ -250,7 +250,7 @@ void HFrame::layout ( void )
 	 * created initially) */
 	
 	/* set the frame icon */
-	wxIcon l_oIcon ( static_cast < char * > ( g_oIconPath ), wxBITMAP_TYPE_XPM );
+	wxIcon l_oIcon ( static_cast < char * > ( setup.f_oIconPath ), wxBITMAP_TYPE_XPM );
 	if ( l_oIcon.Ok ( ) )
 		SetIcon ( l_oIcon );
 

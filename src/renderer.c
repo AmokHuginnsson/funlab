@@ -35,7 +35,7 @@ Copyright:
 
 #include "renderer.h"
 #include "gl.h"
-#include "variables.h"
+#include "setup.h"
 
 using namespace stdhapi;
 using namespace stdhapi::hcore;
@@ -70,11 +70,11 @@ HRenderer::HRenderer ( void )
 		f_poAnalyser = NULL;
 		throw;
 		}
-	f_ppdLand = xcalloc ( g_iDensity, double * );
-	for ( l_iCtr = 0; l_iCtr < g_iDensity; l_iCtr ++ )
-		f_ppdLand [ l_iCtr ] = xcalloc ( g_iDensity, double );
+	f_ppdLand = xcalloc ( setup.f_iDensity, double * );
+	for ( l_iCtr = 0; l_iCtr < setup.f_iDensity; l_iCtr ++ )
+		f_ppdLand [ l_iCtr ] = xcalloc ( setup.f_iDensity, double );
 	for ( l_iCtr = 0; l_iCtr < 3; l_iCtr ++ )
-		f_ppiNode [ l_iCtr ] = xcalloc ( g_iDensity, int );
+		f_ppiNode [ l_iCtr ] = xcalloc ( setup.f_iDensity, int );
 	f_pdTrygo = xcalloc ( 1024, double );
 	for ( l_iCtr = 0; l_iCtr < 1024; l_iCtr ++ )
 		f_pdTrygo [ l_iCtr ] = sin( ( ( double ) l_iCtr * M_PI ) / 2048. );
@@ -89,7 +89,7 @@ HRenderer::HRenderer ( void )
 HRenderer::~HRenderer ( void )
 	{
 	M_PROLOG
-	if ( g_oFormula )
+	if ( setup.f_oFormula )
 		f_oCondition.wait ( );
 	while ( f_bBusy )
 		;
@@ -108,7 +108,7 @@ HRenderer::~HRenderer ( void )
 			xfree ( f_ppiNode [ l_iCtr ] );
 		f_ppiNode [ l_iCtr ] = NULL;
 		}
-	for ( l_iCtr = 0; l_iCtr < g_iDensity; l_iCtr ++ )
+	for ( l_iCtr = 0; l_iCtr < setup.f_iDensity; l_iCtr ++ )
 		{
 		if ( f_ppdLand [ l_iCtr ] )
 			xfree ( f_ppdLand [ l_iCtr ] );
@@ -129,13 +129,13 @@ void HRenderer::makeland( void )
 	f_dLowerXEdge = - f_dSize;
 	f_dLowerYEdge = - f_dSize;
 	E = f_dSize;
-	f_dResolution = ( E - f_dLowerYEdge ) / ( double ) g_iDensity;
+	f_dResolution = ( E - f_dLowerYEdge ) / ( double ) setup.f_iDensity;
 	y = f_dLowerXEdge;
-	for ( j = 0; j < g_iDensity; j ++ )
+	for ( j = 0; j < setup.f_iDensity; j ++ )
 		{
 		x = f_dLowerYEdge;
 		( * f_pdYVariable ) = y;
-		for ( i = 0; i < g_iDensity; i ++ )
+		for ( i = 0; i < setup.f_iDensity; i ++ )
 			{
 			( * f_pdXVariable ) = x;
 			f_ppdLand [ i ] [ j ] = f_poAnalyser->count ( );
@@ -195,7 +195,7 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 	y += f_dDY;
 	z += f_dDZ;
 
-	if ( g_bStereo )
+	if ( setup.f_bStereo )
 		{
 		int alpha = ( f_dDX > 0 ) ? 3 : - 3;
 		double ox = x;
@@ -210,9 +210,9 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 	_c = ( int ) ( -( x * f_dFOV ) / y );
 	_r = ( int ) ( -( z * f_dFOV ) / y );
 	_c = -_c;
-	_c += ( g_iResolutionX >> 1 );
+	_c += ( setup.f_iResolutionX >> 1 );
 	_r = -_r;
-	_r += ( g_iResolutionY >> 1 );
+	_r += ( setup.f_iResolutionY >> 1 );
 	return ( true );
 	M_EPILOG
 	}
@@ -228,35 +228,35 @@ void HRenderer::draw_frame ( void )
 	double x = 0, y = 0;
 	unsigned long int l_iRed = 0, l_iBlue = 0;
 	for ( j = 0; j < 3; j++ )
-		for ( i = 0; i < g_iDensity; i++ )
+		for ( i = 0; i < setup.f_iDensity; i++ )
 			f_ppiNode [ j ] [ i ] = 0;
 	f_dFOV = 240.0;
 	f_poSurface->clear ( );
 	precount ( );
-	if ( g_bStereo )
+	if ( setup.f_bStereo )
 		{
 		l_iRed = f_poSurface->RGB ( 0xff, 0, 0 );
 		l_iBlue = f_poSurface->RGB ( 0, 0, 0xff );
 		}
-	for ( f = 0; f < ( g_bStereo ? 2 : 1 ); f ++ )
+	for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
 		{
-		f_dDX = g_bStereo ? ( f ? - 4 : 4 ) : 0;
+		f_dDX = setup.f_bStereo ? ( f ? - 4 : 4 ) : 0;
 		y = f_dLowerXEdge;
-		for ( j = 0; j < g_iDensity; j ++ )
+		for ( j = 0; j < setup.f_iDensity; j ++ )
 			{
 			x = f_dLowerYEdge;
-			for ( i = 0; i < g_iDensity; i ++ )
+			for ( i = 0; i < setup.f_iDensity; i ++ )
 				{
 				valid = T( x, y, f_ppdLand [ i ] [ j ], c, r );
 				if ( valid && oldvalid && f_ppiNode [ 2 ] [ i ] )
 					{
 					if ( i > 0 )
 						f_poSurface->line( oldc, oldr, c, r,
-								g_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
+								setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 					if ( j > 0 )
 						f_poSurface->line( c, r, f_ppiNode [ 0 ] [ i ],
 								f_ppiNode [ 1 ] [ i ],
-								g_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
+								setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 					}
 				f_ppiNode [ 0 ] [ i ] = c;
 				f_ppiNode [ 1 ] [ i ] = r;
@@ -288,7 +288,7 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 	l_pdVariables = f_poAnalyser->analyse ( a_pcFormula );
 	if ( ! l_pdVariables )
 		{
-		if ( g_oFormula )
+		if ( setup.f_oFormula )
 			f_oCondition.signal ( );
 		return ( true );
 		}
@@ -303,13 +303,13 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 		}
 	if ( ! HSurface::surface_count ( ) )
 		{
-		f_poSurface->init ( g_iResolutionX, g_iResolutionY );
-		SDL_WarpMouse ( g_iResolutionX >> 1, g_iResolutionY >> 1 );
+		f_poSurface->init ( setup.f_iResolutionX, setup.f_iResolutionY );
+		SDL_WarpMouse ( setup.f_iResolutionX >> 1, setup.f_iResolutionY >> 1 );
 		f_bLoop = true;
 		spawn ( );
 		}
 	else
-		SDL_WarpMouse ( g_iResolutionX >> 1, g_iResolutionY >> 1 );
+		SDL_WarpMouse ( setup.f_iResolutionX >> 1, setup.f_iResolutionY >> 1 );
 	return ( false );
 	M_EPILOG
 	}
@@ -330,7 +330,7 @@ int HRenderer::run ( void )
 					{
 					dx = l_uEvent.motion.xrel > 0 ? l_uEvent.motion.xrel : - l_uEvent.motion.xrel;
 					dy = l_uEvent.motion.yrel > 0 ? l_uEvent.motion.yrel : - l_uEvent.motion.yrel;
-					if ( ( dx < ( g_iResolutionX >> 1 ) ) && ( dy < ( g_iResolutionY >> 1 ) ) )
+					if ( ( dx < ( setup.f_iResolutionX >> 1 ) ) && ( dy < ( setup.f_iResolutionY >> 1 ) ) )
 						{
 						switch ( l_uEvent.motion.state )
 							{
@@ -386,7 +386,7 @@ int HRenderer::run ( void )
 						{
 						case ( 'q' ):
 							{
-							if ( g_oFormula )
+							if ( setup.f_oFormula )
 								{
 								f_bLoop = false;
 								f_poSurface->down ( );

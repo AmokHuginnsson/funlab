@@ -31,21 +31,9 @@ Copyright:
 #include <stdhapi.h>
 M_CVSID ( "$CVSHeader$" );
 
-#include "variables.h"
+#include "setup.h"
 
 using namespace stdhapi::hcore;
-
-OVariable g_psVars [ ] =
-	{
-		{ D_HSTRING, "log_path", & g_oLogPath },
-		{ D_HSTRING, "icon_path", & g_oIconPath },
-		{ D_HSTRING, "resource_path", & g_oResourcePath },
-		{ D_INT, "resolution_x", & g_iResolutionX },
-		{ D_INT, "resolution_y", & g_iResolutionY },
-		{ D_INT, "density", & g_iDensity },
-		{ D_BOOL, "stereo", & g_bStereo },
-		{ D_NONE, NULL, NULL }
-	};
 
 bool set_variables ( HString & a_roOption, HString & a_roValue )
 	{
@@ -56,8 +44,19 @@ bool set_variables ( HString & a_roOption, HString & a_roValue )
 
 int process_funlabrc_file ( void )
 	{
-	rc_file::process_rc_file ( "funlab", NULL, g_psVars, NULL );
-	if ( ! g_oLogPath )
-		g_oLogPath = "funlab.log";
+	OVariable l_psVars [ ] =
+		{
+			{ D_HSTRING,	"log_path",				& setup.f_oLogPath },
+			{ D_HSTRING,	"icon_path",			& setup.f_oIconPath },
+			{ D_HSTRING,	"resource_path",	& setup.f_oResourcePath },
+			{ D_INT,			"resolution_x",		& setup.f_iResolutionX },
+			{ D_INT,			"resolution_y",		& setup.f_iResolutionY },
+			{ D_INT,			"density",				& setup.f_iDensity },
+			{ D_BOOL,			"stereo",					& setup.f_bStereo },
+			{ D_NONE,			NULL,							NULL }
+		};
+	rc_file::process_rc_file ( "funlab", NULL, l_psVars, NULL );
+	if ( ! setup.f_oLogPath )
+		setup.f_oLogPath = "funlab.log";
 	return ( 0 );
 	}
