@@ -53,7 +53,7 @@ int process_funlabrc_file ( void )
 			{ D_INT,			"resolution_y",		& setup.f_iResolutionY },
 			{ D_INT,			"density",				& setup.f_iDensity },
 			{ D_BOOL,			"stereo",					& setup.f_bStereo },
-			{ D_NONE,			NULL,							NULL }
+			{ D_VOID,			NULL,							NULL }
 		};
 	rc_file::process_rc_file ( "funlab", NULL, l_psVars, NULL );
 	if ( ! setup.f_oLogPath )
