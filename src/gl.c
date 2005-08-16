@@ -28,6 +28,7 @@ Copyright:
 #include <SDL/SDL.h>
 
 #include <stdhapi.h>
+M_CVSID ( "$CVSHeader$" );
 
 #include "gl.h"
 
