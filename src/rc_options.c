@@ -37,8 +37,9 @@ using namespace stdhapi::hcore;
 
 bool set_variables ( HString & a_roOption, HString & a_roValue )
 	{
-	printf ( "option: [%s], value: [%s]\n", ( char * ) a_roOption,
-			( char * ) a_roValue );
+	fprintf ( stdout, "option: [%s], value: [%s]\n",
+			static_cast < char const * const > ( a_roOption ),
+			static_cast < char const * const > ( a_roValue ) );
 	return ( false );
 	}
 
