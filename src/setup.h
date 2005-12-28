@@ -29,12 +29,6 @@ Copyright:
 
 struct OSetup
 	{
-	OSetup ( void ) : f_bQuiet ( false ), f_bVerbose ( false ),
-										f_bHelp ( false ), f_bStereo ( false ),
-										f_iDensity ( 32 ), f_iResolutionX ( 640 ),
-										f_iResolutionY ( 480 ), f_pcProgramName ( NULL ),
-										f_oLogPath ( ), f_oFormula ( ), f_oResourcePath ( ),
-										f_oIconPath ( ) {}
 	bool f_bQuiet;			/* --quiet, --silent */
 	bool f_bVerbose;		/* --verbose */
 	bool f_bHelp;
@@ -47,6 +41,13 @@ struct OSetup
 	stdhapi::hcore::HString f_oFormula;
 	stdhapi::hcore::HString f_oResourcePath;
 	stdhapi::hcore::HString f_oIconPath;
+	/* self-sufficient */
+	OSetup ( void ) : f_bQuiet ( false ), f_bVerbose ( false ),
+										f_bHelp ( false ), f_bStereo ( false ),
+										f_iDensity ( 32 ), f_iResolutionX ( 640 ),
+										f_iResolutionY ( 480 ), f_pcProgramName ( NULL ),
+										f_oLogPath ( ), f_oFormula ( ), f_oResourcePath ( ),
+										f_oIconPath ( ) {}
 private:
 	OSetup ( OSetup const & );
 	OSetup & operator = ( OSetup const & );
