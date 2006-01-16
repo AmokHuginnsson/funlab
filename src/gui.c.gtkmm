@@ -93,7 +93,7 @@ HWindowMain::HWindowMain ( BaseObjectType * a_poBaseObject,
 	/* FORMULAS LIST */
 	a_roResources->get_widget ( "TREE_FORMULAS", f_poFormulasList );
 	a_roResources->get_widget ( "EDIT_FORMULA", f_poFormulaEdit );
-	
+	f_poFormulasList->append_column_editable ( _ ( "Formulas" ),  );
 	return;
 	M_EPILOG
 	}
@@ -162,12 +162,12 @@ int gui_start ( int a_iArgc, char * a_ppcArgv [ ] )
 		}
 	catch ( Glib::Exception & e )
 		{
-		cerr << e.what ( ) << endl;
+		cerr << "Glib::Exception: " << e.what ( ) << endl;
 		return ( - 1 );
 		}
 	catch ( std::exception & e )
 		{
-		cerr << e.what ( ) << endl;
+		cerr << "std::exception: " << e.what ( ) << endl;
 		return ( - 1 );
 		}
 	return ( 0 );
