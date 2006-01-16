@@ -36,7 +36,7 @@ VPATH					= $(DIR_ROOT)/src
 DIR_DEST 			=
 prefix				= $(DIR_DEST)/usr/bin
 doc						= $(DIR_DEST)/usr/share/doc
-LIBS					= SDL wx_gtk_xrc-2.4 hcore hconsole hdata dbwrapper tools
+LIBS					= SDL @GUI_LIBS@ hcore hconsole hdata dbwrapper tools
 TARGET				= 1exec
 ifdef NODEBUG
 	TARGET = $(FUNLABNAME)
@@ -107,26 +107,26 @@ else
 endif
 COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I$(DIR_BUILD) \
 																-I/usr/local/include
-COMPILER_WX_FLAGS							= $(shell wx-config --cxxflags)
+COMPILER_@GUI_TYPE@_FLAGS			= @GUI_FLAGS@
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib
 LINKER_PRIME_FLAGS						= \
 								@SPECIAL_LINKER_FLAGS@\
 								-Wl,--fatal-warnings\
 								-Wl,--demangle\
 
-LINKER_WX_FLAGS								= $(shell wx-config --libs) $(shell wx-config --gl-libs)
+LINKER_@GUI_TYPE@_FLAGS				= @GUI_FLAGS@
 
 CXXFLAGS			= $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
 								$(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) \
 								$(COMPILER_PATH_FLAGS) $(COMPILER_PRIME_FLAGS) \
-								$(COMPILER_WX_FLAGS)
-LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS) $(LINKER_WX_FLAGS)
+								$(COMPILER_@GUI_TYPE@_FLAGS)
+LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS) $(LINKER_@GUI_TYPE@_FLAGS)
 
 STATICLIBS = $(patsubst %, ~/lib/lib%.a, $(LIBS))
-LIBS := $(patsubst %, -l%, $(LIBS))
+LIBS := $(subst -l-l, -l, $(patsubst %, -l%, $(LIBS)))
 
 STATICLIBS += -rdynamic -ldl
-STATICLIBS += -lncurses -lSDL -lwx_gtk_xrc-2.4 $(LINKER_WX_FLAGS)
+STATICLIBS += -lncurses -lSDL @GUI_LIBS@ $(LINKER_@GUI_TYPE@_FLAGS)
 #STATICLIBS += -lccmalloc
 
 ifeq ($(CURDIR),$(DIR_BUILD))

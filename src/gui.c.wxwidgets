@@ -1,7 +1,7 @@
 /*
 ---       `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski         ---
 
-	rc_options.c - this file is integral part of `funlab' project.
+	gui.c.wxwidgets - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -514,3 +514,4 @@ void HEvtHandler::on_list_item_select ( wxListEvent & a_roEvent )
 	M_EPILOG
 	}
 
+/* vim: set ft=c : */

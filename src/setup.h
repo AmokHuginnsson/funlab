@@ -27,6 +27,8 @@ Copyright:
 #ifndef __SETUP_H
 #define __SETUP_H
 
+#include <stdhapi.h>
+
 struct OSetup
 	{
 	bool f_bQuiet;			/* --quiet, --silent */

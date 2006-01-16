@@ -143,6 +143,13 @@ void foo(){printw("x");}],[AC_MSG_RESULT([[no :)]])],
 		AC_MSG_ERROR([Can not continue with brain-damaged ncurses.])])
 
 dnl We have to set up proper compiler/linker flags.
+
+dnl Hardcoded quick fix.
+AC_SUBST([GUI_TYPE],[GTKMM])
+AC_SUBST([GUI_LIBS],[["\$(shell pkg-config --libs-only-l \`pkg-config --list-all|awk '/gtkmm/{print \$\$1}'\`)"]])
+AC_SUBST([GUI_FLAGS],[["\$(shell pkg-config --cflags --libs-only-other --libs-only-L \`pkg-config --list-all|awk '/gtkmm/{print \$\$1}'\`)"]])
+dnl end
+
 AC_OUTPUT([Makefile])
 AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
 AC_MSG_RESULT([[Now you can type \`make'.]])

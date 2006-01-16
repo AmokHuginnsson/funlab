@@ -75,8 +75,8 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 				l_oArrow += 'v';
 				fprintf ( stderr, _ ( "Formula syntax error ...\n%s at this place:\n%s\n%s\n" ),
 						static_cast < char const * > ( l_oRenderer.error ( ) ),
-						static_cast < char * > ( l_oArrow ),
-						static_cast < char * > ( setup.f_oFormula ) );
+						static_cast < char const * > ( l_oArrow ),
+						static_cast < char const * > ( setup.f_oFormula ) );
 				}
 			}
 		else
