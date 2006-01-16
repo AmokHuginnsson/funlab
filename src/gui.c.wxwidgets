@@ -514,4 +514,4 @@ void HEvtHandler::on_list_item_select ( wxListEvent & a_roEvent )
 	M_EPILOG
 	}
 
-/* vim: set ft=c : */
+/* vim: set ft=cpp : */

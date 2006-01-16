@@ -146,8 +146,8 @@ dnl We have to set up proper compiler/linker flags.
 
 dnl Hardcoded quick fix.
 AC_SUBST([GUI_TYPE],[GTKMM])
-AC_SUBST([GUI_LIBS],[["\$(shell pkg-config --libs-only-l \`pkg-config --list-all|awk '/gtkmm/{print \$\$1}'\`)"]])
-AC_SUBST([GUI_FLAGS],[["\$(shell pkg-config --cflags --libs-only-other --libs-only-L \`pkg-config --list-all|awk '/gtkmm/{print \$\$1}'\`)"]])
+AC_SUBST([GUI_LIBS],[["\$(shell pkg-config --libs-only-l \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
+AC_SUBST([GUI_FLAGS],[["\$(shell pkg-config --cflags --libs-only-other --libs-only-L \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
 dnl end
 
 AC_OUTPUT([Makefile])

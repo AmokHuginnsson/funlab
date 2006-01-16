@@ -3,7 +3,8 @@
 
 log_path ${HOME}/prog/funlab/x_funlab.log
 icon_path ${HOME}/prog/funlab/res/funlab.xpm
-resource_path ${HOME}/prog/funlab/res/funlab.xrc
+#resource_path ${HOME}/prog/funlab/res/funlab.xrc
+resource_path ${HOME}/prog/funlab/res/funlab.glade
 resolution_x 640
 resolution_y 480
 density 32

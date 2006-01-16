@@ -24,17 +24,154 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <gtkmm.h>
+#include <libglademm/xml.h>
+#include <iostream>
+
 #include "version.h"
 #include "setup.h"
 #include "renderer.h"
 
+using namespace std;
 using namespace stdhapi::hcore;
+
+class HWindowMain : public Gtk::Window
+	{
+protected:
+	/*{*/
+	Gtk::TreeView * f_poFormulasList;
+	Gtk::Entry * f_poFormulaEdit;
+	/*}*/
+public:
+	/*{*/
+	HWindowMain ( BaseObjectType *, Glib::RefPtr< Gnome::Glade::Xml > const & );
+	virtual ~HWindowMain ( void );
+	/*}*/
+protected:
+	/*{*/
+	void on_new ( void );
+	void on_open ( void );
+	void on_save_as ( void );
+	void on_quit ( void );
+	void on_about ( void );
+	/*}*/
+	};
+
+HWindowMain::HWindowMain ( BaseObjectType * a_poBaseObject,
+		Glib::RefPtr< Gnome::Glade::Xml > const & a_roResources )
+	: Gtk::Window ( a_poBaseObject ),
+	f_poFormulasList ( NULL ), f_poFormulaEdit ( NULL )
+	{
+	M_PROLOG
+	Gtk::ToolButton * l_poToolButton = NULL;
+	Gtk::MenuItem * l_poMenuItem = NULL;
+	/* NEW */
+	a_roResources->get_widget ( "ID_TOOLBAR_NEW", l_poToolButton );
+	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_new ) );
+	a_roResources->get_widget ( "ID_MENU_NEW", l_poMenuItem );
+	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_new ) );
+	/* OPEN */
+	a_roResources->get_widget ( "ID_TOOLBAR_OPEN", l_poToolButton );
+	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_open ) );
+	a_roResources->get_widget ( "ID_MENU_OPEN", l_poMenuItem );
+	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_open ) );
+	/* SAVE_AS */
+	a_roResources->get_widget ( "ID_TOOLBAR_SAVE_AS", l_poToolButton );
+	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_save_as ) );
+	a_roResources->get_widget ( "ID_MENU_SAVE_AS", l_poMenuItem );
+	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_save_as ) );
+	/* QUIT */
+	a_roResources->get_widget ( "ID_TOOLBAR_QUIT", l_poToolButton );
+	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_quit ) );
+	a_roResources->get_widget ( "ID_MENU_QUIT", l_poMenuItem );
+	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_quit ) );
+	/* ABOUT */
+	a_roResources->get_widget ( "ID_TOOLBAR_ABOUT", l_poToolButton );
+	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_about ) );
+	a_roResources->get_widget ( "ID_MENU_ABOUT", l_poMenuItem );
+	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_about ) );
+	/* FORMULAS LIST */
+	a_roResources->get_widget ( "TREE_FORMULAS", f_poFormulasList );
+	a_roResources->get_widget ( "EDIT_FORMULA", f_poFormulaEdit );
+	
+	return;
+	M_EPILOG
+	}
+
+HWindowMain::~HWindowMain ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+void HWindowMain::on_new ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+void HWindowMain::on_open ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+void HWindowMain::on_save_as ( void )
+	{
+	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+void HWindowMain::on_quit ( void )
+	{
+	M_PROLOG
+	Gtk::Main::quit ( );
+	return;
+	M_EPILOG
+	}
+
+void HWindowMain::on_about ( void )
+	{
+	M_PROLOG
+	HString l_oMsg;
+	l_oMsg.format ( _ ( "The funlab program, very fancy GUI application that\n"
+				"can be used for rendering function surfaces.\n"
+				"Welcome to funlab %s" ), VER );
+	Gtk::MessageDialog l_oMessageAbout ( * this, static_cast < char const * const > ( l_oMsg ) );
+	l_oMessageAbout.set_title ( _ ( "About funlab" ) );
+	l_oMessageAbout.run ( );
+	return;
+	M_EPILOG
+	}
 
 int gui_start ( int a_iArgc, char * a_ppcArgv [ ] )
 	{
 	M_PROLOG
-	return ( a_iArgc && a_ppcArgv );
+	try
+		{
+		Gtk::Main l_oGUI ( a_iArgc, a_ppcArgv );
+		Glib::RefPtr < Gnome::Glade::Xml > l_oResources = Gnome::Glade::Xml::create (
+				static_cast < char const * const > ( setup.f_oResourcePath ) );
+		HWindowMain * l_poWindowMain = NULL;
+		l_oResources->get_widget_derived ( "WINDOW_MAIN", l_poWindowMain );
+		l_oGUI.run ( * l_poWindowMain );
+		}
+	catch ( Glib::Exception & e )
+		{
+		cerr << e.what ( ) << endl;
+		return ( - 1 );
+		}
+	catch ( std::exception & e )
+		{
+		cerr << e.what ( ) << endl;
+		return ( - 1 );
+		}
+	return ( 0 );
 	M_EPILOG
 	}
 
-/* vim: set ft=c : */
+/* vim: set ft=cpp : */

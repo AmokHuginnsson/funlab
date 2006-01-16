@@ -58,7 +58,7 @@ FIND	= find
 CXX ?= g++
 CXX := $(subst -x c++ -x c++,-x c++,$(subst colorgcc,colorgcc -x c++,$(CXX)))
 DXX ?= $(CXX)
-DXX := $(subst -x c++,,$(subst colorgcc,g++,$(DXX)))
+DXX := $(subst -x c++,,$(subst colorg,g,$(DXX)))
 LXX ?= g++
 ARFLAGS = r
 CWARNING_FLAGS =	\
@@ -75,8 +75,6 @@ CWARNING_FLAGS =	\
 						-Wlong-long\
 						-Wmissing-noreturn\
 						-Wpointer-arith\
-						-Wredundant-decls\
-						@WARN_SHADOW@\
 						-Wsign-compare\
 						-Wundef\
 						-Wwrite-strings
@@ -87,11 +85,13 @@ CWARNING_FLAGS =	\
 						-Wstrict-prototypes\
 						-Wtraditional\ #C only
 #						-Wmissing-format-attribute\
+						-Wredundant-decls\
+						@WARN_SHADOW@\
 						-Wunreachable-code\ # too much warrnings
 #						-Waggregate-return\ # useless for C++
 CXXWARNING_FLAGS		=	\
-						-Weffc++\
 						-Wsign-promo
+#						-Weffc++\
 #						-Wold-style-cast\ # lots of warrnings from libc headers
 #						-Woverloaded-virtual\ # too much unecessary warrnings
 ifeq ($(HD),1)
@@ -111,8 +111,8 @@ COMPILER_@GUI_TYPE@_FLAGS			= @GUI_FLAGS@
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib
 LINKER_PRIME_FLAGS						= \
 								@SPECIAL_LINKER_FLAGS@\
-								-Wl,--fatal-warnings\
 								-Wl,--demangle\
+#								-Wl,--fatal-warnings\
 
 LINKER_@GUI_TYPE@_FLAGS				= @GUI_FLAGS@
 

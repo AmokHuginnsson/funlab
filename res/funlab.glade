@@ -4,7 +4,7 @@
 <glade-interface>
 
 <widget class="GtkWindow" id="WINDOW_MAIN">
-  <property name="width_request">360</property>
+  <property name="width_request">480</property>
   <property name="height_request">360</property>
   <property name="visible">True</property>
   <property name="title" translatable="yes">funlab 0.0.0</property>
@@ -34,7 +34,7 @@
 	  <property name="child_pack_direction">GTK_PACK_DIRECTION_LTR</property>
 
 	  <child>
-	    <widget class="GtkMenuItem" id="ID_FILE">
+	    <widget class="GtkMenuItem" id="ID_MENU_FILE">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">_File</property>
 	      <property name="use_underline">True</property>
@@ -43,38 +43,34 @@
 		<widget class="GtkMenu" id="MENU_FILE">
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_NEW">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_NEW">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-new</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_new" last_modification_time="Sat, 14 Jan 2006 21:37:01 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_OPEN">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_OPEN">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-open</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_open" last_modification_time="Sat, 14 Jan 2006 21:37:10 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_SAVE">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_SAVE">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-save</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_save" last_modification_time="Sat, 14 Jan 2006 21:37:18 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_SAVE_AS">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_SAVE_AS">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-save-as</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_save_as" last_modification_time="Sat, 14 Jan 2006 21:37:28 GMT"/>
 		    </widget>
 		  </child>
 
@@ -85,11 +81,10 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_QUIT">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_QUIT">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-quit</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_quit" last_modification_time="Sat, 14 Jan 2006 21:37:40 GMT"/>
 		    </widget>
 		  </child>
 		</widget>
@@ -98,7 +93,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkMenuItem" id="ID_EDIT">
+	    <widget class="GtkMenuItem" id="ID_MENU_EDIT">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">_Edit</property>
 	      <property name="use_underline">True</property>
@@ -107,38 +102,34 @@
 		<widget class="GtkMenu" id="MENU_EDIT">
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_CUT">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_CUT">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-cut</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_cut" last_modification_time="Sat, 14 Jan 2006 21:37:51 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_COPY">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_COPY">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-copy</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_copy" last_modification_time="Sat, 14 Jan 2006 21:38:14 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_PASTE">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_PASTE">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-paste</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_paste" last_modification_time="Sat, 14 Jan 2006 21:37:59 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="ID_DELETE">
+		    <widget class="GtkImageMenuItem" id="ID_MENU_DELETE">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-delete</property>
 		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_delete" last_modification_time="Sat, 14 Jan 2006 21:38:24 GMT"/>
 		    </widget>
 		  </child>
 		</widget>
@@ -147,7 +138,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkMenuItem" id="ID_HELP">
+	    <widget class="GtkMenuItem" id="ID_MENU_HELP">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">_Help</property>
 	      <property name="use_underline">True</property>
@@ -156,11 +147,10 @@
 		<widget class="GtkMenu" id="MENU_HELP">
 
 		  <child>
-		    <widget class="GtkMenuItem" id="about1">
+		    <widget class="GtkMenuItem" id="ID_MENU_ABOUT">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_About</property>
 		      <property name="use_underline">True</property>
-		      <signal name="activate" handler="on_about" last_modification_time="Sat, 14 Jan 2006 21:38:32 GMT"/>
 		    </widget>
 		  </child>
 		</widget>
@@ -184,13 +174,12 @@
 	  <property name="show_arrow">True</property>
 
 	  <child>
-	    <widget class="GtkToolButton" id="ID_NEW">
+	    <widget class="GtkToolButton" id="ID_TOOLBAR_NEW">
 	      <property name="visible">True</property>
 	      <property name="stock_id">gtk-new</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_new" last_modification_time="Sat, 14 Jan 2006 21:36:52 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -199,13 +188,12 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="ID_OPEN">
+	    <widget class="GtkToolButton" id="ID_TOOLBAR_OPEN">
 	      <property name="visible">True</property>
 	      <property name="stock_id">gtk-open</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_open" last_modification_time="Sat, 14 Jan 2006 21:38:48 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -214,13 +202,12 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="ID_SAVE_AS">
+	    <widget class="GtkToolButton" id="ID_TOOLBAR_SAVE_AS">
 	      <property name="visible">True</property>
 	      <property name="stock_id">gtk-save-as</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_save_as" last_modification_time="Sat, 14 Jan 2006 21:39:01 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -229,13 +216,12 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="ID_ADD">
+	    <widget class="GtkToolButton" id="ID_TOOLBAR_ADD">
 	      <property name="visible">True</property>
 	      <property name="stock_id">gtk-add</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_add" last_modification_time="Sat, 14 Jan 2006 21:39:13 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -244,13 +230,12 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="ID_REMOVE">
+	    <widget class="GtkToolButton" id="ID_TOOLBAR_REMOVE">
 	      <property name="visible">True</property>
 	      <property name="stock_id">gtk-remove</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_remove" last_modification_time="Sat, 14 Jan 2006 21:39:25 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -259,13 +244,12 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="ID_QUIT">
+	    <widget class="GtkToolButton" id="ID_TOOLBAR_QUIT">
 	      <property name="visible">True</property>
 	      <property name="stock_id">gtk-quit</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_quit" last_modification_time="Sat, 14 Jan 2006 21:39:42 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -274,13 +258,12 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="ID_ABOUT">
+	    <widget class="GtkToolButton" id="ID_TOOLBAR_ABOUT">
 	      <property name="visible">True</property>
 	      <property name="stock_id">gtk-about</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_about" last_modification_time="Sat, 14 Jan 2006 21:39:55 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
