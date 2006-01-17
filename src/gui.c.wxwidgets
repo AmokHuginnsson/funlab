@@ -333,7 +333,7 @@ void HFrame::on_about ( wxCommandEvent & )
 	return;
 	}
 
-void HFrame::open ( const HString & a_oPath )
+void HFrame::open ( HString const & a_oPath )
 	{
 	M_PROLOG
 	if ( a_oPath.is_empty ( ) )
@@ -345,7 +345,7 @@ void HFrame::open ( const HString & a_oPath )
 	if ( l_oFile )
 		{
 		while ( l_oFile.read_line ( l_oLine, HFile::D_STRIP_NEWLINES ) >= 0 )
-			f_poList->InsertItem ( l_iIndex ++, static_cast < char * > ( l_oLine ) );
+			f_poList->InsertItem ( l_iIndex ++, static_cast < char const * const > ( l_oLine ) );
 		l_oFile.close ( );
 		}
 	f_poList->SetFocus ( );
@@ -356,22 +356,19 @@ void HFrame::open ( const HString & a_oPath )
 	M_EPILOG
 	}
 
-void HFrame::save ( const HString & a_oPath )
+void HFrame::save ( HString const & a_oPath )
 	{
 	M_PROLOG
 	if ( a_oPath.is_empty ( ) )
 		M_THROW ( _ ( "Empty path." ), g_iErrNo );
 	int l_iIndex = 0, l_iCount = f_poList->GetItemCount ( );
 	HFile l_oFile ( HFile::D_WRITING );
-	if ( l_iCount )
+	l_oFile.open ( a_oPath );
+	if ( l_oFile )
 		{
-		l_oFile.open ( a_oPath );
-		if ( l_oFile )
-			{
-			for ( l_iIndex = 0; l_iIndex < l_iCount ; l_iIndex ++ )
-				l_oFile << f_poList->GetItemText ( l_iIndex ) << endl;
-			l_oFile.close ( );
-			}
+		for ( l_iIndex = 0; l_iIndex < l_iCount; l_iIndex ++ )
+			l_oFile << f_poList->GetItemText ( l_iIndex ) << endl;
+		l_oFile.close ( );
 		}
 	return;
 	M_EPILOG
