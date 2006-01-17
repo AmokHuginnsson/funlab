@@ -362,6 +362,25 @@ bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
 					Gtk::MessageDialog l_oInfo ( * this,
 							static_cast < char const * const > ( l_oError ) );
 					l_oInfo.set_title ( _ ( "Formula syntax error ..." ) );
+					Pango::FontDescription l_oFontDesc;
+//					l_oFontDesc.set_family ( "fixed" );
+					l_oFontDesc.set_size ( 14 );
+//					Glib::ListHandle<Widget*> l = l_oInfo.get_children ( );
+					Gtk::Box_Helpers::BoxList &gg=l_oInfo.get_action_area ( )->children ( );
+					for ( Gtk::Box_Helpers::BoxList::iterator k = gg.begin ( ); k != gg.end ( ); ++k )
+						{
+//					Glib::ListHandle<Widget*> l = k->get_widget ( )->get_children ( );
+//						for ( Glib::ListHandle<Widget*>::iterator i = l.begin ( ); i != l.end ( ); ++ i )
+	//						{
+		//					Gtk::MessageDialog o ( * this, ( *i )->get_name ( ) );
+							Gtk::MessageDialog o ( * this, k->get_widget ( )->get_name ( ) );
+							static_cast < Gtk::Button * > ( k->get_widget ( ) )->get_child ( )->modify_font ( l_oFontDesc );
+							k->get_widget ( )->modify_font ( l_oFontDesc );
+							static_cast < Gtk::Button * > ( k->get_widget ( ) )->set_label ( "kurwa" );
+							o.run ( );
+							//( *i )->modify_font ( l_oFontDesc );
+			//				}
+						}
 					l_oInfo.run ( );
 /*					
 					wxFont * l_poFont = & f_poList->GetFont ( );
