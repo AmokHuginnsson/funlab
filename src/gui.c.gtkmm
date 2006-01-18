@@ -71,6 +71,8 @@ protected:
 	void on_remove ( void );
 	void on_sel_changed ( void );
 	bool on_key_press ( GdkEventKey * );
+	void show_error_message ( char const * const, char const * const, int );
+	void set_font_all ( Pango::FontDescription const &, Gtk::Widget * );
 	void open ( HString const & );
 	void save ( HString const & );
 	/*}*/
@@ -324,9 +326,7 @@ void HWindowMain::on_sel_changed ( void )
 bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
 	{
 	M_PROLOG
-	int l_iCtr = 0, l_iPosition = 0;
-	static char const l_pcSpace [ ] = "                                                       ";
-	HString l_oFormula, l_oError, l_oArrow;
+	HString l_oFormula;
 	switch ( a_poEventKey->keyval )
 		{
 		case ( GDK_Delete ):
@@ -347,60 +347,7 @@ bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
 				{
 				l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str ( );
 				if ( f_oRenderer.render_surface ( l_oFormula ) )
-					{
-					l_iPosition = f_oRenderer.error_position ( );
-					for ( l_iCtr = 0; l_iCtr < l_iPosition; l_iCtr ++ )
-						l_oArrow += '-';
-					l_oArrow += 'v';
-					l_oArrow += l_pcSpace;
-					l_oFormula += l_pcSpace;
-					l_oError.format ( "%s at this place:%s\n\n%s\n%s",
-							static_cast < char const * const > ( f_oRenderer.error ( ) ),
-							l_pcSpace,
-							static_cast < char const * const > ( l_oArrow ),
-							static_cast < char const * const > ( l_oFormula ) );
-					Gtk::MessageDialog l_oInfo ( * this,
-							static_cast < char const * const > ( l_oError ) );
-					l_oInfo.set_title ( _ ( "Formula syntax error ..." ) );
-					Pango::FontDescription l_oFontDesc;
-//					l_oFontDesc.set_family ( "fixed" );
-					l_oFontDesc.set_size ( 14 );
-//					Glib::ListHandle<Widget*> l = l_oInfo.get_children ( );
-					Gtk::Box_Helpers::BoxList &gg=l_oInfo.get_action_area ( )->children ( );
-					for ( Gtk::Box_Helpers::BoxList::iterator k = gg.begin ( ); k != gg.end ( ); ++k )
-						{
-//					Glib::ListHandle<Widget*> l = k->get_widget ( )->get_children ( );
-//						for ( Glib::ListHandle<Widget*>::iterator i = l.begin ( ); i != l.end ( ); ++ i )
-	//						{
-		//					Gtk::MessageDialog o ( * this, ( *i )->get_name ( ) );
-							Gtk::MessageDialog o ( * this, k->get_widget ( )->get_name ( ) );
-							static_cast < Gtk::Button * > ( k->get_widget ( ) )->get_child ( )->modify_font ( l_oFontDesc );
-							k->get_widget ( )->modify_font ( l_oFontDesc );
-							static_cast < Gtk::Button * > ( k->get_widget ( ) )->set_label ( "kurwa" );
-							o.run ( );
-							//( *i )->modify_font ( l_oFontDesc );
-			//				}
-						}
-					l_oInfo.run ( );
-/*					
-					wxFont * l_poFont = & f_poList->GetFont ( );
-					if ( l_poFont );
-						l_oInfo.SetFont ( * l_poFont );
-					wxWindowList * l_poList = & l_oInfo.GetChildren ( );
-					if ( l_poList )
-						{
-						wxWindowListNode * l_poNode = l_poList->GetFirst ( );
-					  while  ( l_poNode )
-							{
-							wxWindow * l_poWindow = l_poNode->GetData ( );
-							if ( l_poWindow )
-								l_poWindow->SetFont ( * l_poFont );
-							l_poNode = l_poNode->GetNext ( );
-							}
-						}
-					l_oInfo.ShowModal ( );
-*/
-					}
+					show_error_message ( l_oFormula, f_oRenderer.error ( ), f_oRenderer.error_position ( ) );
 				f_bRendererActive = true;
 				}
 			break;
@@ -412,6 +359,70 @@ bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
 		}
 		
 	return ( false );
+	M_EPILOG
+	}
+
+void HWindowMain::show_error_message ( char const * const a_pcFormula,
+		char const * const a_pcMessage, int a_iPosition )
+	{
+	M_PROLOG
+	int l_iCtr = 0;
+	HString l_oError, l_oArrow;
+	for ( l_iCtr = 0; l_iCtr < a_iPosition; l_iCtr ++ )
+		l_oArrow += '-';
+	l_oArrow += 'v';
+	l_oError.format ( "<b>%s at this place:<tt>\n\n%s\n%s</tt></b>",
+			a_pcMessage, static_cast < char const * const > ( l_oArrow ),
+			a_pcFormula );
+	Gtk::MessageDialog l_oInfo ( * this,
+			static_cast < char const * const > ( l_oError ), true );
+	l_oInfo.set_title ( _ ( "Formula syntax error ..." ) );
+	Pango::FontDescription l_oFontDesc ( "Sans Bold 14" );
+	set_font_all ( l_oFontDesc, & l_oInfo );
+	l_oInfo.run ( );
+	return;
+	M_EPILOG
+	}
+
+void HWindowMain::set_font_all ( Pango::FontDescription const & a_oFontDesc,
+		Gtk::Widget * a_poWidget )
+	{
+	M_PROLOG
+	if ( ! a_poWidget )
+		return;
+	a_poWidget->modify_font ( a_oFontDesc );
+	Gtk::Dialog * l_poDialog = dynamic_cast < Gtk::Dialog * > ( a_poWidget );
+	Gtk::Box * l_poBox = dynamic_cast < Gtk::Box * > ( a_poWidget );
+	Gtk::Window * l_poWindow = dynamic_cast < Gtk::Window * > ( a_poWidget );
+	Gtk::Label * l_poLabel = dynamic_cast < Gtk::Label * > ( a_poWidget );
+	if ( l_poLabel )
+		l_poLabel->set_line_wrap ( false );
+	if ( l_poDialog )
+		{
+		set_font_all ( a_oFontDesc, l_poDialog->get_vbox ( ) );
+		set_font_all ( a_oFontDesc, l_poDialog->get_action_area ( ) );
+		}
+	else if ( l_poWindow )
+		{
+		Glib::ListHandle < Widget * > l_oChildren = l_poWindow->get_children ( );
+		for ( Glib::ListHandle < Widget * >::iterator l_oChildIterator = l_oChildren.begin ( );
+				l_oChildIterator != l_oChildren.end ( ); ++ l_oChildIterator )
+			set_font_all ( a_oFontDesc, * l_oChildIterator );
+		}
+	else if ( l_poBox )
+		{
+		Gtk::Box_Helpers::BoxList & l_oBoxList = l_poBox->children ( );
+		for ( Gtk::Box_Helpers::BoxList::iterator l_oBoxIterator = l_oBoxList.begin ( );
+				l_oBoxIterator != l_oBoxList.end ( ); ++ l_oBoxIterator )
+			set_font_all ( a_oFontDesc, l_oBoxIterator->get_widget ( ) );
+		Glib::ListHandle < Widget * > l_oChildren = l_poBox->get_children ( );
+		for ( Glib::ListHandle < Widget * >::iterator l_oChildIterator = l_oChildren.begin ( );
+				l_oChildIterator != l_oChildren.end ( ); ++ l_oChildIterator )
+			set_font_all ( a_oFontDesc, * l_oChildIterator );
+		}
+//	Gtk::MessageDialog o ( * this, a_poWidget->get_name ( ) );
+//	o.run ( );
+	return;
 	M_EPILOG
 	}
 

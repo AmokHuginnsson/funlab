@@ -210,7 +210,7 @@ bool HApp::OnInit ( void )
 	/* load resources */
 	wxImage::AddHandler ( new wxXPMHandler );
 	wxXmlResource::Get ( )->InitAllHandlers ( );
-	wxXmlResource::Get ( )->Load ( static_cast < char * > ( setup.f_oResourcePath ) );
+	wxXmlResource::Get ( )->Load ( static_cast < char const * const > ( setup.f_oResourcePath ) );
 	
 	/* create the main application window */
 	f_poFrame = new HFrame ( );
@@ -251,7 +251,7 @@ void HFrame::layout ( void )
 	 * created initially) */
 	
 	/* set the frame icon */
-	wxIcon l_oIcon ( static_cast < char * > ( setup.f_oIconPath ), wxBITMAP_TYPE_XPM );
+	wxIcon l_oIcon ( static_cast < char const * const > ( setup.f_oIconPath ), wxBITMAP_TYPE_XPM );
 	if ( l_oIcon.Ok ( ) )
 		SetIcon ( l_oIcon );
 
@@ -328,7 +328,7 @@ void HFrame::on_about ( wxCommandEvent & )
 				"can be used for rendering function surfaces.\n"
 				"Welcome to funlab %s" ), VER );
 
-	wxMessageBox ( static_cast < char * > ( l_oMsg ),
+	wxMessageBox ( static_cast < char const * const > ( l_oMsg ),
 			_ ( "About funlab" ), wxOK | wxICON_INFORMATION, this );
 	return;
 	}
@@ -459,12 +459,12 @@ void HEvtHandler::on_key_press ( wxKeyEvent & a_roEvent )
 					l_oArrow += l_pcSpace;
 					l_oFormula += l_pcSpace;
 					l_oError.format ( "%s at this place:%s\n\n%s\n%s",
-							static_cast < char const * > ( f_oRenderer.error ( ) ),
+							static_cast < char const * const > ( f_oRenderer.error ( ) ),
 							l_pcSpace,
-							static_cast < char * > ( l_oArrow ),
-							static_cast < char * > ( l_oFormula ) );
+							static_cast < char const * const > ( l_oArrow ),
+							static_cast < char const * const > ( l_oFormula ) );
 					wxMessageDialog l_oInfo ( NULL,
-							static_cast < char * > ( l_oError ),
+							static_cast < char const * const > ( l_oError ),
 							_ ( "Formula syntax error ..." ), wxOK );
 					wxFont * l_poFont = & f_poList->GetFont ( );
 					if ( l_poFont );

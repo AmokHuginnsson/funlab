@@ -2,6 +2,10 @@ dnl configure.ac is integral part of funlab project.
 
 dnl Initialization data.
 AC_INIT([[funlab]],[[0.0.0]],[[amok@frihet.ath.cx]])
+AC_ARG_WITH([gtkmm],[AC_HELP_STRING([--with-gtkmm],[Compile with gtkmm gui, default is `yes' if apriopriate library can be found.])],[GUI_GTKMM=$withval],[GUI_GTKMM="auto"])
+dnl `
+AC_ARG_WITH([wxwidgets],[AC_HELP_STRING([--with-wxwidgets],[Compile with wxwidgets gui, default is `yes' if gtkmm is not found and apriopriate wxwidgets library can be found.])],[GUI_WXWIDGETS=$withval],[GUI_WXWIDGETS="auto"])
+dnl `
 
 AC_MSG_RESULT([--- Welcome to funlab configurator ---                   [[0%]]])
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
@@ -23,6 +27,23 @@ CXXFLAGS=["-L~/lib -L/usr/local/lib -I~/prog/include -I/usr/local/include"]
 
 dnl Set up how configure will handle header checks.
 AC_CONFIG_HEADERS([config.h])
+
+if test ["$GUI_GTKMM"] = ["yes"] -a ["$GUI_WXWIDGETS"] = ["yes"] ; then
+	AC_MSG_ERROR([Options --with-gtkmm and --with-wxwidgets are mutualy exclusive.])
+fi
+if test ["$GUI_GTKMM"] = ["no"] -a ["$GUI_WXWIDGETS"] = ["no"] ; then
+	AC_MSG_ERROR([This software requires gui for full usefulness. ])
+fi
+if test ["$GUI_GTKMM"] = ["no"] ; then
+	GUI_WXWIDGETS="yes"
+fi
+if test ["$GUI_WXWIDGETS"] = ["yes"] ; then
+	GUI_GTKMM="no"
+fi
+if test ["$GUI_GTKMM"] = ["auto"] -a ["$GUI_WXWIDGETS"] = ["auto"] ; then
+	GUI_GTKMM="yes"
+	GUI_WXWIDGETS="no"
+fi
 
 dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
@@ -109,6 +130,19 @@ CPPFLAGS=$CXXFLAGS;
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[77%]]])
 AC_CHECK_LIB([ncurses],[initscr],
 							[],[AC_MSG_ERROR([Can not continue without ncurses.])])
+
+if test ["$GUI_GTKMM"] = ["yes"] ; then
+	AC_SUBST([GUI_TYPE],[GTKMM])
+	AC_SUBST([GUI_LIBS],[["\$(shell pkg-config --libs-only-l \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
+	AC_SUBST([GUI_FLAGS],[["\$(shell pkg-config --cflags --libs-only-other --libs-only-L \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
+	ln -sf gui.c.gtkmm src/gui.c
+fi
+if test ["$GUI_WXWIDGETS"] = ["yes"] ; then
+	AC_SUBST([GUI_TYPE],[WXWIDGETS])
+	AC_SUBST([GUI_LIBS],[["\$(shell wx-config --libs|sed -e 's/-pthread//') wx_gtk_xrc-2.4"]])
+	AC_SUBST([GUI_FLAGS],[["\$(shell wx-config --cflags)"]])
+	ln -sf gui.c.wxwidgets src/gui.c
+fi
 dnl WARNING!!! Names in c++ objects are _mangled_ so we need to use
 dnl WARNING!!! this cryptic names here (I hope it is portable).
 dnl UPDATE!: Now I know it is not portable across different versions of
@@ -143,12 +177,6 @@ void foo(){printw("x");}],[AC_MSG_RESULT([[no :)]])],
 		AC_MSG_ERROR([Can not continue with brain-damaged ncurses.])])
 
 dnl We have to set up proper compiler/linker flags.
-
-dnl Hardcoded quick fix.
-AC_SUBST([GUI_TYPE],[GTKMM])
-AC_SUBST([GUI_LIBS],[["\$(shell pkg-config --libs-only-l \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
-AC_SUBST([GUI_FLAGS],[["\$(shell pkg-config --cflags --libs-only-other --libs-only-L \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
-dnl end
 
 AC_OUTPUT([Makefile])
 AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
