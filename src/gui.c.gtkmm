@@ -51,7 +51,6 @@ protected:
 	Gtk::TreeModel::ColumnRecord f_oFormulasListColumns;
 	Gtk::TreeModelColumn < Glib::ustring > f_oFormulasListFormulaColumn;
 	Gtk::TreeView * f_poFormulasListView;
-	Gtk::Entry * f_poFormulaEdit;
 	bool	f_bRendererActive;
 	HRenderer f_oRenderer;
 	/*}*/
@@ -81,7 +80,7 @@ protected:
 HWindowMain::HWindowMain ( BaseObjectType * a_poBaseObject,
 		Glib::RefPtr< Gnome::Glade::Xml > const & a_roResources )
 	: Gtk::Window ( a_poBaseObject ),
-	f_bLock ( false ), f_poFormulasListView ( NULL ), f_poFormulaEdit ( NULL ),
+	f_bLock ( false ), f_poFormulasListView ( NULL ),
 	f_bRendererActive ( false ), f_oRenderer ( )
 	{
 	M_PROLOG
@@ -89,7 +88,6 @@ HWindowMain::HWindowMain ( BaseObjectType * a_poBaseObject,
 	Gtk::MenuItem * l_poMenuItem = NULL;
 	/* FORMULAS LIST */
 	a_roResources->get_widget ( "TREE_FORMULAS", f_poFormulasListView );
-	a_roResources->get_widget ( "EDIT_FORMULA", f_poFormulaEdit );
 	f_oFormulasListColumns.add ( f_oFormulasListFormulaColumn );
 	f_oFormulasListModel = Gtk::ListStore::create ( f_oFormulasListColumns );
 	f_poFormulasListView->set_model ( f_oFormulasListModel );
