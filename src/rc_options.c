@@ -29,7 +29,7 @@ Copyright:
 #include <stdio.h>
 
 #include <stdhapi.h>
-M_CVSID ( "$CVSHeader$" );
+M_CVSID ( "$CVSHeader$" )
 
 #include "setup.h"
 
