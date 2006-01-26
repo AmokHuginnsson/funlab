@@ -71,12 +71,12 @@ HRenderer::HRenderer ( void )
 		f_poAnalyser = NULL;
 		throw;
 		}
-	f_ppdLand = xcalloc ( setup.f_iDensity, double * );
+	f_ppdLand = xcalloc < double * > ( setup.f_iDensity );
 	for ( l_iCtr = 0; l_iCtr < setup.f_iDensity; l_iCtr ++ )
-		f_ppdLand [ l_iCtr ] = xcalloc ( setup.f_iDensity, double );
+		f_ppdLand [ l_iCtr ] = xcalloc < double > ( setup.f_iDensity );
 	for ( l_iCtr = 0; l_iCtr < 3; l_iCtr ++ )
-		f_ppiNode [ l_iCtr ] = xcalloc ( setup.f_iDensity, int );
-	f_pdTrygo = xcalloc ( 1024, double );
+		f_ppiNode [ l_iCtr ] = xcalloc < int > ( setup.f_iDensity );
+	f_pdTrygo = xcalloc < double > ( 1024 );
 	for ( l_iCtr = 0; l_iCtr < 1024; l_iCtr ++ )
 		f_pdTrygo [ l_iCtr ] = sin( ( ( double ) l_iCtr * M_PI ) / 2048. );
 	SDL_EventState ( SDL_MOUSEMOTION, SDL_ENABLE );
