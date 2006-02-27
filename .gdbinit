@@ -9,8 +9,6 @@ set print asm-demangle on
 set print demangle on
 set print pretty on
 set print object on
-set environment TERM cons25
-tty /dev/ttyv9
 define go
 	run
 	source .breaks
