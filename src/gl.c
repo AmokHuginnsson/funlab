@@ -141,7 +141,7 @@ void HSurface::refresh ( void )
 	if ( SDL_MUSTLOCK ( l_psSurface ) )
 		{
 		if ( SDL_LockSurface ( l_psSurface ) < 0 )
-			hcore::log ( D_LOG_ERROR ) << "Can't lock screen: " << SDL_GetError ( ) << endl;
+			hcore::log ( LOG_TYPE::D_ERROR ) << "Can't lock screen: " << SDL_GetError ( ) << endl;
 		}
 	return;
 	M_EPILOG
