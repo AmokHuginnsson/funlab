@@ -81,7 +81,7 @@ void HSurface::down ( void )
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
 	M_ASSERT ( f_iActiveSurfaces > 0 );
 	if ( ! f_pvHandler )
-		M_THROW ( _ ( "surface not initialized" ), g_iErrNo );
+		M_THROW ( _ ( "surface not initialized" ), errno );
 	if ( SDL_MUSTLOCK ( l_psSurface ) )
 		SDL_UnlockSurface ( l_psSurface );
 	SDL_FreeSurface ( static_cast < SDL_Surface * > ( f_pvHandler ) );
@@ -103,7 +103,7 @@ int HSurface::init ( int a_iWidth, int a_iHeight, int a_iBpp )
 			SDL_HWSURFACE | SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_NOFRAME );
 	if ( l_psSurface == NULL )
 		{
-		l_iError = g_iErrNo;
+		l_iError = errno;
 		l_oMessage = _ ( "Couldn't set 640x480x8 video mode: " );
 		l_oMessage +=	SDL_GetError ( );
 		M_THROW ( l_oMessage, l_iError );
