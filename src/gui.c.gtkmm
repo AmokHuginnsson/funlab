@@ -180,7 +180,7 @@ void HWindowMain::open ( HString const & a_oPath )
 	{
 	M_PROLOG
 	if ( a_oPath.is_empty ( ) )
-		M_THROW ( _ ( "Empty path." ), g_iErrNo );
+		M_THROW ( _ ( "Empty path." ), errno );
 	int l_iIndex = 0;
 	HString l_oLine;
 	HFile l_oFile;
@@ -233,7 +233,7 @@ void HWindowMain::save ( HString const & a_oPath )
 	{
 	M_PROLOG
 	if ( a_oPath.is_empty ( ) )
-		M_THROW ( _ ( "Empty path." ), g_iErrNo );
+		M_THROW ( _ ( "Empty path." ), errno );
 	HFile l_oFile ( HFile::D_WRITING );
 	l_oFile.open ( a_oPath );
 	if ( l_oFile )

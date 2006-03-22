@@ -281,7 +281,7 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 	M_PROLOG
 	
 		{
-	M_CRITICAL_SECTION ( );
+	HLock l_oLock ( f_oMutex );
 	if ( ! a_pcFormula )
 		return ( true );
 
@@ -324,7 +324,7 @@ int HRenderer::run ( void )
 		{
 		if ( SDL_WaitEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
 			{
-			M_CRITICAL_SECTION ( );
+			HLock l_oLock ( f_oMutex );
 			switch ( l_uEvent.type )
 				{
 				case ( SDL_MOUSEMOTION ):
