@@ -33,6 +33,7 @@ M_CVSID ( "$CVSHeader$" )
 
 #include "setup.h"
 
+using namespace stdhapi;
 using namespace stdhapi::hcore;
 
 bool set_variables ( HString & a_roOption, HString & a_roValue )
