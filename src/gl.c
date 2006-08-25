@@ -27,14 +27,14 @@ Copyright:
 #include <libintl.h>
 #include <SDL/SDL.h>
 
-#include <stdhapi.h>
-M_CVSID ( "$CVSHeader$" )
+#include <yaal.h>
+M_CVSID ( "$CVSHeader: funlab/src/gl.c,v 1.8 2006/01/24 11:51:46 amok Exp $" )
 
 #include "gl.h"
 
-using namespace stdhapi;
-using namespace stdhapi::hcore;
-using namespace stdhapi::tools;
+using namespace yaal;
+using namespace yaal::hcore;
+using namespace yaal::tools;
 
 int HSurface::f_iActiveSurfaces = 0;
 

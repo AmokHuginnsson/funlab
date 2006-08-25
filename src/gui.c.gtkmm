@@ -33,7 +33,7 @@ Copyright:
 #include "renderer.h"
 
 using namespace std;
-using namespace stdhapi::hcore;
+using namespace yaal::hcore;
 
 class HWindowMain : public Gtk::Window
 	{

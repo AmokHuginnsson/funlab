@@ -29,10 +29,10 @@ Copyright:
 
 #include <hthread.h>
 
-class stdhapi::tools::HAnalyser;
+class yaal::tools::HAnalyser;
 class HSurface;
 
-class HRenderer : public stdhapi::hcore::HThread
+class HRenderer : public yaal::hcore::HThread
 	{
 protected:
 	/*{*/
@@ -54,7 +54,7 @@ protected:
 	double * f_pdXVariable;
 	double * f_pdYVariable;
 	double * *	f_ppdLand;
-	stdhapi::tools::HAnalyser * f_poAnalyser;
+	yaal::tools::HAnalyser * f_poAnalyser;
 	HSurface *	f_poSurface;
 	/*}*/
 public:

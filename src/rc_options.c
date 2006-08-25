@@ -28,13 +28,13 @@ Copyright:
 #include <string.h>
 #include <stdio.h>
 
-#include <stdhapi.h>
-M_CVSID ( "$CVSHeader$" )
+#include <yaal.h>
+M_CVSID ( "$CVSHeader: funlab/src/rc_options.c,v 1.9 2006/01/24 11:51:46 amok Exp $" )
 
 #include "setup.h"
 
-using namespace stdhapi;
-using namespace stdhapi::hcore;
+using namespace yaal;
+using namespace yaal::hcore;
 
 bool set_variables ( HString & a_roOption, HString & a_roValue )
 	{

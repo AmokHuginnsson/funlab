@@ -31,16 +31,16 @@ Copyright:
 #include <libintl.h>
 #include <SDL/SDL.h>
 
-#include <stdhapi.h>
-M_CVSID ( "$CVSHeader$" )
+#include <yaal.h>
+M_CVSID ( "$CVSHeader: funlab/src/renderer.c,v 1.19 2006/01/26 23:17:13 amok Exp $" )
 
 #include "renderer.h"
 #include "gl.h"
 #include "setup.h"
 
-using namespace stdhapi;
-using namespace stdhapi::hcore;
-using namespace stdhapi::tools;
+using namespace yaal;
+using namespace yaal::hcore;
+using namespace yaal::tools;
 
 HRenderer::HRenderer ( void )
 	: f_iRed ( 0 ), f_iGreen ( 0 ), f_iBlue ( 0 ),

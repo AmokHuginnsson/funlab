@@ -13,7 +13,7 @@ AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])
 dnl Unique file in project: funlabrc is sample configuration file.
 AC_MSG_RESULT([--- Finding base directory ... ---                      [[12%]]])
 AC_CONFIG_SRCDIR([[funlabrc]])
-AC_CONFIG_AUX_DIR([../stdhapi/aux])
+AC_CONFIG_AUX_DIR([../yaal/aux])
 
 dnl funlab is not Free Software.
 AC_COPYRIGHT([[funlab (c) 2003 All rights reserved.]])
@@ -163,8 +163,8 @@ AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[84%]]])
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
 			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])
-AC_CHECK_HEADERS([[stdhapi.h]],,
-			[AC_MSG_ERROR([[Can not continue without stdhapi devel!]])])
+AC_CHECK_HEADERS([[yaal.h]],,
+			[AC_MSG_ERROR([[Can not continue without yaal devel!]])])
 AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[92%]]])
 
 dnl We need to check if out ncurses devel is not brain-damaged.

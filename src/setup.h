@@ -27,7 +27,7 @@ Copyright:
 #ifndef __SETUP_H
 #define __SETUP_H
 
-#include <stdhapi.h>
+#include <yaal.h>
 
 struct OSetup
 	{
@@ -39,10 +39,10 @@ struct OSetup
 	int f_iResolutionX;
 	int f_iResolutionY;
 	char * f_pcProgramName;
-	stdhapi::hcore::HString f_oLogPath;
-	stdhapi::hcore::HString f_oFormula;
-	stdhapi::hcore::HString f_oResourcePath;
-	stdhapi::hcore::HString f_oIconPath;
+	yaal::hcore::HString f_oLogPath;
+	yaal::hcore::HString f_oFormula;
+	yaal::hcore::HString f_oResourcePath;
+	yaal::hcore::HString f_oIconPath;
 	/* self-sufficient */
 	OSetup ( void ) : f_bQuiet ( false ), f_bVerbose ( false ),
 										f_bHelp ( false ), f_bStereo ( false ),
