@@ -23,7 +23,7 @@ AC_REVISION([[$ Revision: 0.0.0 $]])
 
 dnl We select default language.
 AC_LANG([C++])
-CXXFLAGS=["-L~/lib -L/usr/local/lib -I~/prog/include -I/usr/local/include"]
+CXXFLAGS=["-L~/lib -L/usr/local/lib -I~/usr/include -I/usr/local/include"]
 
 dnl Set up how configure will handle header checks.
 AC_CONFIG_HEADERS([config.h])

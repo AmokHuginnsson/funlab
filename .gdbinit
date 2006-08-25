@@ -1,4 +1,4 @@
-directory .:~/prog/stdhapi:~/prog/stdhapi/hcore:~/prog/stdhapi/hconsole:~/prog/stdhapi/hdata:~/prog/stdhapi/tools
+directory .:~/src/yaal:~/src/yaal/hcore:~/src/yaal/hconsole:~/src/yaal/hdata:~/src/yaal/tools
 set solib-search-path ~/lib
 set auto-solib-add on
 set extension-language .h c++
