@@ -32,7 +32,7 @@ Copyright:
 #include <SDL/SDL.h>
 
 #include <yaal.h>
-M_CVSID ( "$CVSHeader: funlab/src/renderer.c,v 1.19 2006/01/26 23:17:13 amok Exp $" )
+M_VCSID ( "$CVSHeader: funlab/src/renderer.c,v 1.19 2006/01/26 23:17:13 amok Exp $" )
 
 #include "renderer.h"
 #include "gl.h"

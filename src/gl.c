@@ -28,7 +28,7 @@ Copyright:
 #include <SDL/SDL.h>
 
 #include <yaal.h>
-M_CVSID ( "$CVSHeader: funlab/src/gl.c,v 1.8 2006/01/24 11:51:46 amok Exp $" )
+M_VCSID ( "$CVSHeader: funlab/src/gl.c,v 1.8 2006/01/24 11:51:46 amok Exp $" )
 
 #include "gl.h"
 

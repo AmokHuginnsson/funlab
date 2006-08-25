@@ -43,7 +43,7 @@ Copyright:
 
 /* yaal */
 #include <yaal.h>
-M_CVSID ( "$CVSHeader: funlab/src/gui.c.wxwidgets,v 1.15 2006/01/17 17:08:39 amok Exp $" );
+M_VCSID ( "$CVSHeader: funlab/src/gui.c.wxwidgets,v 1.15 2006/01/17 17:08:39 amok Exp $" );
 
 #include "version.h"
 #include "setup.h"
