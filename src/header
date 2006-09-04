@@ -1,0 +1,9 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <getopt.h>
+#include <string.h>
+#include <libintl.h>
+
+#include <SDL/SDL.h>
+
+#include <yaal.h>
