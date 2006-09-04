@@ -136,13 +136,13 @@ if test ["$GUI_GTKMM"] = ["yes"] ; then
 	AC_SUBST([GUI_LIBS],[["\$(shell pkg-config --libs-only-l \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
 	AC_SUBST([GUI_COMPILER_FLAGS],[["\$(shell pkg-config --cflags --libs-only-other \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
 	AC_SUBST([GUI_LINKER_FLAGS],[["\$(shell pkg-config --libs-only-other --libs-only-L \`pkg-config --list-all|awk '/glademm/{print \$\$1}'\`)"]])
-	ln -sf gui.c.gtkmm src/gui.c
+	ln -sf gui.cxx.gtkmm src/gui.cxx
 fi
 if test ["$GUI_WXWIDGETS"] = ["yes"] ; then
 	AC_SUBST([GUI_TYPE],[WXWIDGETS])
 	AC_SUBST([GUI_LIBS],[["\$(shell wx-config --libs|sed -e 's/-pthread//') wx_gtk_xrc-2.4"]])
 	AC_SUBST([GUI_COMPILER_FLAGS],[["\$(shell wx-config --cflags)"]])
-	ln -sf gui.c.wxwidgets src/gui.c
+	ln -sf gui.cxx.wxwidgets src/gui.cxx
 fi
 dnl WARNING!!! Names in c++ objects are _mangled_ so we need to use
 dnl WARNING!!! this cryptic names here (I hope it is portable).
