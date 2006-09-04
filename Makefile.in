@@ -76,8 +76,6 @@ CWARNING_FLAGS =	\
 						-Wlong-long\
 						-Wmissing-noreturn\
 						-Wpointer-arith\
-						-Wredundant-decls\
-						@WARN_SHADOW@\
 						-Wsign-compare\
 						-Wundef\
 						-Wwrite-strings
@@ -91,7 +89,6 @@ CWARNING_FLAGS =	\
 						-Wunreachable-code\ # too much warrnings
 #						-Waggregate-return\ # useless for C++
 CXXWARNING_FLAGS		=	\
-						-Weffc++\
 						-Wsign-promo
 #						-Wold-style-cast\ # lots of warrnings from libc headers
 #						-Woverloaded-virtual\ # too much unecessary warrnings
@@ -124,9 +121,7 @@ CXXFLAGS			= $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
 LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS) $(LINKER_@GUI_TYPE@_FLAGS)
 
 STATICLIBS = $(patsubst %, ~/lib/lib%.a, $(LIBS))
-LIBS := $(patsubst %, -l%, $(LIBS))
 LIBS := $(subst -l-l, -l, $(patsubst %, -l%, $(LIBS)))
-LIBS := $(subst -l-l, -l, $(patsubst %, -l%, $(LINKER_@GUI_TYPE@_FLAGS)))
 
 STATICLIBS += -rdynamic -ldl
 STATICLIBS += -lncurses -lSDL @GUI_LIBS@ $(LINKER_@GUI_TYPE@_FLAGS)
