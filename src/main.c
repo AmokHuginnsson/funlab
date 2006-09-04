@@ -1,7 +1,7 @@
 /*
 ---            `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
 
-	main.c - this file is integral part of `funlab' project.
+	main.cxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -27,7 +27,7 @@ Copyright:
 #include <libintl.h>
 #include <unistd.h>
 #include <yaal.h> /* all hAPI headers */
-M_VCSID ( "$CVSHeader: funlab/src/main.c,v 1.9 2006/01/24 11:51:46 amok Exp $" )
+M_VCSID ( "$Id$" )
 
 #include "version.h"
 #include "setup.h"

@@ -1,7 +1,7 @@
 /*
 ---             `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
 
-	renderer.c - this file is integral part of `funlab' project.
+	renderer.cxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -32,7 +32,7 @@ Copyright:
 #include <SDL/SDL.h>
 
 #include <yaal.h>
-M_VCSID ( "$CVSHeader: funlab/src/renderer.c,v 1.19 2006/01/26 23:17:13 amok Exp $" )
+M_VCSID ( "$Id$" )
 
 #include "renderer.h"
 #include "gl.h"

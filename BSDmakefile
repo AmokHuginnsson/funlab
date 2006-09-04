@@ -1,4 +1,4 @@
-# $CVSHeader$
+# $Id$
 # This is wrapper around GNU make.
 
 all: Makefile

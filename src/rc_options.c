@@ -1,7 +1,7 @@
 /*
 ---       `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski         ---
 
-	rc_options.c - this file is integral part of `funlab' project.
+	rc_options.cxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -29,7 +29,7 @@ Copyright:
 #include <stdio.h>
 
 #include <yaal.h>
-M_VCSID ( "$CVSHeader: funlab/src/rc_options.c,v 1.9 2006/01/24 11:51:46 amok Exp $" )
+M_VCSID ( "$Id$" )
 
 #include "setup.h"
 

@@ -1,4 +1,4 @@
-# $CVSHeader$
+# $Id$
 # 
 #---       `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski      ---
 #
@@ -25,7 +25,7 @@
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 
 SHELL					= /bin/sh
-FUNLABNAME				= funlab
+PRJNAME				= funlab
 VERSION				= 0
 SUBVERSION		= 0
 EXTRAVERSION	= 0
@@ -36,10 +36,10 @@ VPATH					= $(DIR_ROOT)/src
 DIR_DEST 			=
 prefix				= $(DIR_DEST)/usr/bin
 doc						= $(DIR_DEST)/usr/share/doc
-LIBS					= SDL @GUI_LIBS@ hcore hconsole hdata dbwrapper tools
+LIBS					= SDL @GUI_LIBS@ pthread hcore hconsole hdata dbwrapper tools
 TARGET				= 1exec
 ifdef NODEBUG
-	TARGET = $(FUNLABNAME)
+	TARGET = $(PRJNAME)
 endif
 ifdef TERM
 CL						:= $(shell tput cr;tput dl1)
@@ -48,13 +48,14 @@ RED						:= $(shell tput setaf 1 || tput AF 1)
 RS						:= $(shell tput sgr0 || tput me)
 NONL					:= "-n"
 endif
-HS = .h
-SS = .c
-OS = .o
+HS = h
+SS = cxx
+OS = o
+DS = d
 CTAGS	= @CTAGS@
 FIND	= find
 .SUFFIXES:
-.SUFFIXES: $(SS) $(OS) $(HS)
+.SUFFIXES: .$(SS) .$(OS) .$(HS) .$(DS)
 CXX ?= g++
 CXX := $(subst -x c++ -x c++,-x c++,$(subst colorgcc,colorgcc -x c++,$(CXX)))
 DXX ?= $(CXX)
@@ -75,6 +76,8 @@ CWARNING_FLAGS =	\
 						-Wlong-long\
 						-Wmissing-noreturn\
 						-Wpointer-arith\
+						-Wredundant-decls\
+						@WARN_SHADOW@\
 						-Wsign-compare\
 						-Wundef\
 						-Wwrite-strings
@@ -85,13 +88,11 @@ CWARNING_FLAGS =	\
 						-Wstrict-prototypes\
 						-Wtraditional\ #C only
 #						-Wmissing-format-attribute\
-						-Wredundant-decls\
-						@WARN_SHADOW@\
 						-Wunreachable-code\ # too much warrnings
 #						-Waggregate-return\ # useless for C++
 CXXWARNING_FLAGS		=	\
+						-Weffc++\
 						-Wsign-promo
-#						-Weffc++\
 #						-Wold-style-cast\ # lots of warrnings from libc headers
 #						-Woverloaded-virtual\ # too much unecessary warrnings
 ifeq ($(HD),1)
@@ -107,14 +108,14 @@ else
 endif
 COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I$(DIR_BUILD) \
 																-I/usr/local/include
-COMPILER_@GUI_TYPE@_FLAGS			= @GUI_FLAGS@
+COMPILER_@GUI_TYPE@_FLAGS			= @GUI_COMPILER_FLAGS@
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib
 LINKER_PRIME_FLAGS						= \
 								@SPECIAL_LINKER_FLAGS@\
+								-Wl,--fatal-warnings\
 								-Wl,--demangle\
-#								-Wl,--fatal-warnings\
 
-LINKER_@GUI_TYPE@_FLAGS				= @GUI_FLAGS@
+LINKER_@GUI_TYPE@_FLAGS				= @GUI_LINKER_FLAGS@
 
 CXXFLAGS			= $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
 								$(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) \
@@ -123,31 +124,33 @@ CXXFLAGS			= $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
 LINKER_FLAGS	= $(LINKER_PATH_FLAGS) $(LINKER_PRIME_FLAGS) $(LINKER_@GUI_TYPE@_FLAGS)
 
 STATICLIBS = $(patsubst %, ~/lib/lib%.a, $(LIBS))
+LIBS := $(patsubst %, -l%, $(LIBS))
 LIBS := $(subst -l-l, -l, $(patsubst %, -l%, $(LIBS)))
+LIBS := $(subst -l-l, -l, $(patsubst %, -l%, $(LINKER_@GUI_TYPE@_FLAGS)))
 
 STATICLIBS += -rdynamic -ldl
 STATICLIBS += -lncurses -lSDL @GUI_LIBS@ $(LINKER_@GUI_TYPE@_FLAGS)
 #STATICLIBS += -lccmalloc
 
 ifeq ($(CURDIR),$(DIR_BUILD))
-HDRS = $(strip $(sort $(shell cd $(DIR_ROOT)/src && $(FIND) . -name "*.h")))
-SRCS = $(strip $(sort $(shell cd $(DIR_ROOT)/src && $(FIND) . -name "*.c")))
-OBJS = $(patsubst %.c,%.o,$(SRCS))
+HDRS = $(strip $(sort $(shell cd $(DIR_ROOT)/src && $(FIND) . -name "*.$(HS)")))
+SRCS = $(strip $(sort $(shell cd $(DIR_ROOT)/src && $(FIND) . -name "*.$(SS)")))
+OBJS = $(patsubst %.$(SS),%.$(OS),$(SRCS))
 endif
 
 # implict pattern rule
 
-%.o: %.c
+%.$(OS): %.$(SS)
 	@echo -n "Compiling \`$(subst $(DIR_ROOT)/,,$(<))' ... "; \
-	echo -n "$(@:.o=.d) " > $(@:.o=.d); \
-	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) | grep -v '^#' >> $(@:.o=.d); \
+	echo -n "$(@:.$(OS)=.$(DS)) " > $(@:.$(OS)=.$(DS)); \
+	$(DXX) $(CXXFLAGS) -MM $(<) -MT $(@) | grep -v '^#' >> $(@:.$(OS)=.$(DS)); \
 	$(CXX) $(CXXFLAGS) $(<) -c -o $(@) 2>&1 | tee -a make.log; \
 	echo $(NONL) "done.$(CL)"
 
 #------------------------------------------------------------------------
 
 .DEFAULT:
-	@if [ "$(suffix $(<))" != ".d" ] ; then \
+	@if [ "$(suffix $(<))" != ".$(DS)" ] ; then \
 	echo -n "$(BOLD)$(RED)"; \
 	echo "Lack of \`$(<)'." | tee -a make.log; \
 	echo -n "$(RS)"; fi
@@ -167,10 +170,12 @@ $(DIR_BUILD):
 	echo "Program version $(RELEASE)-`date +%Y%m%d`."; \
 	echo "#define VER \"$(RELEASE)-`date +%Y%m%d`\"" > $(DIR_BUILD)/version.h
 
-$(FUNLABNAME).info : src/$(FUNLABNAME).texinfo
-	@makeinfo src/$(FUNLABNAME).texinfo
+header.gch: $(VPATH)/header $(HDRS)
+	@echo -n "Generating precompiled header \`$(subst $(DIR_ROOT)/,,$(<))' ... "; \
+	$(CXX) -xc++-header $(CXXFLAGS) $(<) -o $(@) ;\
+	echo $(NONL) "done.$(CL)"
 
-$(TARGET): $(OBJS)
+$(TARGET): header.gch $(OBJS)
 	@echo -n "Linking \`$@' ... "
 	@$(LXX) $(LINKER_FLAGS) -o $(TARGET) $(OBJS) $(LIBS) 2>&1 | tee -a make.log
 ifdef NODEBUG
@@ -178,15 +183,18 @@ ifdef NODEBUG
 endif
 	@echo "done."
 
+$(PRJNAME).info : src/$(PRJNAME).texinfo
+	@makeinfo src/$(PRJNAME).texinfo
+
 static:
 	@$(MAKE) LIBS="$(STATICLIBS)"
 
 clean-dep:
-	@$(FIND) . -name '*.d' | xargs /bin/rm -f
+	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f
 
 clean: clean-dep
 	@/bin/rm -f *~ *.out .*~ .*.swp *.bak *.log *.info .depend
-	@/bin/rm -f core $(TARGET).core 1exec.core
+	@/bin/rm -f core $(TARGET).core 1exec.core journal.tut log.tut
 	@/bin/rm -f src/core src/$(TARGET).core src/1exec.core
 	@/bin/rm -f $(OBJS)
 	@/bin/rm -f $(TARGET)
@@ -194,7 +202,7 @@ clean: clean-dep
 
 mrproper: clean
 	@echo -n "Purging ... "; \
-	/bin/rm -f $(FUNLABNAME) version.h src/.gt_* src/tags 1exec.core; \
+	/bin/rm -f $(PRJNAME) version.h src/.gt_* src/tags 1exec.core; \
 	/bin/rm -rf src/1exec.core $(DIR_BUILD); \
 	$(FIND) . -name 'tags' -or -name '.depend' -or -name '*.a' \
 | xargs /bin/rm -f; \
@@ -209,19 +217,19 @@ bin:
 
 install: $(TARGET)
 	@echo "i: you need to become root to do this"
-	@install -c -g root -o root -m=u=rwx,g=rx,o=rx $(FUNLABNAME) $(prefix)
-#	@install -D -g root -o root -m=u=rwx,g=rx,o=rx README COPYRIGHT $(doc)/$(FUNLABNAME)
-#	@install -D -g root -o root -m=u=rwx,g=rx,o=rx .$(FUNLABNAME)rc $(doc)/$(FUNLABNAME)/examples
+	@install -c -g root -o root -m=u=rwx,g=rx,o=rx $(PRJNAME) $(prefix)
+#	@install -D -g root -o root -m=u=rwx,g=rx,o=rx README COPYRIGHT $(doc)/$(PRJNAME)
+#	@install -D -g root -o root -m=u=rwx,g=rx,o=rx .$(PRJNAME)rc $(doc)/$(PRJNAME)/examples
 	@echo "i: now if you wish you can suid $(TARGET)"
 
 tags: $(SRCS) $(HDRS)
 	@echo -n "Rehashing tags ... "; \
-	$(CTAGS)	-R --langmap="c:,c++:.h.c" -h ".h" --languages="c++" \
+	$(CTAGS)	-R --langmap="c++:.$(HS).$(SS)" -h ".$(HS)" --languages="c++" \
 						--c++-kinds="+p+x" --format=2 --fields="afikKlmnsSz" \
 						--extra="+f+q"; \
 	echo "done."
 
 ifeq ($(CURDIR),$(DIR_BUILD))
--include $(OBJS:.o=.d)
+-include $(OBJS:.$(OS)=.$(DS))
 endif
 
