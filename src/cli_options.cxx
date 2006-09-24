@@ -28,7 +28,7 @@ Copyright:
 #include <stdio.h>
 #include <getopt.h>
 
-#include <yaal.h>
+#include <yaal/yaal.h>
 M_VCSID ( "$Id$" )
 
 #include "cli_options.h"

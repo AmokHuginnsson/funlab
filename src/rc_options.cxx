@@ -28,7 +28,7 @@ Copyright:
 #include <string.h>
 #include <stdio.h>
 
-#include <yaal.h>
+#include <yaal/yaal.h>
 M_VCSID ( "$Id$" )
 
 #include "setup.h"

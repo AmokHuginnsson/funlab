@@ -42,7 +42,7 @@ Copyright:
 #include <wx/xrc/xmlres.h>
 
 /* yaal */
-#include <yaal.h>
+#include <yaal/yaal.h>
 M_VCSID ( "$Id$" );
 
 #include "version.h"

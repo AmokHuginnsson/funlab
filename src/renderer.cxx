@@ -31,7 +31,7 @@ Copyright:
 #include <libintl.h>
 #include <SDL/SDL.h>
 
-#include <yaal.h>
+#include <yaal/yaal.h>
 M_VCSID ( "$Id$" )
 
 #include "renderer.h"

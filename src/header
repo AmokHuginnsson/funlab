@@ -6,4 +6,4 @@
 
 #include <SDL/SDL.h>
 
-#include <yaal.h>
+#include <yaal/yaal.h>

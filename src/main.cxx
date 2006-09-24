@@ -26,7 +26,7 @@ Copyright:
 
 #include <libintl.h>
 #include <unistd.h>
-#include <yaal.h> /* all hAPI headers */
+#include <yaal/yaal.h> /* all hAPI headers */
 M_VCSID ( "$Id$" )
 
 #include "version.h"

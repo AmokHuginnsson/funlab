@@ -27,7 +27,7 @@ Copyright:
 #ifndef __RENDERER_H
 #define __RENDERER_H
 
-#include <hthread.h>
+#include <yaal/hcore/hthread.h>
 
 class yaal::tools::HAnalyser;
 class HSurface;

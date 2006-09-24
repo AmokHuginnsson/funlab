@@ -27,7 +27,7 @@ Copyright:
 #ifndef __SETUP_H
 #define __SETUP_H
 
-#include <yaal.h>
+#include <yaal/yaal.h>
 
 struct OSetup
 	{
