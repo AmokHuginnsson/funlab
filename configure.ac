@@ -164,7 +164,7 @@ AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[84%]]])
 AC_CHECK_HEADERS([[ncurses/ncurses.h]],_NCURSES_HEADER=['ncurses/ncurses.h'],
 	[AC_CHECK_HEADERS([[ncurses.h]],_NCURSES_HEADER=['ncurses.h'],
 			[AC_MSG_ERROR([Can not continue without ncurses devel!])])])
-AC_CHECK_HEADERS([[yaal.h]],,
+AC_CHECK_HEADERS([[yaal/yaal.h]],,
 			[AC_MSG_ERROR([[Can not continue without yaal devel!]])])
 AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[92%]]])
 
