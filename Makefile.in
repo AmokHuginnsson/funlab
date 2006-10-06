@@ -101,9 +101,9 @@ ifdef NODEBUG
 	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 else
 	COMPILER_DEBUG_FLAGS				= -g -g3 -ggdb -ggdb3 -gstabs+ -pg -fno-inline \
-																-D__DEBUG__ $(DB)
+																-D__DEBUG__ $(DB) @PCH@
 endif
-COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I$(DIR_BUILD) \
+COMPILER_PATH_FLAGS						= -I$(DIR_ROOT) -I$(DIR_BUILD) -I$(VPATH) \
 																-I/usr/local/include
 COMPILER_@GUI_TYPE@_FLAGS			= @GUI_COMPILER_FLAGS@
 LINKER_PATH_FLAGS							= -L. -L$(DIR_TARGET) -L/usr/local/lib
