@@ -27,6 +27,7 @@ Copyright:
 #include <gtkmm.h>
 #include <libglademm/xml.h>
 #include <iostream>
+#include <libintl.h>
 
 #include "version.h"
 #include "setup.h"
