@@ -81,12 +81,16 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 			}
 		else
 			l_iOpt = gui_start ( a_iArgc, a_ppcArgv );
-		if ( hconsole::is_enabled ( ) )leave_curses (); /* ending ncurses sesion */
+		HConsole& cons = HCons::get_instance();
+		if ( cons.is_enabled ( ) )
+			cons.leave_curses (); /* ending ncurses sesion */
 /* ... there is the place main loop ends. :OD-OT */
 		}
 	catch ( ... )
 		{
-		if ( hconsole::is_enabled ( ) )leave_curses (); /* ending ncurses sesion */
+		HConsole& cons = HCons::get_instance();
+		if ( cons.is_enabled ( ) )
+			cons.leave_curses (); /* ending ncurses sesion */
 		throw;
 		}
 	fprintf ( stderr, "Done.\n" );

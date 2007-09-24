@@ -53,7 +53,8 @@ HRenderer::HRenderer ( void )
 	f_ulColor ( 0 ), f_dCosAlpha ( 0 ), f_dSinAlpha ( 0 ),
 	f_dCosBeta ( 0 ), f_dSinBeta ( 0 ),
 	f_dCosGamma ( 0 ), f_dSinGamma ( 0 ),
-	f_dPrecountA ( 0 ), f_dPrecountB ( 0 ), f_dPrecountC ( 0 ), f_pdTrygo ( NULL )
+	f_dPrecountA ( 0 ), f_dPrecountB ( 0 ), f_dPrecountC ( 0 ), f_pdTrygo ( NULL ),
+	f_oMutex(), f_oCondition(), f_oThread( *this )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -90,7 +91,7 @@ HRenderer::HRenderer ( void )
 HRenderer::~HRenderer ( void )
 	{
 	M_PROLOG
-	if ( HSurface::surface_count ( ) )
+	if ( HSurface::surface_count() )
 		f_oCondition.wait ( );
 	while ( f_bBusy )
 		;
@@ -221,7 +222,7 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 void HRenderer::draw_frame ( void )
 	{
 	M_PROLOG
-	if ( f_bBusy || ! is_alive ( ) )
+	if ( f_bBusy || ! f_oThread.is_alive ( ) )
 		return;
 	f_bBusy = true;
 	bool valid = false, oldvalid = false;
@@ -303,7 +304,7 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 		f_poSurface->init ( setup.f_iResolutionX, setup.f_iResolutionY );
 		SDL_WarpMouse ( setup.f_iResolutionX >> 1, setup.f_iResolutionY >> 1 );
 		f_bLoop = true;
-		spawn ( );
+		f_oThread.spawn ( );
 		}
 	else
 		SDL_WarpMouse ( setup.f_iResolutionX >> 1, setup.f_iResolutionY >> 1 );
@@ -311,12 +312,12 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 	M_EPILOG
 	}
 
-int HRenderer::run ( void )
+int HRenderer::operator() ( HThread const* const a_poCaller )
 	{
 	M_PROLOG
 	int dx = 0, dy = 0;
 	SDL_Event l_uEvent;
-	while ( f_bLoop && is_alive ( ) )
+	while ( f_bLoop && a_poCaller->is_alive ( ) )
 		{
 		if ( SDL_WaitEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
 			{

@@ -31,8 +31,11 @@ Copyright:
 
 class yaal::tools::HAnalyser;
 class HSurface;
+class HRenderer;
 
-class HRenderer : public yaal::hcore::HThread
+typedef yaal::hcore::HThreadT<HRenderer> renderer_t;
+
+class HRenderer
 	{
 protected:
 	/*{*/
@@ -65,10 +68,10 @@ public:
 	void draw_frame ( void );
 	char const * error ( void ) const;
 	int error_position ( void ) const;
+	int operator() ( yaal::hcore::HThread const* const );
 	/*}*/
 protected:
 	/*{*/
-	int run ( void );
 	void makeland ( void );
 	void precount ( void );
 	double sinq( unsigned int );
@@ -89,9 +92,12 @@ private:
 	double f_dPrecountA;
 	double f_dPrecountB;
 	double f_dPrecountC;
-	double * f_pdTrygo;
-	HRenderer ( const HRenderer & );
-	HRenderer & operator = ( const HRenderer & );
+	double* f_pdTrygo;
+	yaal::hcore::HMutex f_oMutex;
+	yaal::hcore::HCondition f_oCondition;
+	renderer_t f_oThread;
+	HRenderer( const HRenderer& );
+	HRenderer& operator = ( const HRenderer& );
 	/*}*/
 	};
 

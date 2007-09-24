@@ -37,7 +37,27 @@ M_VCSID ( "$Id$" )
 
 using namespace yaal;
 using namespace yaal::hcore;
-  
+
+#define D_QUIET_SHORT				"q"
+#define D_QUIET_LONG				"quiet"
+#define D_SILENT_LONG				"silent"
+#define D_VERBOSE_SHORT			"v"
+#define D_VERBOSE_LONG			"verbose"
+#define D_HELP_SHORT				"h"
+#define D_HELP_LONG					"help"
+#define D_VERSION_SHORT			"V"
+#define D_VERSION_LONG			"version"
+#define D_RESOLUTION_X_SHORT	"X"
+#define D_RESOLUTION_X_LONG		"resolution-x"
+#define D_RESOLUTION_Y_SHORT	"Y"
+#define D_RESOLUTION_Y_LONG		"resolution-y"
+#define D_DENSITY_SHORT	"D"
+#define D_DENSITY_LONG	"density"
+#define D_STEREO_SHORT	"S"
+#define D_STEREO_LONG		"stereo"
+#define D_FORMULA_SHORT	"F"
+#define D_FORMULA_LONG	"formula"
+
 /* Set all the option flags according to the switches specified.
    Return the index of the first non-option argument.                    */
 void usage ( void ) __attribute__ ( ( __noreturn__ ) );
@@ -48,15 +68,15 @@ void usage ( void )
 	printf ( "Usage: %s [OPTION]... [FILE]...\n", setup.f_pcProgramName );
 	printf (
 "Options:\n"
-"  -X, --resolution-x         set x resolution\n"
-"  -Y, --resolution-y         set y resolution\n"
-"  -D, --density              set graph density\n"
-"  -S, --stereo               generate stereo picture\n"
-"  -F, --formula              render specified formula\n"
-"  -q, --quiet, --silent      inhibit usual output\n"
-"  --verbose                  print more information\n"
-"  -h, --help                 display this help and exit\n"
-"  -V, --version              output version information and exit\n" );
+"  -"D_RESOLUTION_X_SHORT", --"D_RESOLUTION_X_LONG"         set x resolution\n"
+"  -"D_RESOLUTION_Y_SHORT", --"D_RESOLUTION_Y_LONG"         set y resolution\n"
+"  -"D_DENSITY_SHORT", --"D_DENSITY_LONG"              set graph density\n"
+"  -"D_STEREO_SHORT", --"D_STEREO_LONG"               generate stereo picture\n"
+"  -"D_FORMULA_SHORT", --"D_FORMULA_LONG"              render specified formula\n"
+"  -"D_QUIET_SHORT			", --"D_QUIET_LONG", --"D_SILENT_LONG"      inhibit usual output\n"
+"  -"D_VERBOSE_SHORT		", --"D_VERBOSE_LONG		""    "              print more information\n"
+"  -"D_HELP_SHORT				", --"D_HELP_LONG				"" "                 display this help and exit\n"
+"  -"D_VERSION_SHORT		", --"D_VERSION_LONG		""    "              output version information and exit\n" );
 	throw ( setup.f_bHelp ? 0 : 1 );
 	}
 
@@ -73,16 +93,16 @@ int decode_switches ( int a_iArgc, char ** a_ppcArgv )
 	int l_iUnknown = 0, l_iNonOption = 0;
 	OOption l_psOptions [ ] =
 		{
-			{ "resolution-x",	'X', OOption::D_REQUIRED, D_INT,			& setup.f_iResolutionX,	NULL },
-			{ "resolution-y",	'Y', OOption::D_REQUIRED, D_INT,			& setup.f_iResolutionY,	NULL },
-			{ "density",			'D', OOption::D_REQUIRED, D_INT,			& setup.f_iDensity,			NULL },
-			{ "stereo",				'S', OOption::D_NONE,			D_BOOL,			& setup.f_bStereo,			NULL },
-			{ "formula",			'F', OOption::D_REQUIRED, D_HSTRING,	& setup.f_oFormula,			NULL },
-			{ "quiet",				'q', OOption::D_NONE,			D_BOOL,			& setup.f_bQuiet,				NULL },
-			{ "silent",				'q', OOption::D_NONE,			D_BOOL,			& setup.f_bQuiet,				NULL },
-			{ "verbose",			'v', OOption::D_NONE,			D_BOOL,			& setup.f_bVerbose,			NULL },
-			{ "help",					'h', OOption::D_NONE,			D_BOOL,			& setup.f_bHelp,				usage },
-			{ "version",			'V', OOption::D_NONE,			D_VOID,			NULL,										version }
+			{ D_RESOLUTION_X_LONG,	D_RESOLUTION_X_SHORT, OOption::D_REQUIRED, D_INT,			& setup.f_iResolutionX,	NULL },
+			{ D_RESOLUTION_Y_LONG,	D_RESOLUTION_Y_SHORT, OOption::D_REQUIRED, D_INT,			& setup.f_iResolutionY,	NULL },
+			{ D_DENSITY_LONG,			D_DENSITY_SHORT,		OOption::D_REQUIRED,	D_INT,			& setup.f_iDensity,			NULL },
+			{ D_STEREO_LONG,			D_STEREO_SHORT,			OOption::D_NONE,			D_BOOL,			& setup.f_bStereo,			NULL },
+			{ D_FORMULA_LONG,			D_FORMULA_SHORT,		OOption::D_REQUIRED,	D_HSTRING,	& setup.f_oFormula,			NULL },
+			{ D_QUIET_LONG	,			D_QUIET_SHORT,			OOption::D_NONE,	D_BOOL,	&setup.f_bQuiet,		NULL },
+			{ D_SILENT_LONG,			D_QUIET_SHORT,			OOption::D_NONE,	D_BOOL,	&setup.f_bQuiet,		NULL },
+			{ D_VERBOSE_LONG,			D_VERBOSE_SHORT,		OOption::D_NONE,	D_BOOL,	&setup.f_bVerbose,	NULL },
+			{ D_HELP_LONG,				D_HELP_SHORT,				OOption::D_NONE,	D_BOOL,	&setup.f_bHelp,		usage },
+			{ D_VERSION_LONG,			D_VERSION_SHORT,		OOption::D_NONE,	D_VOID,	NULL,								version }
 		};
 	l_iNonOption = cl_switch::decode_switches ( a_iArgc, a_ppcArgv, l_psOptions,
 			sizeof ( l_psOptions ) / sizeof ( OOption ), & l_iUnknown );
