@@ -52,7 +52,7 @@ HSurface::HSurface ( void )
 	if ( f_iActiveSurfaces < 1 )
 		{
 		hcore::log << _ ( "Initializing SDL library " );
-		if( ( l_iError = SDL_Init ( SDL_INIT_VIDEO ) ) < 0 )
+		if( ( l_iError = SDL_Init ( SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD ) ) < 0 )
 			{
 			l_oMessage = _ ( "Couldn't initialize SDL: " );
 			l_oMessage += SDL_GetError ( );
