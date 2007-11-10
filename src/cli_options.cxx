@@ -83,7 +83,7 @@ int decode_switches( int a_iArgc, char** a_ppcArgv )
 	l_iNonOption = cl_switch::decode_switches( a_iArgc, a_ppcArgv, l_psOptions,
 			info.second, &l_iUnknown );
 	if ( l_iUnknown > 0 )
-		usage( NULL );
+		usage( &info );
 	return ( l_iNonOption );
 	M_EPILOG
 	}
