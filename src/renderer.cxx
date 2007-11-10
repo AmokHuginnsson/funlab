@@ -54,7 +54,7 @@ HRenderer::HRenderer ( void )
 	f_dCosBeta ( 0 ), f_dSinBeta ( 0 ),
 	f_dCosGamma ( 0 ), f_dSinGamma ( 0 ),
 	f_dPrecountA ( 0 ), f_dPrecountB ( 0 ), f_dPrecountC ( 0 ), f_pdTrygo ( NULL ),
-	f_oMutex(), f_oCondition(), f_oThread( *this )
+	f_oMutex(), f_oSemaphore(), f_oThread( *this )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -92,7 +92,7 @@ HRenderer::~HRenderer ( void )
 	{
 	M_PROLOG
 	if ( HSurface::surface_count() )
-		f_oCondition.wait ( );
+		f_oSemaphore.wait ( );
 	while ( f_bBusy )
 		;
 	int l_iCtr = 0;
@@ -388,7 +388,7 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 								{
 								f_bLoop = false;
 								f_poSurface->down ( );
-								f_oCondition.signal ( );
+								f_oSemaphore.signal ( );
 								}
 							break;
 							}

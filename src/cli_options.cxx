@@ -37,77 +37,53 @@ M_VCSID ( "$Id$" )
 
 using namespace yaal;
 using namespace yaal::hcore;
-
-#define D_QUIET_SHORT				"q"
-#define D_QUIET_LONG				"quiet"
-#define D_SILENT_LONG				"silent"
-#define D_VERBOSE_SHORT			"v"
-#define D_VERBOSE_LONG			"verbose"
-#define D_HELP_SHORT				"h"
-#define D_HELP_LONG					"help"
-#define D_VERSION_SHORT			"V"
-#define D_VERSION_LONG			"version"
-#define D_RESOLUTION_X_SHORT	"X"
-#define D_RESOLUTION_X_LONG		"resolution-x"
-#define D_RESOLUTION_Y_SHORT	"Y"
-#define D_RESOLUTION_Y_LONG		"resolution-y"
-#define D_DENSITY_SHORT	"D"
-#define D_DENSITY_LONG	"density"
-#define D_STEREO_SHORT	"S"
-#define D_STEREO_LONG		"stereo"
-#define D_FORMULA_SHORT	"F"
-#define D_FORMULA_LONG	"formula"
+using namespace yaal::tools;
 
 /* Set all the option flags according to the switches specified.
    Return the index of the first non-option argument.                    */
-void usage ( void ) __attribute__ ( ( __noreturn__ ) );
-void usage ( void )
+
+typedef HPair<OOption*,int> option_info_t;
+
+void usage( void* ) __attribute__((__noreturn__));
+void usage( void* arg )
 	{
-	printf ( "%s - "
-" renders three dimensional function surfaces.\n", setup.f_pcProgramName );
-	printf ( "Usage: %s [OPTION]... [FILE]...\n", setup.f_pcProgramName );
-	printf (
-"Options:\n"
-"  -"D_RESOLUTION_X_SHORT", --"D_RESOLUTION_X_LONG"         set x resolution\n"
-"  -"D_RESOLUTION_Y_SHORT", --"D_RESOLUTION_Y_LONG"         set y resolution\n"
-"  -"D_DENSITY_SHORT", --"D_DENSITY_LONG"              set graph density\n"
-"  -"D_STEREO_SHORT", --"D_STEREO_LONG"               generate stereo picture\n"
-"  -"D_FORMULA_SHORT", --"D_FORMULA_LONG"              render specified formula\n"
-"  -"D_QUIET_SHORT			", --"D_QUIET_LONG", --"D_SILENT_LONG"      inhibit usual output\n"
-"  -"D_VERBOSE_SHORT		", --"D_VERBOSE_LONG		""    "              print more information\n"
-"  -"D_HELP_SHORT				", --"D_HELP_LONG				"" "                 display this help and exit\n"
-"  -"D_VERSION_SHORT		", --"D_VERSION_LONG		""    "              output version information and exit\n" );
+	option_info_t* info = static_cast<option_info_t*>( arg );
+	util::show_help( info->first, info->second, setup.f_pcProgramName, "renders three dimensional function surfaces" );
 	throw ( setup.f_bHelp ? 0 : 1 );
 	}
 
-void version ( void ) __attribute__ ( ( __noreturn__ ) );
-void version ( void )
+void version( void* ) __attribute__ ( ( __noreturn__ ) );
+void version( void* )
 	{
 	printf ( "`funlab' %s\n", VER );
 	throw ( 0 );
 	}
 
-int decode_switches ( int a_iArgc, char ** a_ppcArgv )
+int decode_switches( int a_iArgc, char** a_ppcArgv )
 	{
 	M_PROLOG
 	int l_iUnknown = 0, l_iNonOption = 0;
-	OOption l_psOptions [ ] =
+	simple_callback_t help( usage, NULL );
+	simple_callback_t version_call( version, NULL );
+	OOption l_psOptions[] =
 		{
-			{ D_RESOLUTION_X_LONG,	D_RESOLUTION_X_SHORT, OOption::D_REQUIRED, D_INT,			& setup.f_iResolutionX,	NULL },
-			{ D_RESOLUTION_Y_LONG,	D_RESOLUTION_Y_SHORT, OOption::D_REQUIRED, D_INT,			& setup.f_iResolutionY,	NULL },
-			{ D_DENSITY_LONG,			D_DENSITY_SHORT,		OOption::D_REQUIRED,	D_INT,			& setup.f_iDensity,			NULL },
-			{ D_STEREO_LONG,			D_STEREO_SHORT,			OOption::D_NONE,			D_BOOL,			& setup.f_bStereo,			NULL },
-			{ D_FORMULA_LONG,			D_FORMULA_SHORT,		OOption::D_REQUIRED,	D_HSTRING,	& setup.f_oFormula,			NULL },
-			{ D_QUIET_LONG	,			D_QUIET_SHORT,			OOption::D_NONE,	D_BOOL,	&setup.f_bQuiet,		NULL },
-			{ D_SILENT_LONG,			D_QUIET_SHORT,			OOption::D_NONE,	D_BOOL,	&setup.f_bQuiet,		NULL },
-			{ D_VERBOSE_LONG,			D_VERBOSE_SHORT,		OOption::D_NONE,	D_BOOL,	&setup.f_bVerbose,	NULL },
-			{ D_HELP_LONG,				D_HELP_SHORT,				OOption::D_NONE,	D_BOOL,	&setup.f_bHelp,		usage },
-			{ D_VERSION_LONG,			D_VERSION_SHORT,		OOption::D_NONE,	D_VOID,	NULL,								version }
+			{ "resolution-x", D_INT, &setup.f_iResolutionX, "X", OOption::D_REQUIRED, "val", "set x resolution to val value", NULL },
+			{ "resolution-y", D_INT, &setup.f_iResolutionX, "Y", OOption::D_REQUIRED, "val", "set y resolution to val value", NULL },
+			{ "density", D_INT, &setup.f_iDensity, "D", OOption::D_REQUIRED, "val", "set graph density to val", NULL },
+			{ "stereo", D_BOOL, &setup.f_bStereo, "S", OOption::D_NONE, NULL, "generate stereo picture", NULL },
+			{ "formula", D_HSTRING, &setup.f_oFormula, "F", OOption::D_REQUIRED, "eq", "render specified formula", NULL },
+			{ "quiet", D_BOOL, &setup.f_bQuiet, "q", OOption::D_NONE, NULL, "inhibit usual output", NULL },
+			{ "silent", D_BOOL, &setup.f_bQuiet, "q", OOption::D_NONE, NULL, "inhibit usual output", NULL },
+			{ "verbose", D_BOOL, &setup.f_bVerbose, "v", OOption::D_NONE, NULL, "print more information", NULL },
+			{ "help", D_BOOL, &setup.f_bHelp, "h", OOption::D_NONE, NULL, "display this help and exit", &help },
+			{ "version", D_VOID, NULL, "V", OOption::D_NONE, NULL, "output version information and exit", &version_call }
 		};
-	l_iNonOption = cl_switch::decode_switches ( a_iArgc, a_ppcArgv, l_psOptions,
-			sizeof ( l_psOptions ) / sizeof ( OOption ), & l_iUnknown );
+	option_info_t info( l_psOptions, sizeof ( l_psOptions ) / sizeof ( OOption ) );
+	help.second = &info;
+	l_iNonOption = cl_switch::decode_switches( a_iArgc, a_ppcArgv, l_psOptions,
+			info.second, &l_iUnknown );
 	if ( l_iUnknown > 0 )
-		usage ( );
+		usage( NULL );
 	return ( l_iNonOption );
 	M_EPILOG
 	}

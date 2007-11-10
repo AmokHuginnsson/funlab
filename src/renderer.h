@@ -94,7 +94,7 @@ private:
 	double f_dPrecountC;
 	double* f_pdTrygo;
 	yaal::hcore::HMutex f_oMutex;
-	yaal::hcore::HCondition f_oCondition;
+	yaal::hcore::HSemaphore f_oSemaphore;
 	renderer_t f_oThread;
 	HRenderer( const HRenderer& );
 	HRenderer& operator = ( const HRenderer& );

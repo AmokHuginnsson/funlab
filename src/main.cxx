@@ -56,7 +56,7 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 	try
 		{
 /* TO-DO: enter main loop code here */
-		signals::set_handlers ( );
+		HSignalServiceFactory::get_instance();
 		setup.f_pcProgramName = a_ppcArgv [ 0 ];
 		process_funlabrc_file ( );
 		l_iOpt = decode_switches ( a_iArgc, a_ppcArgv );
