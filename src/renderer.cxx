@@ -42,6 +42,9 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
+namespace funlab
+{
+
 HRenderer::HRenderer ( void )
 	: f_iRed ( 0 ), f_iGreen ( 0 ), f_iBlue ( 0 ),
 	f_dLowerXEdge ( 0 ), f_dLowerYEdge ( 0 ), f_dSize ( 0 ), f_dResolution ( 0 ),
@@ -476,4 +479,6 @@ int HRenderer::error_position ( void ) const
 	return ( f_poAnalyser->get_error_token ( ) );
 	M_EPILOG
 	}
+
+}
 

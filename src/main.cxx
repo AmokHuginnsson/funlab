@@ -42,8 +42,14 @@ using namespace yaal::hcore;
 using namespace yaal::hconsole;
 using namespace yaal::tools;
 using namespace yaal::tools::util;
+using namespace funlab;
+
+namespace funlab
+{
 
 OSetup setup;
+
+}
 
 int main ( int a_iArgc, char * a_ppcArgv [ ] )
 	{

@@ -29,6 +29,9 @@ Copyright:
 
 #include <yaal/hcore/hthread.h>
 
+namespace funlab
+{
+
 class yaal::tools::HAnalyser;
 class HSurface;
 class HRenderer;
@@ -100,5 +103,7 @@ private:
 	HRenderer& operator = ( const HRenderer& );
 	/*}*/
 	};
+
+}
 
 #endif /* not __RENDERER_H */

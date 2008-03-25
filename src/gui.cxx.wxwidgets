@@ -51,6 +51,9 @@ M_VCSID ( "$Id$" );
 
 using namespace yaal::hcore;
 
+namespace funlab
+{
+
 int gui_start ( int a_iArgc, char * a_ppcArgv [ ] )
 	{
 	M_PROLOG
@@ -510,5 +513,7 @@ void HEvtHandler::on_list_item_select ( wxListEvent & a_roEvent )
 	return;
 	M_EPILOG
 	}
+
+}
 
 /* vim: set ft=cpp : */

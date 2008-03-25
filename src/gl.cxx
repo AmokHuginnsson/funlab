@@ -36,6 +36,9 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
+namespace funlab
+{
+
 int HSurface::f_iActiveSurfaces = 0;
 
 int HSurface::surface_count ( void )
@@ -408,4 +411,6 @@ void HSurface::toggle_fullscreen ( void )
 	return;
 	M_EPILOG
 	}
+
+}
 

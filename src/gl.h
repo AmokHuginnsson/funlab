@@ -27,6 +27,9 @@ Copyright:
 #ifndef __GL_H
 #define __GL_H
 
+namespace funlab
+{
+
 class HSurface
 	{
 protected:
@@ -62,5 +65,7 @@ private:
 	HSurface & operator = ( const HSurface & );
 	/*}*/
 	};
+
+}
 
 #endif /* not __GL_H */

@@ -36,6 +36,9 @@ Copyright:
 using namespace std;
 using namespace yaal::hcore;
 
+namespace funlab
+{
+
 class HWindowMain : public Gtk::Window
 	{
 	class HLocker
@@ -450,5 +453,7 @@ int gui_start ( int a_iArgc, char * a_ppcArgv [ ] )
 	return ( 0 );
 	M_EPILOG
 	}
+
+}
 
 /* vim: set ft=cpp : */

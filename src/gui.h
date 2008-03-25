@@ -24,10 +24,14 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-
 #ifndef __GUI_H
 #define __GUI_H
 
+namespace funlab
+{
+
 int gui_start ( int, char * [] );
+
+}
 
 #endif /* not __GUI_H */

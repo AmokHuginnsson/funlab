@@ -36,6 +36,9 @@ M_VCSID ( "$Id$" )
 using namespace yaal;
 using namespace yaal::hcore;
 
+namespace funlab
+{
+
 bool set_variables( HString& a_roOption, HString& a_roValue )
 	{
 	::fprintf( stdout, "option: [%s], value: [%s]\n",
@@ -62,4 +65,6 @@ int process_funlabrc_file( void )
 		setup.f_oLogPath = "funlab.log";
 	return ( 0 );
 	}
+
+}
 
