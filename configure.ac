@@ -1,7 +1,7 @@
 dnl configure.ac is integral part of funlab project.
 
 dnl Initialization data.
-AC_INIT([[funlab]],[[0.0.0]],[[amok@frihet.ath.cx]])
+AC_INIT([[funlab]],[[0.0.0]],[[amok@codestation.org]])
 AC_ARG_WITH([gtkmm],[AC_HELP_STRING([--with-gtkmm],[Compile with gtkmm gui, default is `yes' if apriopriate library can be found.])],[GUI_GTKMM=$withval],[GUI_GTKMM="auto"])
 dnl `
 AC_ARG_WITH([wxwidgets],[AC_HELP_STRING([--with-wxwidgets],[Compile with wxwidgets gui, default is `yes' if gtkmm is not found and apriopriate wxwidgets library can be found.])],[GUI_WXWIDGETS=$withval],[GUI_WXWIDGETS="auto"])
