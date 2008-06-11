@@ -190,7 +190,7 @@ void HWindowMain::open ( HString const & a_oPath )
 	HFile l_oFile;
 	Gtk::TreeModel::Row l_oRow;
 	l_oFile.open ( a_oPath );
-	if ( l_oFile )
+	if ( !! l_oFile )
 		{
 		f_oFormulasListModel->clear ( );
 		while ( l_oFile.read_line ( l_oLine, HFile::D_STRIP_NEWLINES ) >= 0 )
@@ -240,7 +240,7 @@ void HWindowMain::save ( HString const & a_oPath )
 		M_THROW ( _ ( "Empty path." ), errno );
 	HFile l_oFile ( HFile::D_WRITING );
 	l_oFile.open ( a_oPath );
-	if ( l_oFile )
+	if ( !! l_oFile )
 		{
 		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children ( );
 		for ( Gtk::TreeIter l_oIter = l_oRows.begin ( ); l_oIter != l_oRows.end ( ); ++ l_oIter )
