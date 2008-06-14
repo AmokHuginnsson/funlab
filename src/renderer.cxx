@@ -305,12 +305,14 @@ bool HRenderer::render_surface ( char const * a_pcFormula )
 	if ( ! HSurface::surface_count ( ) )
 		{
 		f_poSurface->init ( setup.f_iResolutionX, setup.f_iResolutionY );
-		SDL_WarpMouse ( setup.f_iResolutionX >> 1, setup.f_iResolutionY >> 1 );
+		SDL_WarpMouse( static_cast<Uint16>( setup.f_iResolutionX >> 1 ),
+				static_cast<Uint16>( setup.f_iResolutionY >> 1 ) );
 		f_bLoop = true;
 		f_oThread.spawn ( );
 		}
 	else
-		SDL_WarpMouse ( setup.f_iResolutionX >> 1, setup.f_iResolutionY >> 1 );
+		SDL_WarpMouse( static_cast<Uint16>( setup.f_iResolutionX >> 1 ),
+				static_cast<Uint16>( setup.f_iResolutionY >> 1 ) );
 	return ( false );
 	M_EPILOG
 	}

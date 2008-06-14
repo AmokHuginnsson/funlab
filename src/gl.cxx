@@ -214,27 +214,27 @@ void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 		{
 		case ( 1 ):
 			{
-			( * l_pcRawMemory ) = pixel;
+			( * l_pcRawMemory ) = static_cast<char>( pixel );
 			break;
 			}
 		case ( 2 ):
 			{
-			( * reinterpret_cast < Uint16 * > ( l_pcRawMemory ) ) = pixel;
+			( *reinterpret_cast<Uint16*>( l_pcRawMemory ) ) = static_cast<Uint16>( pixel );
 			break;
 			}
 		case ( 3 ):
 			{
 			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN )
 				{
-				l_pcRawMemory [ 0 ] = ( pixel >> 16 ) & 0xff;
-				l_pcRawMemory [ 1 ] = ( pixel >> 8 ) & 0xff;
-				l_pcRawMemory [ 2 ] = pixel & 0xff;
+				l_pcRawMemory[ 0 ] = static_cast<char>( ( pixel >> 16 ) & 0xff );
+				l_pcRawMemory[ 1 ] = static_cast<char>( ( pixel >> 8 ) & 0xff );
+				l_pcRawMemory[ 2 ] = static_cast<char>( pixel & 0xff );
 				}
 			else
 				{
-				l_pcRawMemory [ 0 ] = pixel & 0xff;
-				l_pcRawMemory [ 1 ] = ( pixel >> 8 ) & 0xff;
-				l_pcRawMemory [ 2 ] = ( pixel >> 16 ) & 0xff;
+				l_pcRawMemory[ 0 ] = static_cast<char>( pixel & 0xff );
+				l_pcRawMemory[ 1 ] = static_cast<char>( ( pixel >> 8 ) & 0xff );
+				l_pcRawMemory[ 2 ] = static_cast<char>( ( pixel >> 16 ) & 0xff );
 				}
 			break;
 			}
@@ -382,8 +382,11 @@ unsigned long int HSurface::RGB ( int a_iRed, int a_iGreen, int a_iBlue )
 	{
 	M_PROLOG
 	unsigned long int l_ulValue = 0;
-	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
-	l_ulValue = SDL_MapRGB ( l_psSurface->format, a_iRed, a_iGreen, a_iBlue );
+	SDL_Surface * l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
+	l_ulValue = SDL_MapRGB( l_psSurface->format,
+			static_cast<Uint8>( a_iRed ),
+			static_cast<Uint8>( a_iGreen ),
+			static_cast<Uint8>( a_iBlue ) );
 	return ( l_ulValue );
 	M_EPILOG
 	}

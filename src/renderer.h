@@ -28,11 +28,11 @@ Copyright:
 #define __RENDERER_H
 
 #include <yaal/hcore/hthread.h>
+#include <yaal/tools/hanalyser.h>
 
 namespace funlab
 {
 
-class yaal::tools::HAnalyser;
 class HSurface;
 class HRenderer;
 
@@ -57,11 +57,11 @@ protected:
 	double f_dDY;
 	double f_dDZ;
 	double f_dFOV;
-	double * f_pdXVariable;
-	double * f_pdYVariable;
-	double * *	f_ppdLand;
-	yaal::tools::HAnalyser * f_poAnalyser;
-	HSurface *	f_poSurface;
+	double* f_pdXVariable;
+	double* f_pdYVariable;
+	double**	f_ppdLand;
+	yaal::tools::HAnalyser* f_poAnalyser;
+	HSurface*	f_poSurface;
 	/*}*/
 public:
 	/*{*/
