@@ -68,20 +68,18 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 		hcore::log.rehash ( setup.f_oLogPath, setup.f_pcProgramName );
 /*		if ( ! console::is_enabled ( ) )enter_curses (); / * enabling ncurses ablilities*/
 /* *BOOM* */
-		if ( setup.f_oFormula )
+		if ( !! setup.f_oFormula )
 			{
 			HRenderer l_oRenderer;
-			l_iOpt = l_oRenderer.render_surface ( setup.f_oFormula ) ? 1 : 0;
+			l_iOpt = l_oRenderer.render_surface( setup.f_oFormula ) ? 1 : 0;
 			if ( l_iOpt )
 				{
-				l_iPosition = l_oRenderer.error_position ( );
+				l_iPosition = l_oRenderer.error_position();
 				for ( l_iCtr = 0; l_iCtr < l_iPosition; l_iCtr ++ )
 					l_oArrow += '-';
 				l_oArrow += 'v';
-				fprintf ( stderr, _ ( "Formula syntax error ...\n%s at this place:\n%s\n%s\n" ),
-						static_cast < char const * > ( l_oRenderer.error ( ) ),
-						static_cast < char const * > ( l_oArrow ),
-						static_cast < char const * > ( setup.f_oFormula ) );
+				::fprintf( stderr, _( "Formula syntax error ...\n%s at this place:\n%s\n%s\n" ),
+						l_oRenderer.error(), l_oArrow.raw(), setup.f_oFormula.raw() );
 				}
 			}
 		else

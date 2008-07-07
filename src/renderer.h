@@ -67,7 +67,7 @@ public:
 	/*{*/
 	HRenderer ( void );
 	virtual ~HRenderer ( void );
-	bool render_surface ( char const * );
+	bool render_surface( yaal::hcore::HString const& );
 	void draw_frame ( void );
 	char const * error ( void ) const;
 	int error_position ( void ) const;

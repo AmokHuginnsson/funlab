@@ -195,8 +195,8 @@ void HWindowMain::open ( HString const & a_oPath )
 		f_oFormulasListModel->clear ( );
 		while ( l_oFile.read_line ( l_oLine, HFile::D_STRIP_NEWLINES ) >= 0 )
 			{
-			l_oRow = * ( f_oFormulasListModel->append ( ) );
-			l_oRow [ f_oFormulasListFormulaColumn ] = static_cast < char const * const > ( l_oLine );
+			l_oRow = *( f_oFormulasListModel->append() );
+			l_oRow[ f_oFormulasListFormulaColumn ] = l_oLine.raw();
 			l_iIndex ++;
 			}
 		l_oFile.close ( );
@@ -268,7 +268,7 @@ void HWindowMain::on_about ( void )
 	l_oMsg.format ( _ ( "The funlab program, very fancy GUI application that\n"
 				"can be used for rendering function surfaces.\n"
 				"Welcome to funlab %s" ), VER );
-	Gtk::MessageDialog l_oMessageAbout ( * this, static_cast < char const * const > ( l_oMsg ) );
+	Gtk::MessageDialog l_oMessageAbout( *this, l_oMsg.raw() );
 	l_oMessageAbout.set_title ( _ ( "About funlab" ) );
 	l_oMessageAbout.run ( );
 	return;
@@ -348,8 +348,8 @@ bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
 			if ( l_oIter )
 				{
 				l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str ( );
-				if ( f_oRenderer.render_surface ( l_oFormula ) )
-					show_error_message ( l_oFormula, f_oRenderer.error ( ), f_oRenderer.error_position ( ) );
+				if ( f_oRenderer.render_surface( l_oFormula ) )
+					show_error_message( l_oFormula.raw(), f_oRenderer.error(), f_oRenderer.error_position() );
 				f_bRendererActive = true;
 				}
 			break;
@@ -364,8 +364,8 @@ bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
 	M_EPILOG
 	}
 
-void HWindowMain::show_error_message ( char const * const a_pcFormula,
-		char const * const a_pcMessage, int a_iPosition )
+void HWindowMain::show_error_message( char const* const a_pcFormula,
+		char const* const a_pcMessage, int a_iPosition )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -374,14 +374,14 @@ void HWindowMain::show_error_message ( char const * const a_pcFormula,
 		l_oArrow += '-';
 	l_oArrow += 'v';
 	l_oError.format ( "<b>%s at this place:<tt>\n\n%s\n%s</tt></b>",
-			a_pcMessage, static_cast < char const * const > ( l_oArrow ),
+			a_pcMessage, l_oArrow.raw(),
 			a_pcFormula );
-	Gtk::MessageDialog l_oInfo ( * this,
-			static_cast < char const * const > ( l_oError ), true );
-	l_oInfo.set_title ( _ ( "Formula syntax error ..." ) );
-	Pango::FontDescription l_oFontDesc ( "Sans Bold 14" );
-	set_font_all ( l_oFontDesc, & l_oInfo );
-	l_oInfo.run ( );
+	Gtk::MessageDialog l_oInfo( *this,
+			l_oError.raw(), true );
+	l_oInfo.set_title( _( "Formula syntax error ..." ) );
+	Pango::FontDescription l_oFontDesc( "Sans Bold 14" );
+	set_font_all( l_oFontDesc, &l_oInfo );
+	l_oInfo.run();
 	return;
 	M_EPILOG
 	}
@@ -428,14 +428,14 @@ void HWindowMain::set_font_all ( Pango::FontDescription const & a_oFontDesc,
 	M_EPILOG
 	}
 
-int gui_start ( int a_iArgc, char * a_ppcArgv [ ] )
+int gui_start( int a_iArgc, char* a_ppcArgv[] )
 	{
 	M_PROLOG
 	try
 		{
-		Gtk::Main l_oGUI ( a_iArgc, a_ppcArgv );
-		Glib::RefPtr < Gnome::Glade::Xml > l_oResources = Gnome::Glade::Xml::create (
-				static_cast < char const * const > ( setup.f_oResourcePath ) );
+		Gtk::Main l_oGUI( a_iArgc, a_ppcArgv );
+		Glib::RefPtr<Gnome::Glade::Xml> l_oResources = Gnome::Glade::Xml::create(
+				setup.f_oResourcePath.raw() );
 		HWindowMain * l_poWindowMain = NULL;
 		l_oResources->get_widget_derived ( "WINDOW_MAIN", l_poWindowMain );
 		l_oGUI.run ( * l_poWindowMain );

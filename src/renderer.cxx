@@ -280,17 +280,17 @@ void HRenderer::draw_frame ( void )
 	M_EPILOG
 	}
 
-bool HRenderer::render_surface ( char const * a_pcFormula )
+bool HRenderer::render_surface ( HString const& a_oFormula )
 	{
 	M_PROLOG
 	
 		{
 	HLock l_oLock ( f_oMutex );
-	if ( ! a_pcFormula )
+	if ( ! a_oFormula )
 		return ( true );
 
-	double * l_pdVariables = NULL;
-	l_pdVariables = f_poAnalyser->analyse ( a_pcFormula );
+	double* l_pdVariables = NULL;
+	l_pdVariables = f_poAnalyser->analyse ( a_oFormula );
 	if ( ! l_pdVariables )
 		return ( true );
 	f_dSize = 10;
@@ -389,7 +389,7 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 						{
 						case ( 'q' ):
 							{
-							if ( setup.f_oFormula )
+							if ( !! setup.f_oFormula )
 								{
 								f_bLoop = false;
 								f_poSurface->down ( );

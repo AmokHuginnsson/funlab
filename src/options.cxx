@@ -46,8 +46,7 @@ namespace funlab
 bool set_variables( HString& a_roOption, HString& a_roValue )
 	{
 	::fprintf( stdout, "option: [%s], value: [%s]\n",
-			static_cast<char const* const>( a_roOption ),
-			static_cast<char const* const>( a_roValue ) );
+			a_roOption.raw(), a_roValue.raw() );
 	return ( false );
 	}
 
@@ -99,7 +98,7 @@ OOption n_psOptions[] =
 
 int process_funlabrc_file( void )
 	{
-	rc_file::process_rc_file ( "funlab", NULL, n_psOptions, NULL );
+	rc_file::process_rc_file( "funlab", HString(), n_psOptions, NULL );
 	if ( ! setup.f_oLogPath )
 		setup.f_oLogPath = "funlab.log";
 	return ( 0 );
