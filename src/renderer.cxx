@@ -32,7 +32,7 @@ Copyright:
 #include <SDL/SDL.h>
 
 #include <yaal/yaal.h>
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 
 #include "renderer.h"
 #include "gl.h"

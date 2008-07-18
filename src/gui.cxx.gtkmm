@@ -29,6 +29,8 @@ Copyright:
 #include <iostream>
 #include <libintl.h>
 
+M_VCSID( "$Id: "__ID__" $" )
+
 #include "version.h"
 #include "setup.h"
 #include "renderer.h"

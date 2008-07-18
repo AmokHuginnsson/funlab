@@ -28,7 +28,7 @@ Copyright:
 #include <SDL/SDL.h>
 
 #include <yaal/yaal.h>
-M_VCSID ( "$Id$" )
+M_VCSID( "$Id: "__ID__" $" )
 
 #include "gl.h"
 
@@ -394,8 +394,8 @@ unsigned long int HSurface::RGB ( int a_iRed, int a_iGreen, int a_iBlue )
 void HSurface::clear ( void )
 	{
 	M_PROLOG
-	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
-	SDL_FillRect ( l_psSurface, NULL, RGB ( 0, 0, 0 ) );
+	SDL_Surface* l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
+	SDL_FillRect( l_psSurface, NULL, static_cast<int>( RGB( 0, 0, 0 ) ) );
 	return;
 	M_EPILOG
 	}
