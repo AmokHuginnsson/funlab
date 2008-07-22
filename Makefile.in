@@ -35,6 +35,7 @@ SRC_TARGET		= src
 EXEC_NAME			= 1exec
 TARGETS				= TARGET
 CTAGS	= @CTAGS@
+GITID = @GITID@
 
 include $(DIR_ROOT)/_aux/inc-helper-pre.mk
 
