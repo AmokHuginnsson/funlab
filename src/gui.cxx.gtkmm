@@ -195,7 +195,7 @@ void HWindowMain::open ( HString const & a_oPath )
 	if ( !! l_oFile )
 		{
 		f_oFormulasListModel->clear ( );
-		while ( l_oFile.read_line ( l_oLine, HFile::D_STRIP_NEWLINES ) >= 0 )
+		while ( l_oFile.read_line ( l_oLine, HFile::READ::D_STRIP_NEWLINES ) >= 0 )
 			{
 			l_oRow = *( f_oFormulasListModel->append() );
 			l_oRow[ f_oFormulasListFormulaColumn ] = l_oLine.raw();
@@ -240,7 +240,7 @@ void HWindowMain::save ( HString const & a_oPath )
 	M_PROLOG
 	if ( a_oPath.is_empty ( ) )
 		M_THROW ( _ ( "Empty path." ), errno );
-	HFile l_oFile ( HFile::D_WRITING );
+	HFile l_oFile ( HFile::OPEN::D_WRITING );
 	l_oFile.open ( a_oPath );
 	if ( !! l_oFile )
 		{
