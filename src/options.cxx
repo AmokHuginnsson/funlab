@@ -81,7 +81,7 @@ OOption n_psOptions[] =
 		{ "resource_path", D_HSTRING, &setup.f_oResourcePath, NULL, OOption::D_REQUIRED, "path", "path to XUL resources", NULL },
 		{ "icon_path", D_HSTRING, &setup.f_oIconPath, NULL, OOption::D_REQUIRED, "path", "path to icon resources", NULL },
 		{ "resolution-x", D_INT, &setup.f_iResolutionX, "X", OOption::D_REQUIRED, "val", "set x resolution to val value", NULL },
-		{ "resolution-y", D_INT, &setup.f_iResolutionX, "Y", OOption::D_REQUIRED, "val", "set y resolution to val value", NULL },
+		{ "resolution-y", D_INT, &setup.f_iResolutionY, "Y", OOption::D_REQUIRED, "val", "set y resolution to val value", NULL },
 		{ "density", D_INT, &setup.f_iDensity, "D", OOption::D_REQUIRED, "val", "set graph density to val", NULL },
 		{ "stereo", D_BOOL, &setup.f_bStereo, "S", OOption::D_NONE, NULL, "generate stereo picture", NULL },
 		{ "formula", D_HSTRING, &setup.f_oFormula, "F", OOption::D_REQUIRED, "eq", "render specified formula", NULL },
