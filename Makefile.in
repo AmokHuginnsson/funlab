@@ -39,9 +39,6 @@ GITID = @GITID@
 
 include $(DIR_ROOT)/_aux/inc-helper-pre.mk
 
-ifndef NODEBUG
-	COMPILER_PCH_FLAGS=@PCH@
-endif
 CWARNING_FLAGS:=$(filter-out -Wredundant-decls,$(CWARNING_FLAGS))
 CWARNING_FLAGS:=$(filter-out -Werror,$(CWARNING_FLAGS)) # kurwa gtkmm ma problem z TimeVal::as_double()
 CXXWARNING_FLAGS:=$(filter-out -Weffc++,$(CXXWARNING_FLAGS))
