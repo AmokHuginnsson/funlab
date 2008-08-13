@@ -28,7 +28,7 @@ export DIR_ROOT	?= $(CURDIR)
 VERSION				= 0
 SUBVERSION		= 0
 EXTRAVERSION	= 0
-include $(DIR_ROOT)/_aux/common-paths.mk
+include $(DIR_ROOT)/_aux/mk/0_paths.mk
 LIBS					= SDL @GUI_LIBS@ pthread hdata dbwrapper tools hconsole hcore
 TARGET				= funlab
 SRC_TARGET		= src
@@ -48,17 +48,17 @@ LINKER_PRIME_FLAGS +=	@SPECIAL_LINKER_FLAGS@
 COMPILER_@GUI_TYPE@_FLAGS			= @GUI_COMPILER_FLAGS@
 LINKER_@GUI_TYPE@_FLAGS				= @GUI_LINKER_FLAGS@
 
-include $(DIR_ROOT)/_aux/common-flags-post.mk
+include $(DIR_ROOT)/_aux/mk/7_flags-post.mk
 CXXFLAGS			+= $(COMPILER_@GUI_TYPE@_FLAGS)
 LINKER_FLAGS	+= $(LINKER_@GUI_TYPE@_FLAGS)
-include $(DIR_ROOT)/_aux/common-int-libs.mk
+include $(DIR_ROOT)/_aux/mk/8_int-libs.mk
 LIBS := $(subst -l-l, -l, $(LIBS))
-include $(DIR_ROOT)/_aux/common-func.mk
-include $(DIR_ROOT)/_aux/common-prepare-target.mk
-include $(DIR_ROOT)/_aux/common-common-targets.mk
-include $(DIR_ROOT)/_aux/common-filenames.mk
-include $(DIR_ROOT)/_aux/common-target-default.mk
-include $(DIR_ROOT)/_aux/common-target-tags.mk
+include $(DIR_ROOT)/_aux/mk/9_func.mk
+include $(DIR_ROOT)/_aux/mk/a_prepare-target.mk
+include $(DIR_ROOT)/_aux/mk/b_common-targets.mk
+include $(DIR_ROOT)/_aux/mk/c_filenames.mk
+include $(DIR_ROOT)/_aux/mk/e_target-default.mk
+include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
 
 ifeq ($(CURDIR),$(DIR_BUILD))
 -include $(OBJS:.$(OS)=.$(DS))
