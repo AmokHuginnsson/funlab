@@ -1,7 +1,7 @@
 /*
 ---             `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
 
-	gl.h - this file is integral part of `funlab' project.
+	hsurface.h - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,36 +24,40 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __GL_H
-#define __GL_H
+#ifndef __HSURFACE_H
+#define __HSURFACE_H
+
+#include <yaal/hcore/hpointer.h>
 
 namespace funlab
 {
 
 class HSurface
 	{
+public:
+	typedef yaal::hcore::HPointer<HSurface> ptr_t;
 protected:
 	/*{*/
 	int	f_iWidth;
 	int f_iHeight;
-	int f_iBpp;
-	void * f_pvHandler;
+	int f_iBPP;
+	void* f_pvHandler;
 	/*}*/
 public:
 	/*{*/
-	HSurface ( void );
-	virtual ~HSurface ( void );
-	int init ( int, int, int = 32 );
-	void down ( void );
-	void refresh ( void );
-	void clear ( void );
-	unsigned long int get_pixel ( int, int );
-	void put_pixel ( int, int, unsigned long int );
-	void line ( double, double, double, double, unsigned long int );
-	unsigned long int RGB ( int, int, int );
-	bool is_valid ( void );
-	void toggle_fullscreen ( void );
-	static int surface_count ( void );
+	HSurface( void );
+	virtual ~HSurface( void );
+	int init( int, int, int = 32 );
+	void down( void );
+	void refresh( void );
+	void clear( void );
+	int long unsigned get_pixel( int, int );
+	void put_pixel( int, int, int long unsigned );
+	void line( double, double, double, double, int long unsigned );
+	int long unsigned RGB( int, int, int );
+	bool is_valid( void );
+	void toggle_fullscreen( void );
+	static int surface_count( void );
 	/*}*/
 protected:
 	/*{*/
@@ -61,11 +65,11 @@ protected:
 private:
 	/*{*/
 	static int f_iActiveSurfaces;
-	HSurface ( const HSurface & );
-	HSurface & operator = ( const HSurface & );
+	HSurface( HSurface const& );
+	HSurface& operator = ( HSurface const& );
 	/*}*/
 	};
 
 }
 
-#endif /* not __GL_H */
+#endif /* not __HSURFACE_H */

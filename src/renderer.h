@@ -29,7 +29,7 @@ Copyright:
 
 #include <yaal/hcore/hthread.h>
 #include <yaal/tools/hanalyser.h>
-#include "gl.h"
+#include "hsurface.h"
 
 namespace funlab
 {

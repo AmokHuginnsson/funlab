@@ -1,7 +1,7 @@
 /*
 ---             `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
 
-	gl.cxx - this file is integral part of `funlab' project.
+	hsurface.cxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -30,7 +30,7 @@ Copyright:
 #include <yaal/yaal.h>
 M_VCSID( "$Id: "__ID__" $" )
 
-#include "gl.h"
+#include "hsurface.h"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -47,7 +47,7 @@ int HSurface::surface_count ( void )
 	}
 
 HSurface::HSurface ( void )
-	: f_iWidth ( 0 ), f_iHeight ( 0 ), f_iBpp ( 0 ), f_pvHandler ( NULL )
+	: f_iWidth ( 0 ), f_iHeight ( 0 ), f_iBPP ( 0 ), f_pvHandler ( NULL )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -58,10 +58,10 @@ HSurface::HSurface ( void )
 		if( ( l_iError = SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD ) ) < 0 )
 			{
 			l_oMessage = _ ( "Couldn't initialize SDL: " );
-			l_oMessage += SDL_GetError ( );
+			l_oMessage += SDL_GetError();
 			M_THROW ( l_oMessage, l_iError );
 			}
-		hcore::log << _ ( "ok." ) << endl;
+		hcore::log << _( "ok." ) << endl;
 		}
 	return;
 	M_EPILOG
@@ -101,14 +101,14 @@ int HSurface::init( int a_iWidth, int a_iHeight, int a_iBpp )
 	SDL_Surface * l_psSurface = NULL;
 	f_iWidth = a_iWidth;
 	f_iHeight = a_iHeight;
-	f_iBpp = a_iBpp;
-	l_psSurface = SDL_SetVideoMode( f_iWidth, f_iHeight, f_iBpp,
+	f_iBPP = a_iBpp;
+	l_psSurface = SDL_SetVideoMode( f_iWidth, f_iHeight, f_iBPP,
 			SDL_HWSURFACE | SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_NOFRAME );
 	if ( l_psSurface == NULL )
 		{
 		l_iError = errno;
 		l_oMessage = _ ( "Couldn't set 640x480x8 video mode: " );
-		l_oMessage +=	SDL_GetError ( );
+		l_oMessage +=	SDL_GetError();
 		M_THROW ( l_oMessage, l_iError );
 		}
 	if ( l_psSurface->flags != ( SDL_HWSURFACE | SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_NOFRAME ) )
@@ -117,15 +117,15 @@ int HSurface::init( int a_iWidth, int a_iHeight, int a_iBpp )
 		hcore::log << " (" << SDL_HWSURFACE << '|' << SDL_ANYFORMAT << '|' << SDL_DOUBLEBUF << '|' << SDL_NOFRAME << ")" << endl;
 		}
 	f_pvHandler = l_psSurface;
-	f_iBpp = l_psSurface->format->BitsPerPixel;
-	if ( f_iBpp != a_iBpp )
-		hcore::log << "BPP downgrade: " << a_iBpp << " -> " << f_iBpp << endl;
-	hcore::log << "Set " << f_iWidth << 'x' << f_iHeight << " at " << f_iBpp << " bits-per-pixel mode" << endl;
+	f_iBPP = l_psSurface->format->BitsPerPixel;
+	if ( f_iBPP != a_iBpp )
+		hcore::log << "BPP downgrade: " << a_iBpp << " -> " << f_iBPP << endl;
+	hcore::log << "Set " << f_iWidth << 'x' << f_iHeight << " at " << f_iBPP << " bits-per-pixel mode" << endl;
 	if ( SDL_MUSTLOCK ( l_psSurface ) )
 		{
 		hcore::log << "Locking surface ";
 		if ( SDL_LockSurface ( l_psSurface ) < 0 )
-			hcore::log << "failed: " << SDL_GetError ( ) << endl;
+			hcore::log << "failed: " << SDL_GetError() << endl;
 		else hcore::log << "ok." << endl;
 		}
 	f_iActiveSurfaces ++;
@@ -144,7 +144,7 @@ void HSurface::refresh ( void )
 	if ( SDL_MUSTLOCK ( l_psSurface ) )
 		{
 		if ( SDL_LockSurface( l_psSurface ) < 0 )
-			hcore::log ( LOG_TYPE::D_ERROR ) << "Can't lock screen: " << SDL_GetError ( ) << endl;
+			hcore::log ( LOG_TYPE::D_ERROR ) << "Can't lock screen: " << SDL_GetError() << endl;
 		}
 	return;
 	M_EPILOG
@@ -154,14 +154,14 @@ void HSurface::refresh ( void )
  * Return the pixel value at (x, y)
  * NOTE: The surface must be locked before calling this!
  */
-unsigned long int HSurface::get_pixel ( int x, int y )
+int long unsigned HSurface::get_pixel ( int x, int y )
 	{
 	M_PROLOG
 	unsigned char * l_pcRawMemory = NULL;
 	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
 	
 	if ( ( x < 0 ) || ( y < 0 ) || ( x >= f_iWidth ) || ( y >= f_iHeight ) )
-		return ( static_cast < unsigned long int > ( - 1 ) );
+		return ( static_cast < int long unsigned > ( - 1 ) );
 	
 	/* Here l_pcRawMemory is the address to the pixel we want to retrieve */
 	l_pcRawMemory = static_cast < unsigned char * > ( l_psSurface->pixels )
@@ -186,7 +186,7 @@ unsigned long int HSurface::get_pixel ( int x, int y )
 			}
 		case ( 4 ):
 			{
-			return ( * reinterpret_cast < unsigned long int * > ( l_pcRawMemory ) );
+			return ( * reinterpret_cast < int long unsigned * > ( l_pcRawMemory ) );
 			}
 		}
 	return ( 0 );       /* shouldn't happen, but avoids warnings */
@@ -197,7 +197,7 @@ unsigned long int HSurface::get_pixel ( int x, int y )
  * Set the pixel at (x, y) to the given value
  * NOTE: The surface must be locked before calling this!
  */
-void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
+void HSurface::put_pixel ( int x, int y, int long unsigned pixel )
 	{
 	M_PROLOG
 	unsigned char * l_pcRawMemory = NULL;
@@ -240,7 +240,7 @@ void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 			}
 		case ( 4 ):
 			{
-			( * reinterpret_cast < unsigned long int * > ( l_pcRawMemory ) ) = pixel;
+			( * reinterpret_cast < int long unsigned * > ( l_pcRawMemory ) ) = pixel;
 			break;
 			}
 		}
@@ -248,7 +248,7 @@ void HSurface::put_pixel ( int x, int y, unsigned long int pixel )
 	M_EPILOG
 	}
 
-void HSurface::line ( double x0, double y0, double x1, double y1, unsigned long int color )
+void HSurface::line ( double x0, double y0, double x1, double y1, int long unsigned color )
 	{
 	M_PROLOG
 /*
@@ -378,10 +378,10 @@ void HSurface::line ( double x0, double y0, double x1, double y1, unsigned long 
 	M_EPILOG
 	}
 
-unsigned long int HSurface::RGB ( int a_iRed, int a_iGreen, int a_iBlue )
+int long unsigned HSurface::RGB ( int a_iRed, int a_iGreen, int a_iBlue )
 	{
 	M_PROLOG
-	unsigned long int l_ulValue = 0;
+	int long unsigned l_ulValue = 0;
 	SDL_Surface * l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
 	l_ulValue = SDL_MapRGB( l_psSurface->format,
 			static_cast<Uint8>( a_iRed ),

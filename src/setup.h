@@ -27,10 +27,16 @@ Copyright:
 #ifndef __SETUP_H
 #define __SETUP_H
 
+#include <iostream>
 #include <yaal/yaal.h>
+
+#define out ( cout << __FILE__ + OSetup::PATH_OFFSET << ":" << __LINE__ << ": " )
 
 namespace funlab
 {
+
+inline std::ostream& operator << ( std::ostream& o, yaal::hcore::HString const& s )
+	{ return ( o << s.raw() ); }
 
 struct OSetup
 	{

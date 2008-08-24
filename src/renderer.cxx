@@ -35,7 +35,6 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 
 #include "renderer.h"
-#include "gl.h"
 #include "setup.h"
 
 using namespace yaal;
@@ -46,17 +45,17 @@ namespace funlab
 {
 
 HRenderer::HRenderer ( void )
-	: f_iRed ( 0 ), f_iGreen ( 0 ), f_iBlue ( 0 ),
-	f_dLowerXEdge ( 0 ), f_dLowerYEdge ( 0 ), f_dSize ( 0 ), f_dResolution ( 0 ),
-	f_dAngleX ( 0 ), f_dAngleY ( 0 ), f_dAngleZ ( 0 ),
-	f_dDX ( 0 ), f_dDY ( 0 ), f_dDZ ( 0 ), f_dFOV ( 0 ),
-	f_pdXVariable ( NULL ), f_pdYVariable ( NULL ),
-	f_ppdLand ( NULL ), f_oAnalyser(), f_oSurface(),
-	f_bLoop ( false ), f_bBusy ( false ),
-	f_ulColor ( 0 ), f_dCosAlpha ( 0 ), f_dSinAlpha ( 0 ),
-	f_dCosBeta ( 0 ), f_dSinBeta ( 0 ),
-	f_dCosGamma ( 0 ), f_dSinGamma ( 0 ),
-	f_dPrecountA ( 0 ), f_dPrecountB ( 0 ), f_dPrecountC ( 0 ), f_pdTrygo ( NULL ),
+	: f_iRed( 0 ), f_iGreen( 0 ), f_iBlue( 0 ),
+	f_dLowerXEdge( 0 ), f_dLowerYEdge( 0 ), f_dSize( 0 ), f_dResolution( 0 ),
+	f_dAngleX( 0 ), f_dAngleY( 0 ), f_dAngleZ( 0 ),
+	f_dDX( 0 ), f_dDY( 0 ), f_dDZ( 0 ), f_dFOV( 0 ),
+	f_pdXVariable( NULL ), f_pdYVariable( NULL ),
+	f_ppdLand( NULL ), f_oAnalyser(), f_oSurface(),
+	f_bLoop( false ), f_bBusy( false ),
+	f_ulColor( 0 ), f_dCosAlpha( 0 ), f_dSinAlpha( 0 ),
+	f_dCosBeta( 0 ), f_dSinBeta( 0 ),
+	f_dCosGamma( 0 ), f_dSinGamma( 0 ),
+	f_dPrecountA( 0 ), f_dPrecountB( 0 ), f_dPrecountC( 0 ), f_pdTrygo( NULL ),
 	f_oMutex(), f_oSemaphore(), f_oThread( *this )
 	{
 	M_PROLOG
@@ -69,10 +68,10 @@ HRenderer::HRenderer ( void )
 	f_pdTrygo = xcalloc < double > ( 1024 );
 	for ( l_iCtr = 0; l_iCtr < 1024; l_iCtr ++ )
 		f_pdTrygo [ l_iCtr ] = sin( ( ( double ) l_iCtr * M_PI ) / 2048. );
-	SDL_EventState ( SDL_MOUSEMOTION, SDL_ENABLE );
-	SDL_EventState ( SDL_MOUSEBUTTONDOWN, SDL_ENABLE );
-	SDL_EventState ( SDL_MOUSEBUTTONUP, SDL_ENABLE );
-	SDL_EventState ( SDL_VIDEOEXPOSE, SDL_ENABLE );
+	SDL_EventState( SDL_MOUSEMOTION, SDL_ENABLE );
+	SDL_EventState( SDL_MOUSEBUTTONDOWN, SDL_ENABLE );
+	SDL_EventState( SDL_MOUSEBUTTONUP, SDL_ENABLE );
+	SDL_EventState( SDL_VIDEOEXPOSE, SDL_ENABLE );
 	return;
 	M_EPILOG
 	}
@@ -134,12 +133,12 @@ void HRenderer::makeland( void )
 
 void HRenderer::precount ( void )
 	{
-	f_dCosAlpha = cosq ( static_cast < unsigned int > ( f_dAngleX ) );
-	f_dSinAlpha = sinq ( static_cast < unsigned int > ( f_dAngleX ) );
-	f_dCosBeta = cosq ( static_cast < unsigned int > ( f_dAngleY ) );
-	f_dSinBeta = sinq ( static_cast < unsigned int > ( f_dAngleY ) );
-	f_dCosGamma = cosq ( static_cast < unsigned int > ( f_dAngleZ ) );
-	f_dSinGamma = sinq ( static_cast < unsigned int > ( f_dAngleZ ) );
+	f_dCosAlpha = cosq( static_cast<unsigned int>( f_dAngleX ) );
+	f_dSinAlpha = sinq( static_cast<unsigned int>( f_dAngleX ) );
+	f_dCosBeta = cosq( static_cast<unsigned int>( f_dAngleY ) );
+	f_dSinBeta = sinq( static_cast<unsigned int>( f_dAngleY ) );
+	f_dCosGamma = cosq( static_cast<unsigned int>( f_dAngleZ ) );
+	f_dSinGamma = sinq( static_cast<unsigned int>( f_dAngleZ ) );
 	f_dPrecountA = f_dCosAlpha * f_dSinGamma;
 	f_dPrecountB = f_dSinAlpha * f_dSinBeta;
 	f_dPrecountC = f_dCosAlpha * f_dCosGamma;
@@ -153,10 +152,12 @@ double HRenderer::sinq( unsigned int a_iAngle )
 	if ( a_iAngle > 2047 )
 		{
 		a_iAngle -= 2048;
-		if ( a_iAngle > 1023 ) a_iAngle = 2047-a_iAngle;
-		return ( - f_pdTrygo [ a_iAngle ] );
+		if ( a_iAngle > 1023 )
+			a_iAngle = 2047 - a_iAngle;
+		return ( - f_pdTrygo[ a_iAngle ] );
 		}
-	if ( a_iAngle > 1023 ) a_iAngle = 2047-a_iAngle;
+	if ( a_iAngle > 1023 )
+		a_iAngle = 2047 - a_iAngle;
 	return ( f_pdTrygo [ a_iAngle ] );
 	}
 
@@ -165,7 +166,7 @@ double HRenderer::cosq( unsigned int a_iAngle )
 	return ( sinq( a_iAngle + 1024 ) );
 	}
 
-bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
+bool HRenderer::T( double _x, double _y, double _z, int& _c, int& _r )
 	{
 	M_PROLOG
 	double x = 0, y = 0, z = 0;
@@ -184,8 +185,8 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 		{
 		int alpha = ( f_dDX > 0 ) ? 3 : - 3;
 		double ox = x;
-		x = x * cosq ( alpha ) - y * sinq ( alpha );
-		y = y * cosq ( alpha ) + ox * sinq ( alpha );
+		x = x * cosq( alpha ) - y * sinq( alpha );
+		y = y * cosq( alpha ) + ox * sinq( alpha );
 		}
 	
 	if ( y > 0 )
@@ -205,7 +206,7 @@ bool HRenderer::T( double _x, double _y, double _z, int & _c, int & _r )
 void HRenderer::draw_frame ( void )
 	{
 	M_PROLOG
-	if ( f_bBusy || ! f_oThread.is_alive ( ) )
+	if ( f_bBusy || ! f_oThread.is_alive() )
 		return;
 	f_bBusy = true;
 	bool valid = false, oldvalid = false;
@@ -280,7 +281,7 @@ bool HRenderer::render_surface( HString const& a_oFormula )
 	f_iRed = 8;
 	f_iGreen = 8;
 	f_iBlue = 0xf8;
-	makeland ( );
+	makeland();
 		}
 	if ( ! HSurface::surface_count() )
 		{
@@ -288,7 +289,7 @@ bool HRenderer::render_surface( HString const& a_oFormula )
 		SDL_WarpMouse( static_cast<Uint16>( setup.f_iResolutionX >> 1 ),
 				static_cast<Uint16>( setup.f_iResolutionY >> 1 ) );
 		f_bLoop = true;
-		f_oThread.spawn ( );
+		f_oThread.spawn();
 		}
 	else
 		SDL_WarpMouse( static_cast<Uint16>( setup.f_iResolutionX >> 1 ),
@@ -317,27 +318,19 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 						{
 						switch ( l_uEvent.motion.state )
 							{
-							case ( SDL_BUTTON ( 1 ) ):
-								{
+							case ( SDL_BUTTON( 1 ) ):
 								f_dAngleZ += l_uEvent.motion.xrel << 2;
 								f_dAngleX -= l_uEvent.motion.yrel << 2;
-								break;
-								}
-							case ( SDL_BUTTON ( 2 ) ):
-								{
+							break;
+							case ( SDL_BUTTON( 2 ) ):
 								f_dSize += l_uEvent.motion.xrel;
-								makeland ( );
-								break;
-								}
-							case ( SDL_BUTTON ( 3 ) ):
-								{
+								makeland();
+							break;
+							case ( SDL_BUTTON( 3 ) ):
 								f_dAngleY += l_uEvent.motion.xrel << 2;
-								break;
-								}
+							break;
 							default:
-								{
-								break;
-								}
+							break;
 							}
 						}
 					break;
@@ -347,19 +340,13 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 					switch ( l_uEvent.button.button )
 						{
 						case ( 4 ):
-							{
 							f_dDY ++;
-							break;
-							}
+						break;
 						case ( 5 ):
-							{
 							f_dDY --;
-							break;
-							}
+						break;
 						default:
-							{
-							break;
-							}
+						break;
 						}
 					break;
 					}
@@ -389,8 +376,8 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 								f_iRed += 16;
 								f_iRed %= 256;
 								}
-							break;
 							}
+						break;
 						case ( 'g' ):
 							{
 							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
@@ -403,8 +390,8 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 								f_iGreen += 16;
 								f_iGreen %= 256;
 								}
-							break;
 							}
+						break;
 						case ( 'b' ):
 							{
 							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
@@ -417,19 +404,15 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 								f_iBlue += 16;
 								f_iBlue %= 256;
 								}
-							break;
 							}
+						break;
 						default:
-							{
-							break;
-							}
+						break;
 						}
-					break;
 					}
+				break;
 				default:
-					{
-					break;
-					}
+				break;
 				}
 			if ( f_bLoop )
 				{
