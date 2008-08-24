@@ -30,8 +30,27 @@ Copyright:
 namespace funlab
 {
 
+class HEventInterface
+	{
+	};
+
+class HEventListenerInterface
+	{
+public:
+	void on_event( HEventInterface* e )
+		{ do_on_event( e ); }
+	virtual ~HEventListenerInterface( void ) {}
+protected:
+	virtual void do_on_event( HEventInterface* ) = 0;
+	};
+
+class HKeyboardEvent : public HEventInterface
+	{
+	};
+
 int gui_start ( int, char * [] );
 
 }
 
 #endif /* not __GUI_H */
+

@@ -61,7 +61,7 @@ protected:
 	double* f_pdYVariable;
 	double**	f_ppdLand;
 	yaal::tools::HAnalyser f_oAnalyser;
-	HSurface f_oSurface;
+	HSurface::ptr_t f_oSurface;
 	/*}*/
 public:
 	/*{*/

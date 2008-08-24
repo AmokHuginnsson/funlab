@@ -37,6 +37,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "renderer.h"
 #include "setup.h"
 
+using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -79,10 +80,13 @@ HRenderer::HRenderer ( void )
 HRenderer::~HRenderer( void )
 	{
 	M_PROLOG
+	cout << "waiting ... " << flush;
 	if ( HSurface::surface_count() )
 		f_oSemaphore.wait();
+	cout << "still waiting ... " << flush;
 	while ( f_bBusy )
 		;
+	cout << "done" << endl;
 	int l_iCtr = 0;
 	if ( f_pdTrygo )
 		xfree ( f_pdTrygo );
@@ -142,7 +146,7 @@ void HRenderer::precount ( void )
 	f_dPrecountA = f_dCosAlpha * f_dSinGamma;
 	f_dPrecountB = f_dSinAlpha * f_dSinBeta;
 	f_dPrecountC = f_dCosAlpha * f_dCosGamma;
-	f_ulColor = f_oSurface.RGB( f_iRed, f_iGreen, f_iBlue );
+	f_ulColor = f_oSurface->RGB( f_iRed, f_iGreen, f_iBlue );
 	return;
 	}
 
@@ -217,12 +221,12 @@ void HRenderer::draw_frame ( void )
 		for ( i = 0; i < setup.f_iDensity; i++ )
 			f_ppiNode[ j ][ i ] = 0;
 	f_dFOV = 240.0;
-	f_oSurface.clear();
+	f_oSurface->clear();
 	precount();
 	if ( setup.f_bStereo )
 		{
-		l_iRed = f_oSurface.RGB( 0xff, 0, 0 );
-		l_iBlue = f_oSurface.RGB( 0, 0, 0xff );
+		l_iRed = f_oSurface->RGB( 0xff, 0, 0 );
+		l_iBlue = f_oSurface->RGB( 0, 0, 0xff );
 		}
 	for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
 		{
@@ -237,10 +241,10 @@ void HRenderer::draw_frame ( void )
 				if ( valid && oldvalid && f_ppiNode [ 2 ] [ i ] )
 					{
 					if ( i > 0 )
-						f_oSurface.line( oldc, oldr, c, r,
+						f_oSurface->line( oldc, oldr, c, r,
 								setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 					if ( j > 0 )
-						f_oSurface.line( c, r, f_ppiNode [ 0 ] [ i ],
+						f_oSurface->line( c, r, f_ppiNode [ 0 ] [ i ],
 								f_ppiNode [ 1 ] [ i ],
 								setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 					}
@@ -256,7 +260,7 @@ void HRenderer::draw_frame ( void )
 			}
 		}
 	usleep( 1000 );
-	f_oSurface.refresh();
+	f_oSurface->refresh();
 	f_bBusy = false;
 	M_EPILOG
 	}
@@ -285,7 +289,8 @@ bool HRenderer::render_surface( HString const& a_oFormula )
 		}
 	if ( ! HSurface::surface_count() )
 		{
-		f_oSurface.init( setup.f_iResolutionX, setup.f_iResolutionY );
+		f_oSurface = HSurface::ptr_t( new HSurface );
+		f_oSurface->init( setup.f_iResolutionX, setup.f_iResolutionY );
 		SDL_WarpMouse( static_cast<Uint16>( setup.f_iResolutionX >> 1 ),
 				static_cast<Uint16>( setup.f_iResolutionY >> 1 ) );
 		f_bLoop = true;
@@ -305,7 +310,7 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 	SDL_Event l_uEvent;
 	while ( f_bLoop && a_poCaller->is_alive ( ) )
 		{
-		if ( SDL_WaitEvent( &l_uEvent ) && f_oSurface.is_valid() )
+		if ( SDL_WaitEvent( &l_uEvent ) && f_oSurface->is_valid() )
 			{
 			HLock l_oLock ( f_oMutex );
 			switch ( l_uEvent.type )
@@ -357,12 +362,12 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 						case ( 'q' ):
 							{
 							f_bLoop = false;
-							f_oSurface.down();
+							f_oSurface->down();
 							f_oSemaphore.signal();
 							}
 						break;
 						case ( 'f' ):
-							f_oSurface.toggle_fullscreen();
+							f_oSurface->toggle_fullscreen();
 						break;
 						case ( 'r' ):
 							{

@@ -31,6 +31,7 @@ Copyright:
 
 #include <yaal/yaal.h>
 M_VCSID( "$Id: "__ID__" $" )
+#include "gui.h"
 
 #include "version.h"
 #include "setup.h"
@@ -42,7 +43,7 @@ using namespace yaal::hcore;
 namespace funlab
 {
 
-class HWindowMain : public Gtk::Window
+class HWindowMain : public Gtk::Window, public HEventListenerInterface
 	{
 	class HLocker
 		{
@@ -76,7 +77,8 @@ protected:
 	void on_add ( void );
 	void on_remove ( void );
 	void on_sel_changed ( void );
-	bool on_key_press ( GdkEventKey * );
+	bool on_key_press( GdkEventKey* );
+	virtual void do_on_event( HEventInterface* );
 	void show_error_message ( char const * const, char const * const, int );
 	void set_font_all ( Pango::FontDescription const &, Gtk::Widget * );
 	void open ( HString const & );
@@ -328,7 +330,7 @@ void HWindowMain::on_sel_changed ( void )
 	M_EPILOG
 	}
 
-bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
+bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 	{
 	M_PROLOG
 	HString l_oFormula;
@@ -359,6 +361,11 @@ bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
 		
 	return ( false );
 	M_EPILOG
+	}
+
+void HWindowMain::do_on_event( HEventInterface* )
+	{
+	return;
 	}
 
 void HWindowMain::show_error_message( char const* const a_pcFormula,
