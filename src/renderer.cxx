@@ -51,7 +51,7 @@ HRenderer::HRenderer ( void )
 	f_dAngleX ( 0 ), f_dAngleY ( 0 ), f_dAngleZ ( 0 ),
 	f_dDX ( 0 ), f_dDY ( 0 ), f_dDZ ( 0 ), f_dFOV ( 0 ),
 	f_pdXVariable ( NULL ), f_pdYVariable ( NULL ),
-	f_ppdLand ( NULL ), f_poAnalyser ( NULL ), f_poSurface ( NULL ),
+	f_ppdLand ( NULL ), f_oAnalyser(), f_oSurface(),
 	f_bLoop ( false ), f_bBusy ( false ),
 	f_ulColor ( 0 ), f_dCosAlpha ( 0 ), f_dSinAlpha ( 0 ),
 	f_dCosBeta ( 0 ), f_dSinBeta ( 0 ),
@@ -61,20 +61,6 @@ HRenderer::HRenderer ( void )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
-	f_poAnalyser = new ( std::nothrow ) HAnalyser;
-	M_ENSURE ( f_poAnalyser );
-	try
-		{
-		f_poSurface = new ( std::nothrow ) HSurface;
-		M_ENSURE ( f_poSurface );
-		}
-	catch ( ... )
-		{
-		if ( f_poAnalyser )
-			delete f_poAnalyser;
-		f_poAnalyser = NULL;
-		throw;
-		}
 	f_ppdLand = xcalloc < double * > ( setup.f_iDensity );
 	for ( l_iCtr = 0; l_iCtr < setup.f_iDensity; l_iCtr ++ )
 		f_ppdLand [ l_iCtr ] = xcalloc < double > ( setup.f_iDensity );
@@ -91,20 +77,14 @@ HRenderer::HRenderer ( void )
 	M_EPILOG
 	}
 
-HRenderer::~HRenderer ( void )
+HRenderer::~HRenderer( void )
 	{
 	M_PROLOG
 	if ( HSurface::surface_count() )
-		f_oSemaphore.wait ( );
+		f_oSemaphore.wait();
 	while ( f_bBusy )
 		;
 	int l_iCtr = 0;
-	if ( f_poAnalyser )
-		delete f_poAnalyser;
-	f_poAnalyser = NULL;
-	if ( f_poSurface )
-		delete f_poSurface;
-	f_poSurface = NULL;
 	if ( f_pdTrygo )
 		xfree ( f_pdTrygo );
 	for ( l_iCtr = 0; l_iCtr < 3; l_iCtr ++ )
@@ -139,11 +119,11 @@ void HRenderer::makeland( void )
 	for ( j = 0; j < setup.f_iDensity; j ++ )
 		{
 		x = f_dLowerYEdge;
-		( * f_pdYVariable ) = y;
+		( *f_pdYVariable ) = y;
 		for ( i = 0; i < setup.f_iDensity; i ++ )
 			{
 			( * f_pdXVariable ) = x;
-			f_ppdLand [ i ] [ j ] = f_poAnalyser->count ( );
+			f_ppdLand[ i ][ j ] = f_oAnalyser.count();
 			x += f_dResolution;
 			}
 		y += f_dResolution;
@@ -163,7 +143,7 @@ void HRenderer::precount ( void )
 	f_dPrecountA = f_dCosAlpha * f_dSinGamma;
 	f_dPrecountB = f_dSinAlpha * f_dSinBeta;
 	f_dPrecountC = f_dCosAlpha * f_dCosGamma;
-	f_ulColor = f_poSurface->RGB ( f_iRed, f_iGreen, f_iBlue );
+	f_ulColor = f_oSurface.RGB( f_iRed, f_iGreen, f_iBlue );
 	return;
 	}
 
@@ -234,14 +214,14 @@ void HRenderer::draw_frame ( void )
 	unsigned long int l_iRed = 0, l_iBlue = 0;
 	for ( j = 0; j < 3; j++ )
 		for ( i = 0; i < setup.f_iDensity; i++ )
-			f_ppiNode [ j ] [ i ] = 0;
+			f_ppiNode[ j ][ i ] = 0;
 	f_dFOV = 240.0;
-	f_poSurface->clear ( );
-	precount ( );
+	f_oSurface.clear();
+	precount();
 	if ( setup.f_bStereo )
 		{
-		l_iRed = f_poSurface->RGB ( 0xff, 0, 0 );
-		l_iBlue = f_poSurface->RGB ( 0, 0, 0xff );
+		l_iRed = f_oSurface.RGB( 0xff, 0, 0 );
+		l_iBlue = f_oSurface.RGB( 0, 0, 0xff );
 		}
 	for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
 		{
@@ -256,10 +236,10 @@ void HRenderer::draw_frame ( void )
 				if ( valid && oldvalid && f_ppiNode [ 2 ] [ i ] )
 					{
 					if ( i > 0 )
-						f_poSurface->line( oldc, oldr, c, r,
+						f_oSurface.line( oldc, oldr, c, r,
 								setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 					if ( j > 0 )
-						f_poSurface->line( c, r, f_ppiNode [ 0 ] [ i ],
+						f_oSurface.line( c, r, f_ppiNode [ 0 ] [ i ],
 								f_ppiNode [ 1 ] [ i ],
 								setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 					}
@@ -274,13 +254,13 @@ void HRenderer::draw_frame ( void )
 			y += f_dResolution;
 			}
 		}
-	usleep ( 1000 );
-	f_poSurface->refresh ( );
+	usleep( 1000 );
+	f_oSurface.refresh();
 	f_bBusy = false;
 	M_EPILOG
 	}
 
-bool HRenderer::render_surface ( HString const& a_oFormula )
+bool HRenderer::render_surface( HString const& a_oFormula )
 	{
 	M_PROLOG
 	
@@ -290,7 +270,7 @@ bool HRenderer::render_surface ( HString const& a_oFormula )
 		return ( true );
 
 	double* l_pdVariables = NULL;
-	l_pdVariables = f_poAnalyser->analyse ( a_oFormula );
+	l_pdVariables = f_oAnalyser.analyse( a_oFormula );
 	if ( ! l_pdVariables )
 		return ( true );
 	f_dSize = 10;
@@ -302,9 +282,9 @@ bool HRenderer::render_surface ( HString const& a_oFormula )
 	f_iBlue = 0xf8;
 	makeland ( );
 		}
-	if ( ! HSurface::surface_count ( ) )
+	if ( ! HSurface::surface_count() )
 		{
-		f_poSurface->init ( setup.f_iResolutionX, setup.f_iResolutionY );
+		f_oSurface.init( setup.f_iResolutionX, setup.f_iResolutionY );
 		SDL_WarpMouse( static_cast<Uint16>( setup.f_iResolutionX >> 1 ),
 				static_cast<Uint16>( setup.f_iResolutionY >> 1 ) );
 		f_bLoop = true;
@@ -324,7 +304,7 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 	SDL_Event l_uEvent;
 	while ( f_bLoop && a_poCaller->is_alive ( ) )
 		{
-		if ( SDL_WaitEvent ( & l_uEvent ) && f_poSurface->is_valid ( ) )
+		if ( SDL_WaitEvent( &l_uEvent ) && f_oSurface.is_valid() )
 			{
 			HLock l_oLock ( f_oMutex );
 			switch ( l_uEvent.type )
@@ -389,19 +369,14 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 						{
 						case ( 'q' ):
 							{
-							if ( !! setup.f_oFormula )
-								{
-								f_bLoop = false;
-								f_poSurface->down ( );
-								f_oSemaphore.signal ( );
-								}
-							break;
+							f_bLoop = false;
+							f_oSurface.down();
+							f_oSemaphore.signal();
 							}
+						break;
 						case ( 'f' ):
-							{
-							f_poSurface->toggle_fullscreen ( );
-							break;
-							}
+							f_oSurface.toggle_fullscreen();
+						break;
 						case ( 'r' ):
 							{
 							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
@@ -458,8 +433,8 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 				}
 			if ( f_bLoop )
 				{
-				draw_frame ( );
-				while ( SDL_PollEvent ( & l_uEvent ) )
+				draw_frame();
+				while ( SDL_PollEvent( &l_uEvent ) )
 					;
 				}
 			}
@@ -468,17 +443,17 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 	M_EPILOG
 	}
 
-char const * HRenderer::error ( void ) const
+char const* HRenderer::error( void ) const
 	{
 	M_PROLOG
-	return ( f_poAnalyser->get_error ( ) );
+	return ( f_oAnalyser.get_error() );
 	M_EPILOG
 	}
 
-int HRenderer::error_position ( void ) const
+int HRenderer::error_position( void ) const
 	{
 	M_PROLOG
-	return ( f_poAnalyser->get_error_token ( ) );
+	return ( f_oAnalyser.get_error_token() );
 	M_EPILOG
 	}
 

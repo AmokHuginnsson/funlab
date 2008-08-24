@@ -55,7 +55,7 @@ HSurface::HSurface ( void )
 	if ( f_iActiveSurfaces < 1 )
 		{
 		hcore::log << _ ( "Initializing SDL library " );
-		if( ( l_iError = SDL_Init ( SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD ) ) < 0 )
+		if( ( l_iError = SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD ) ) < 0 )
 			{
 			l_oMessage = _ ( "Couldn't initialize SDL: " );
 			l_oMessage += SDL_GetError ( );
@@ -67,33 +67,33 @@ HSurface::HSurface ( void )
 	M_EPILOG
 	}
 
-HSurface::~HSurface ( void )
+HSurface::~HSurface( void )
 	{
 	M_PROLOG
 	if ( f_pvHandler )
-		down ( );
+		down();
 	if ( f_iActiveSurfaces < 1 )
-		SDL_Quit ( );
+		SDL_Quit();
 	return;
 	M_EPILOG
 	}
 
-void HSurface::down ( void )
+void HSurface::down( void )
 	{
 	M_PROLOG
-	SDL_Surface * l_psSurface = static_cast < SDL_Surface * > ( f_pvHandler );
-	M_ASSERT ( f_iActiveSurfaces > 0 );
+	SDL_Surface* l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
+	M_ASSERT( f_iActiveSurfaces > 0 );
 	if ( ! f_pvHandler )
-		M_THROW ( _ ( "surface not initialized" ), errno );
-	if ( SDL_MUSTLOCK ( l_psSurface ) )
-		SDL_UnlockSurface ( l_psSurface );
-	SDL_FreeSurface ( static_cast < SDL_Surface * > ( f_pvHandler ) );
+		M_THROW( _( "surface not initialized" ), errno );
+	if ( SDL_MUSTLOCK( l_psSurface ) )
+		SDL_UnlockSurface( l_psSurface );
+	SDL_FreeSurface( static_cast<SDL_Surface*>( f_pvHandler ) );
 	f_pvHandler = NULL;
 	f_iActiveSurfaces --;
 	M_EPILOG
 	}
 
-int HSurface::init ( int a_iWidth, int a_iHeight, int a_iBpp )
+int HSurface::init( int a_iWidth, int a_iHeight, int a_iBpp )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -102,7 +102,7 @@ int HSurface::init ( int a_iWidth, int a_iHeight, int a_iBpp )
 	f_iWidth = a_iWidth;
 	f_iHeight = a_iHeight;
 	f_iBpp = a_iBpp;
-	l_psSurface = SDL_SetVideoMode ( f_iWidth, f_iHeight, f_iBpp,
+	l_psSurface = SDL_SetVideoMode( f_iWidth, f_iHeight, f_iBpp,
 			SDL_HWSURFACE | SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_NOFRAME );
 	if ( l_psSurface == NULL )
 		{
@@ -143,7 +143,7 @@ void HSurface::refresh ( void )
 		;
 	if ( SDL_MUSTLOCK ( l_psSurface ) )
 		{
-		if ( SDL_LockSurface ( l_psSurface ) < 0 )
+		if ( SDL_LockSurface( l_psSurface ) < 0 )
 			hcore::log ( LOG_TYPE::D_ERROR ) << "Can't lock screen: " << SDL_GetError ( ) << endl;
 		}
 	return;

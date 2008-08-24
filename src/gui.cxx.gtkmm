@@ -87,61 +87,61 @@ protected:
 HWindowMain::HWindowMain ( BaseObjectType * a_poBaseObject,
 		Glib::RefPtr< Gnome::Glade::Xml > const & a_roResources )
 	: Gtk::Window ( a_poBaseObject ),
-	f_bLock ( false ), f_poFormulasListView ( NULL ),
-	f_bRendererActive ( false ), f_oRenderer ( )
+	f_bLock( false ), f_poFormulasListView( NULL ),
+	f_bRendererActive( false ), f_oRenderer()
 	{
 	M_PROLOG
 	Gtk::ToolButton * l_poToolButton = NULL;
 	Gtk::MenuItem * l_poMenuItem = NULL;
 	/* FORMULAS LIST */
-	a_roResources->get_widget ( "TREE_FORMULAS", f_poFormulasListView );
-	f_oFormulasListColumns.add ( f_oFormulasListFormulaColumn );
+	a_roResources->get_widget( "TREE_FORMULAS", f_poFormulasListView );
+	f_oFormulasListColumns.add( f_oFormulasListFormulaColumn );
 	f_oFormulasListModel = Gtk::ListStore::create ( f_oFormulasListColumns );
-	f_poFormulasListView->set_model ( f_oFormulasListModel );
-	f_poFormulasListView->append_column_editable ( _ ( "Formulas" ), f_oFormulasListFormulaColumn );
-	Glib::RefPtr < Gtk::TreeSelection > l_oSelection = f_poFormulasListView->get_selection ( );
-	l_oSelection->set_mode ( Gtk::SELECTION_SINGLE );
-	l_oSelection->signal_changed ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_sel_changed ) );
-	f_poFormulasListView->signal_key_press_event ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_key_press ), false );
-	f_poFormulasListView->grab_focus ( );
+	f_poFormulasListView->set_model( f_oFormulasListModel );
+	f_poFormulasListView->append_column_editable( _( "Formulas" ), f_oFormulasListFormulaColumn );
+	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
+	l_oSelection->set_mode( Gtk::SELECTION_SINGLE );
+	l_oSelection->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_sel_changed ) );
+	f_poFormulasListView->signal_key_press_event().connect( sigc::mem_fun( *this, &HWindowMain::on_key_press ), false );
+	f_poFormulasListView->grab_focus();
 	/* NEW */
 	a_roResources->get_widget ( "ID_TOOLBAR_NEW", l_poToolButton );
-	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_new ) );
+	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_new ) );
 	a_roResources->get_widget ( "ID_MENU_NEW", l_poMenuItem );
-	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_new ) );
+	l_poMenuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_new ) );
 	/* OPEN */
 	a_roResources->get_widget ( "ID_TOOLBAR_OPEN", l_poToolButton );
-	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_open ) );
+	l_poToolButton->signal_clicked().connect ( sigc::mem_fun ( * this, & HWindowMain::on_open ) );
 	a_roResources->get_widget ( "ID_MENU_OPEN", l_poMenuItem );
-	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_open ) );
+	l_poMenuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_open ) );
 	/* SAVE_AS */
 	a_roResources->get_widget ( "ID_TOOLBAR_SAVE_AS", l_poToolButton );
-	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_save_as ) );
+	l_poToolButton->signal_clicked().connect ( sigc::mem_fun ( * this, & HWindowMain::on_save_as ) );
 	a_roResources->get_widget ( "ID_MENU_SAVE_AS", l_poMenuItem );
-	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_save_as ) );
+	l_poMenuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_save_as ) );
 	/* QUIT */
 	a_roResources->get_widget ( "ID_TOOLBAR_QUIT", l_poToolButton );
-	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_quit ) );
+	l_poToolButton->signal_clicked().connect ( sigc::mem_fun ( * this, & HWindowMain::on_quit ) );
 	a_roResources->get_widget ( "ID_MENU_QUIT", l_poMenuItem );
-	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_quit ) );
+	l_poMenuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_quit ) );
 	/* ABOUT */
 	a_roResources->get_widget ( "ID_TOOLBAR_ABOUT", l_poToolButton );
-	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_about ) );
+	l_poToolButton->signal_clicked().connect ( sigc::mem_fun ( * this, & HWindowMain::on_about ) );
 	a_roResources->get_widget ( "ID_MENU_ABOUT", l_poMenuItem );
-	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_about ) );
+	l_poMenuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_about ) );
 	/* ADD */
 	a_roResources->get_widget ( "ID_TOOLBAR_ADD", l_poToolButton );
-	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_add ) );
+	l_poToolButton->signal_clicked().connect ( sigc::mem_fun ( * this, & HWindowMain::on_add ) );
 /*
 	a_roResources->get_widget ( "ID_MENU_ADD", l_poMenuItem );
-	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_add ) );
+	l_poMenuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_add ) );
 */
 	/* REMOVE */
 	a_roResources->get_widget ( "ID_TOOLBAR_REMOVE", l_poToolButton );
-	l_poToolButton->signal_clicked ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_remove ) );
+	l_poToolButton->signal_clicked().connect ( sigc::mem_fun ( * this, & HWindowMain::on_remove ) );
 /*
 	a_roResources->get_widget ( "ID_MENU_REMOVE", l_poMenuItem );
-	l_poMenuItem->signal_activate ( ).connect ( sigc::mem_fun ( * this, & HWindowMain::on_remove ) );
+	l_poMenuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_remove ) );
 */
 	return;
 	M_EPILOG
@@ -158,7 +158,7 @@ void HWindowMain::on_new ( void )
 	{
 	M_PROLOG
 	HLocker l_oLock ( f_bLock );
-	f_oFormulasListModel->clear ( );
+	f_oFormulasListModel->clear();
 	return;
 	M_EPILOG
 	}
@@ -177,8 +177,8 @@ void HWindowMain::on_open ( void )
 	l_oFileOpenDialog.add_filter ( l_oFileFilter );
 	l_oFileOpenDialog.add_button ( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
 	l_oFileOpenDialog.add_button ( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
-	if ( l_oFileOpenDialog.run ( ) == Gtk::RESPONSE_OK )
-		open ( l_oFileOpenDialog.get_filename ( ).c_str ( ) );
+	if ( l_oFileOpenDialog.run() == Gtk::RESPONSE_OK )
+		open ( l_oFileOpenDialog.get_filename().c_str ( ) );
 	return;
 	M_EPILOG
 	}
@@ -186,7 +186,7 @@ void HWindowMain::on_open ( void )
 void HWindowMain::open ( HString const & a_oPath )
 	{
 	M_PROLOG
-	if ( a_oPath.is_empty ( ) )
+	if ( a_oPath.is_empty() )
 		M_THROW ( _ ( "Empty path." ), errno );
 	int l_iIndex = 0;
 	HString l_oLine;
@@ -195,21 +195,21 @@ void HWindowMain::open ( HString const & a_oPath )
 	l_oFile.open ( a_oPath );
 	if ( !! l_oFile )
 		{
-		f_oFormulasListModel->clear ( );
+		f_oFormulasListModel->clear();
 		while ( l_oFile.read_line ( l_oLine, HFile::READ::D_STRIP_NEWLINES ) >= 0 )
 			{
 			l_oRow = *( f_oFormulasListModel->append() );
 			l_oRow[ f_oFormulasListFormulaColumn ] = l_oLine.raw();
 			l_iIndex ++;
 			}
-		l_oFile.close ( );
+		l_oFile.close();
 		}
-	f_poFormulasListView->grab_focus ( );
-	Glib::RefPtr < Gtk::TreeSelection > l_oSelection = f_poFormulasListView->get_selection ( );
+	f_poFormulasListView->grab_focus();
+	Glib::RefPtr < Gtk::TreeSelection > l_oSelection = f_poFormulasListView->get_selection();
 	if ( l_iIndex )
 		{
-		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children ( );
-		Gtk::TreeIter l_oIter = l_oRows.begin ( );
+		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
+		Gtk::TreeIter l_oIter = l_oRows.begin();
 		f_poFormulasListView->set_cursor ( f_oFormulasListModel->get_path ( l_oIter ) );
 		}
 	return;
@@ -230,8 +230,8 @@ void HWindowMain::on_save_as ( void )
 	l_oFileOpenDialog.add_filter ( l_oFileFilter );
 	l_oFileOpenDialog.add_button ( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
 	l_oFileOpenDialog.add_button ( Gtk::Stock::SAVE, Gtk::RESPONSE_OK );
-	if ( l_oFileOpenDialog.run ( ) == Gtk::RESPONSE_OK )
-		save ( l_oFileOpenDialog.get_filename ( ).c_str ( ) );
+	if ( l_oFileOpenDialog.run() == Gtk::RESPONSE_OK )
+		save ( l_oFileOpenDialog.get_filename().c_str ( ) );
 	return;
 	M_EPILOG
 	}
@@ -239,16 +239,16 @@ void HWindowMain::on_save_as ( void )
 void HWindowMain::save ( HString const & a_oPath )
 	{
 	M_PROLOG
-	if ( a_oPath.is_empty ( ) )
+	if ( a_oPath.is_empty() )
 		M_THROW ( _ ( "Empty path." ), errno );
 	HFile l_oFile ( HFile::OPEN::D_WRITING );
 	l_oFile.open ( a_oPath );
 	if ( !! l_oFile )
 		{
-		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children ( );
-		for ( Gtk::TreeIter l_oIter = l_oRows.begin ( ); l_oIter != l_oRows.end ( ); ++ l_oIter )
-			l_oFile << l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str ( ) << endl;
-		l_oFile.close ( );
+		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
+		for ( Gtk::TreeIter l_oIter = l_oRows.begin(); l_oIter != l_oRows.end ( ); ++ l_oIter )
+			l_oFile << l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str() << endl;
+		l_oFile.close();
 		}
 	return;
 	M_EPILOG
@@ -258,7 +258,7 @@ void HWindowMain::on_quit ( void )
 	{
 	M_PROLOG
 	HLocker l_oLock ( f_bLock );
-	Gtk::Main::quit ( );
+	Gtk::Main::quit();
 	return;
 	M_EPILOG
 	}
@@ -273,7 +273,7 @@ void HWindowMain::on_about ( void )
 				"Welcome to funlab %s" ), VER );
 	Gtk::MessageDialog l_oMessageAbout( *this, l_oMsg.raw() );
 	l_oMessageAbout.set_title ( _ ( "About funlab" ) );
-	l_oMessageAbout.run ( );
+	l_oMessageAbout.run();
 	return;
 	M_EPILOG
 	}
@@ -282,9 +282,9 @@ void HWindowMain::on_add ( void )
 	{
 	M_PROLOG
 	HLocker l_oLock ( f_bLock );
-	Gtk::TreeIter l_oIter = f_oFormulasListModel->append ( );
+	Gtk::TreeIter l_oIter = f_oFormulasListModel->append();
 	f_poFormulasListView->set_cursor ( f_oFormulasListModel->get_path ( l_oIter ) );
-	f_poFormulasListView->grab_focus ( );
+	f_poFormulasListView->grab_focus();
 	return;
 	M_EPILOG
 	}
@@ -293,16 +293,16 @@ void HWindowMain::on_remove ( void )
 	{
 	M_PROLOG
 	HLocker l_oLock ( f_bLock );
-	Glib::RefPtr < Gtk::TreeSelection > l_oSelection = f_poFormulasListView->get_selection ( );
-	Gtk::TreeIter l_oIter = l_oSelection->get_selected ( );
+	Glib::RefPtr < Gtk::TreeSelection > l_oSelection = f_poFormulasListView->get_selection();
+	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
 	if ( l_oIter )
 		{
-		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children ( );
+		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
 		Gtk::TreeIter l_oIterNew = l_oIter;
 		++ l_oIterNew;
-		if ( l_oIterNew == l_oRows.end ( ) )
+		if ( l_oIterNew == l_oRows.end() )
 			{
-			if ( l_oIter != l_oRows.begin ( ) )
+			if ( l_oIter != l_oRows.begin() )
 				{
 				l_oIterNew = l_oIter;
 				-- l_oIter;
@@ -311,7 +311,7 @@ void HWindowMain::on_remove ( void )
 		f_oFormulasListModel->erase ( l_oIter );
 		if ( l_oIterNew )
 			f_poFormulasListView->set_cursor ( f_oFormulasListModel->get_path ( l_oIterNew ) );
-		f_poFormulasListView->grab_focus ( );
+		f_poFormulasListView->grab_focus();
 		}
 	return;
 	M_EPILOG
@@ -320,10 +320,10 @@ void HWindowMain::on_remove ( void )
 void HWindowMain::on_sel_changed ( void )
 	{
 	M_PROLOG
-	Glib::RefPtr < Gtk::TreeSelection > l_oSelection = f_poFormulasListView->get_selection ( );
-	Gtk::TreeIter l_oIter = l_oSelection->get_selected ( );
+	Glib::RefPtr < Gtk::TreeSelection > l_oSelection = f_poFormulasListView->get_selection();
+	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
 	if ( ! f_bLock && f_bRendererActive && l_oIter )
-		f_oRenderer.render_surface ( l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str ( ) );
+		f_oRenderer.render_surface ( l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str() );
 	return;
 	M_EPILOG
 	}
@@ -335,32 +335,26 @@ bool HWindowMain::on_key_press ( GdkEventKey * a_poEventKey )
 	switch ( a_poEventKey->keyval )
 		{
 		case ( GDK_Delete ):
-			{
-			on_remove ( );
-			break;
-			}
+			on_remove();
+		break;
 		case ( GDK_Insert ):
-			{
-			on_add ( );
-			break;
-			}
+			on_add();
+		break;
 		case ( ' ' ):
 			{
-			Glib::RefPtr < Gtk::TreeSelection > l_oSelection = f_poFormulasListView->get_selection ( );
-			Gtk::TreeIter l_oIter = l_oSelection->get_selected ( );
+			Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
+			Gtk::TreeIter l_oIter = l_oSelection->get_selected();
 			if ( l_oIter )
 				{
-				l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str ( );
+				l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str();
 				if ( f_oRenderer.render_surface( l_oFormula ) )
 					show_error_message( l_oFormula.raw(), f_oRenderer.error(), f_oRenderer.error_position() );
 				f_bRendererActive = true;
 				}
-			break;
 			}
+		break;
 		default :
-			{
-			break;
-			}
+		break;
 		}
 		
 	return ( false );
@@ -389,44 +383,44 @@ void HWindowMain::show_error_message( char const* const a_pcFormula,
 	M_EPILOG
 	}
 
-void HWindowMain::set_font_all ( Pango::FontDescription const & a_oFontDesc,
-		Gtk::Widget * a_poWidget )
+void HWindowMain::set_font_all( Pango::FontDescription const& a_oFontDesc,
+		Gtk::Widget* a_poWidget )
 	{
 	M_PROLOG
 	if ( ! a_poWidget )
 		return;
-	a_poWidget->modify_font ( a_oFontDesc );
-	Gtk::Dialog * l_poDialog = dynamic_cast < Gtk::Dialog * > ( a_poWidget );
-	Gtk::Box * l_poBox = dynamic_cast < Gtk::Box * > ( a_poWidget );
-	Gtk::Window * l_poWindow = dynamic_cast < Gtk::Window * > ( a_poWidget );
-	Gtk::Label * l_poLabel = dynamic_cast < Gtk::Label * > ( a_poWidget );
+	a_poWidget->modify_font( a_oFontDesc );
+	Gtk::Dialog* l_poDialog = dynamic_cast<Gtk::Dialog*>( a_poWidget );
+	Gtk::Box* l_poBox = dynamic_cast<Gtk::Box*>( a_poWidget );
+	Gtk::Window* l_poWindow = dynamic_cast<Gtk::Window*>( a_poWidget );
+	Gtk::Label* l_poLabel = dynamic_cast<Gtk::Label*>( a_poWidget );
 	if ( l_poLabel )
-		l_poLabel->set_line_wrap ( false );
+		l_poLabel->set_line_wrap( false );
 	if ( l_poDialog )
 		{
-		set_font_all ( a_oFontDesc, l_poDialog->get_vbox ( ) );
-		set_font_all ( a_oFontDesc, l_poDialog->get_action_area ( ) );
+		set_font_all( a_oFontDesc, l_poDialog->get_vbox() );
+		set_font_all( a_oFontDesc, l_poDialog->get_action_area() );
 		}
 	else if ( l_poWindow )
 		{
-		Glib::ListHandle < Widget * > l_oChildren = l_poWindow->get_children ( );
-		for ( Glib::ListHandle < Widget * >::iterator l_oChildIterator = l_oChildren.begin ( );
-				l_oChildIterator != l_oChildren.end ( ); ++ l_oChildIterator )
-			set_font_all ( a_oFontDesc, * l_oChildIterator );
+		Glib::ListHandle<Widget*> l_oChildren = l_poWindow->get_children();
+		for ( Glib::ListHandle<Widget*>::iterator l_oChildIterator = l_oChildren.begin();
+				l_oChildIterator != l_oChildren.end(); ++ l_oChildIterator )
+			set_font_all( a_oFontDesc, *l_oChildIterator );
 		}
 	else if ( l_poBox )
 		{
-		Gtk::Box_Helpers::BoxList & l_oBoxList = l_poBox->children ( );
-		for ( Gtk::Box_Helpers::BoxList::iterator l_oBoxIterator = l_oBoxList.begin ( );
-				l_oBoxIterator != l_oBoxList.end ( ); ++ l_oBoxIterator )
-			set_font_all ( a_oFontDesc, l_oBoxIterator->get_widget ( ) );
-		Glib::ListHandle < Widget * > l_oChildren = l_poBox->get_children ( );
-		for ( Glib::ListHandle < Widget * >::iterator l_oChildIterator = l_oChildren.begin ( );
-				l_oChildIterator != l_oChildren.end ( ); ++ l_oChildIterator )
+		Gtk::Box_Helpers::BoxList & l_oBoxList = l_poBox->children();
+		for ( Gtk::Box_Helpers::BoxList::iterator l_oBoxIterator = l_oBoxList.begin();
+				l_oBoxIterator != l_oBoxList.end(); ++ l_oBoxIterator )
+			set_font_all ( a_oFontDesc, l_oBoxIterator->get_widget() );
+		Glib::ListHandle < Widget * > l_oChildren = l_poBox->get_children();
+		for ( Glib::ListHandle < Widget * >::iterator l_oChildIterator = l_oChildren.begin();
+				l_oChildIterator != l_oChildren.end(); ++ l_oChildIterator )
 			set_font_all ( a_oFontDesc, * l_oChildIterator );
 		}
-//	Gtk::MessageDialog o ( * this, a_poWidget->get_name ( ) );
-//	o.run ( );
+//	Gtk::MessageDialog o ( * this, a_poWidget->get_name() );
+//	o.run();
 	return;
 	M_EPILOG
 	}
@@ -445,12 +439,12 @@ int gui_start( int a_iArgc, char* a_ppcArgv[] )
 		}
 	catch ( Glib::Exception & e )
 		{
-		cerr << "Glib::Exception: " << e.what ( ) << endl;
+		cerr << "Glib::Exception: " << e.what() << endl;
 		return ( - 1 );
 		}
 	catch ( std::exception & e )
 		{
-		cerr << "std::exception: " << e.what ( ) << endl;
+		cerr << "std::exception: " << e.what() << endl;
 		return ( - 1 );
 		}
 	return ( 0 );

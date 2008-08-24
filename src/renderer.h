@@ -29,11 +29,11 @@ Copyright:
 
 #include <yaal/hcore/hthread.h>
 #include <yaal/tools/hanalyser.h>
+#include "gl.h"
 
 namespace funlab
 {
 
-class HSurface;
 class HRenderer;
 
 typedef yaal::hcore::HThreadT<HRenderer> renderer_t;
@@ -45,7 +45,7 @@ protected:
 	int f_iRed;
 	int f_iGreen;
 	int f_iBlue;
-	int * f_ppiNode [ 3 ];
+	int* f_ppiNode[ 3 ];
 	double f_dLowerXEdge;
 	double f_dLowerYEdge;
 	double f_dSize;
@@ -60,8 +60,8 @@ protected:
 	double* f_pdXVariable;
 	double* f_pdYVariable;
 	double**	f_ppdLand;
-	yaal::tools::HAnalyser* f_poAnalyser;
-	HSurface*	f_poSurface;
+	yaal::tools::HAnalyser f_oAnalyser;
+	HSurface f_oSurface;
 	/*}*/
 public:
 	/*{*/
@@ -79,7 +79,7 @@ protected:
 	void precount ( void );
 	double sinq( unsigned int );
 	double cosq( unsigned int );
-	bool T( double, double, double, int & _c, int & _r );
+	bool T( double, double, double, int& _c, int& _r );
 	/*}*/
 private:
 	/*{*/
