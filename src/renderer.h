@@ -30,6 +30,7 @@ Copyright:
 #include <yaal/hcore/hthread.h>
 #include <yaal/tools/hanalyser.h>
 #include "hsurface.h"
+#include "gui.h"
 
 namespace funlab
 {
@@ -62,10 +63,11 @@ protected:
 	double**	f_ppdLand;
 	yaal::tools::HAnalyser f_oAnalyser;
 	HSurface::ptr_t f_oSurface;
+	HKeyboardEventListener* f_poKeyboardEventListener;
 	/*}*/
 public:
 	/*{*/
-	HRenderer ( void );
+	HRenderer( HKeyboardEventListener* );
 	virtual ~HRenderer ( void );
 	bool render_surface( yaal::hcore::HString const& );
 	void draw_frame ( void );

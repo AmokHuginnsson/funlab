@@ -45,7 +45,7 @@ using namespace yaal::tools;
 namespace funlab
 {
 
-HRenderer::HRenderer ( void )
+HRenderer::HRenderer( HKeyboardEventListener* a_poKeyboardEventListener )
 	: f_iRed( 0 ), f_iGreen( 0 ), f_iBlue( 0 ),
 	f_dLowerXEdge( 0 ), f_dLowerYEdge( 0 ), f_dSize( 0 ), f_dResolution( 0 ),
 	f_dAngleX( 0 ), f_dAngleY( 0 ), f_dAngleZ( 0 ),
@@ -57,7 +57,7 @@ HRenderer::HRenderer ( void )
 	f_dCosBeta( 0 ), f_dSinBeta( 0 ),
 	f_dCosGamma( 0 ), f_dSinGamma( 0 ),
 	f_dPrecountA( 0 ), f_dPrecountB( 0 ), f_dPrecountC( 0 ), f_pdTrygo( NULL ),
-	f_oMutex(), f_oSemaphore(), f_oThread( *this )
+	f_oMutex(), f_oSemaphore(), f_oThread( *this ), f_poKeyboardEventListener( a_poKeyboardEventListener )
 	{
 	M_PROLOG
 	int l_iCtr = 0;
@@ -313,6 +313,9 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 		if ( SDL_WaitEvent( &l_uEvent ) && f_oSurface->is_valid() )
 			{
 			HLock l_oLock ( f_oMutex );
+			HKeyboardEvent e;
+			e.set_code( l_uEvent.key.keysym.sym );
+			f_poKeyboardEventListener.on_event( &e );
 			switch ( l_uEvent.type )
 				{
 				case ( SDL_MOUSEMOTION ):
