@@ -63,7 +63,6 @@ protected:
 	double**	f_ppdLand;
 	yaal::tools::HAnalyser f_oAnalyser;
 	HSurface::ptr_t f_oSurface;
-	HKeyboardEventListener* f_poKeyboardEventListener;
 	/*}*/
 public:
 	/*{*/
@@ -88,7 +87,7 @@ private:
 	/*{*/
 	bool f_bLoop;
 	bool f_bBusy;
-	unsigned long int f_ulColor;
+	yaal::u32_t f_ulColor;
 	double f_dCosAlpha;
 	double f_dSinAlpha;
 	double f_dCosBeta;
@@ -102,6 +101,7 @@ private:
 	yaal::hcore::HMutex f_oMutex;
 	yaal::hcore::HSemaphore f_oSemaphore;
 	renderer_t f_oThread;
+	HKeyboardEventListener* f_poKeyboardEventListener;
 	HRenderer( const HRenderer& );
 	HRenderer& operator = ( const HRenderer& );
 	/*}*/

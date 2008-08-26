@@ -51,10 +51,10 @@ public:
 	void down( void );
 	void refresh( void );
 	void clear( void );
-	int long unsigned get_pixel( int, int );
-	void put_pixel( int, int, int long unsigned );
-	void line( double, double, double, double, int long unsigned );
-	int long unsigned RGB( int, int, int );
+	yaal::u32_t get_pixel( int, int );
+	void put_pixel( int, int, yaal::u32_t );
+	void line( double, double, double, double, yaal::u32_t );
+	yaal::u32_t RGB( int, int, int );
 	bool is_valid( void );
 	void toggle_fullscreen( void );
 	static int surface_count( void );

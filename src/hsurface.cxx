@@ -158,14 +158,14 @@ void HSurface::refresh( void )
  * Return the pixel value at (x, y)
  * NOTE: The surface must be locked before calling this!
  */
-int long unsigned HSurface::get_pixel( int x, int y )
+u32_t HSurface::get_pixel( int x, int y )
 	{
 	M_PROLOG
 	unsigned char* l_pcRawMemory = NULL;
 	SDL_Surface* l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
 
 	if ( ( x < 0 ) || ( y < 0 ) || ( x >= f_iWidth ) || ( y >= f_iHeight ) )
-		return ( static_cast<int long unsigned>( -1 ) );
+		return ( static_cast<u32_t>( -1 ) );
 
 	/* Here l_pcRawMemory is the address to the pixel we want to retrieve */
 	l_pcRawMemory = static_cast<unsigned char*>( l_psSurface->pixels )
@@ -190,7 +190,7 @@ int long unsigned HSurface::get_pixel( int x, int y )
 			}
 		case ( 4 ):
 			{
-			return ( *reinterpret_cast<int long unsigned*>( l_pcRawMemory ) );
+			return ( *reinterpret_cast<u32_t*>( l_pcRawMemory ) );
 			}
 		}
 	return ( 0 );       /* shouldn't happen, but avoids warnings */
@@ -201,7 +201,7 @@ int long unsigned HSurface::get_pixel( int x, int y )
  * Set the pixel at (x, y) to the given value
  * NOTE: The surface must be locked before calling this!
  */
-void HSurface::put_pixel( int x, int y, int long unsigned pixel )
+void HSurface::put_pixel( int x, int y, u32_t pixel )
 	{
 	M_PROLOG
 	unsigned char* l_pcRawMemory = NULL;
@@ -239,7 +239,7 @@ void HSurface::put_pixel( int x, int y, int long unsigned pixel )
 			}
 		break;
 		case ( 4 ):
-			( *reinterpret_cast<int long unsigned*>( l_pcRawMemory ) ) = pixel;
+			( *reinterpret_cast<u32_t*>( l_pcRawMemory ) ) = pixel;
 		break;
 		default:
 			M_ASSERT( ! "color plane not supported" );
@@ -249,7 +249,7 @@ void HSurface::put_pixel( int x, int y, int long unsigned pixel )
 	M_EPILOG
 	}
 
-void HSurface::line ( double x0, double y0, double x1, double y1, int long unsigned color )
+void HSurface::line ( double x0, double y0, double x1, double y1, u32_t color )
 	{
 	M_PROLOG
 /*
@@ -381,10 +381,10 @@ void HSurface::line ( double x0, double y0, double x1, double y1, int long unsig
 	M_EPILOG
 	}
 
-int long unsigned HSurface::RGB( int a_iRed, int a_iGreen, int a_iBlue )
+u32_t HSurface::RGB( int a_iRed, int a_iGreen, int a_iBlue )
 	{
 	M_PROLOG
-	int long unsigned l_ulValue = 0;
+	u32_t l_ulValue = 0;
 	SDL_Surface * l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
 	l_ulValue = SDL_MapRGB( l_psSurface->format,
 			static_cast<Uint8>( a_iRed ),

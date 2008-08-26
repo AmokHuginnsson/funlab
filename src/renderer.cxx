@@ -216,7 +216,7 @@ void HRenderer::draw_frame ( void )
 	bool valid = false, oldvalid = false;
 	int f = 0, i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
 	double x = 0, y = 0;
-	unsigned long int l_iRed = 0, l_iBlue = 0;
+	u32_t l_iRed = 0, l_iBlue = 0;
 	for ( j = 0; j < 3; j++ )
 		for ( i = 0; i < setup.f_iDensity; i++ )
 			f_ppiNode[ j ][ i ] = 0;
