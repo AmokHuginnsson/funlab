@@ -289,7 +289,8 @@ bool HRenderer::render_surface( HString const& a_oFormula )
 		}
 	if ( ! HSurface::surface_count() )
 		{
-		f_oSurface = HSurface::ptr_t( new HSurface );
+		if ( ! f_oSurface )
+			f_oSurface = HSurface::ptr_t( new HSurface );
 		f_oSurface->init( setup.f_iResolutionX, setup.f_iResolutionY );
 		SDL_WarpMouse( static_cast<Uint16>( setup.f_iResolutionX >> 1 ),
 				static_cast<Uint16>( setup.f_iResolutionY >> 1 ) );
@@ -315,7 +316,6 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 			HLock l_oLock ( f_oMutex );
 			HKeyboardEvent e;
 			e.set_code( l_uEvent.key.keysym.sym );
-			f_poKeyboardEventListener.on_event( &e );
 			switch ( l_uEvent.type )
 				{
 				case ( SDL_MOUSEMOTION ):
@@ -364,9 +364,18 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 						{
 						case ( 'q' ):
 							{
-							f_bLoop = false;
-							f_oSurface->down();
-							f_oSemaphore.signal();
+							if ( f_poKeyboardEventListener )
+								{
+								HKeyboardEvent e;
+								e.set_code( l_uEvent.key.keysym.sym );
+								f_poKeyboardEventListener->on_event( &e );
+								}
+							else
+								{
+								f_bLoop = false;
+								f_oSurface->down();
+								f_oSemaphore.signal();
+								}
 							}
 						break;
 						case ( 'f' ):
@@ -446,6 +455,14 @@ int HRenderer::error_position( void ) const
 	M_PROLOG
 	return ( f_oAnalyser.get_error_token() );
 	M_EPILOG
+	}
+
+void HRenderer::shutdown( void )
+	{
+	f_oThread.finish();
+	cout << __PRETTY_FUNCTION__ << endl;
+	f_oSurface->down();
+	f_oSurface = HSurface::ptr_t();
 	}
 
 }

@@ -59,6 +59,7 @@ protected:
 	Gtk::TreeModel::ColumnRecord f_oFormulasListColumns;
 	Gtk::TreeModelColumn<Glib::ustring> f_oFormulasListFormulaColumn;
 	Gtk::TreeView* f_poFormulasListView;
+	Glib::Dispatcher f_oDispatcher;
 	bool f_bRendererActive;
 	HRenderer f_oRenderer;
 	/*}*/
@@ -70,6 +71,7 @@ public:
 	/*}*/
 protected:
 	/*{*/
+	void shutdown_renderer( void );
 	void on_new( void );
 	void on_open( void );
 	void on_save_as( void );
@@ -108,6 +110,9 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	l_oSelection->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_sel_changed ) );
 	f_poFormulasListView->signal_key_press_event().connect( sigc::mem_fun( *this, &HWindowMain::on_key_press ), false );
 	f_poFormulasListView->grab_focus();
+	
+	f_oDispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
+
 	/* NEW */
 	a_roResources->get_widget( "ID_TOOLBAR_NEW", l_poToolButton );
 	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_new ) );
@@ -353,16 +358,7 @@ void HWindowMain::on_sel_changed( void )
 bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 	{
 	M_PROLOG
-	HKeyboardEvent e;
-	e.set_code( a_poEventKey->keyval );
-	HKeyboardEventListener::on_event( &e );
-	return ( false );
-	M_EPILOG
-	}
-
-void HWindowMain::do_on_event( HKeyboardEvent* e )
-	{
-	switch ( e->get_code() )
+	switch ( a_poEventKey->keyval )
 		{
 		case ( GDK_Delete ):
 			on_remove();
@@ -383,9 +379,24 @@ void HWindowMain::do_on_event( HKeyboardEvent* e )
 				}
 			}
 		break;
-		default :
+		default:
 		break;
 		}
+	return ( false );
+	M_EPILOG
+	}
+
+void HWindowMain::shutdown_renderer( void )
+	{
+	cout << __PRETTY_FUNCTION__ << endl;
+	f_oRenderer.shutdown();
+	}
+
+void HWindowMain::do_on_event( HKeyboardEvent* e )
+	{
+	cout << __PRETTY_FUNCTION__ << endl;
+	if ( e->get_code() == 'q' )
+		f_oDispatcher();
 	return;
 	}
 
