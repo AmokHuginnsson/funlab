@@ -26,6 +26,7 @@ Copyright:
 
 #include <gtkmm.h>
 #include <libglademm/xml.h>
+#include <cairomm/context.h>
 #include <iostream>
 #include <libintl.h>
 
@@ -61,17 +62,64 @@ HEmbeddedRenderer::~HEmbeddedRenderer( void )
 	{
 	}
 
-bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* )
+bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event )
 	{
+	Glib::RefPtr<Gdk::Window> window = get_window();
+	if ( window )
+		{
+		Gtk::Allocation allocation = get_allocation();
+		const int width = allocation.get_width();
+		const int height = allocation.get_height();
+		Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
+		if ( event )
+			{
+			// clip to the area indicated by the expose event so that we only
+			// redraw the portion of the window that needs to be redrawn
+			cr->rectangle(event->area.x, event->area.y,
+					event->area.width, event->area.height);
+			cr->clip();
+			}
+		double m_line_width = 0.05;
+		double m_radius = 0.42;
+		// scale to unit square and translate (0, 0) to be (0.5, 0.5), i.e.
+		// the center of the window
+		cr->scale(width, height);
+		cr->translate(0.5, 0.5);
+		cr->set_line_width(m_line_width);
+
+		cr->save();
+		cr->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
+		cr->paint();
+		cr->restore();
+		cr->arc(0, 0, m_radius, 0, 2 * M_PI);
+		cr->save();
+		cr->set_source_rgba(1.0, 1.0, 1.0, 0.8);
+		cr->fill_preserve();
+		cr->restore();
+		cr->stroke_preserve();
+		cr->clip();
+
+		cr->save();
+		cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+
+		// draw the hours hand
+		cr->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
+		cr->move_to(0, 0);
+		cr->line_to(sin(0) * (m_radius * 0.5),
+				-cos(0) * (m_radius * 0.5));
+		cr->stroke();
+		cr->restore();
+		}
+	return ( false );
 	}
 
 class HWindowMain : public Gtk::Window, public HKeyboardEventListener
 	{
 	class HLocker
 		{
-		bool & f_rbLock;
-		explicit HLocker ( bool & a_rbLock ) : f_rbLock ( a_rbLock ) { f_rbLock = true; }
-		virtual ~HLocker ( void ) { f_rbLock = false; }
+		bool& f_rbLock;
+		explicit HLocker( bool& a_rbLock ) : f_rbLock( a_rbLock ) { f_rbLock = true; }
+		virtual ~HLocker( void ) { f_rbLock = false; }
 		friend class HWindowMain;
 		};
 protected:
@@ -136,7 +184,7 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	
 	f_oDispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
 
-	a_roResources->get_widget( "RENDERER", f_poEmbeddedRenderer );
+	a_roResources->get_widget_derived( "RENDERER", f_poEmbeddedRenderer );
 
 	/* NEW */
 	a_roResources->get_widget( "ID_TOOLBAR_NEW", l_poToolButton );
