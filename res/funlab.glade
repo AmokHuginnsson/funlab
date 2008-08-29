@@ -220,12 +220,8 @@
             <property name="position">320</property>
             <property name="position_set">True</property>
             <child>
-              <widget class="GtkViewport" id="VIEWPORT">
+              <widget class="GtkDrawingArea" id="RENDERER">
                 <property name="visible">True</property>
-                <property name="resize_mode">GTK_RESIZE_QUEUE</property>
-                <child>
-                  <placeholder/>
-                </child>
               </widget>
               <packing>
                 <property name="resize">False</property>
