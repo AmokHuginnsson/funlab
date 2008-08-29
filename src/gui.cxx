@@ -43,6 +43,28 @@ using namespace yaal::hcore;
 namespace funlab
 {
 
+class HEmbeddedRenderer : public Gtk::DrawingArea
+	{
+public:
+	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
+	virtual ~HEmbeddedRenderer( void );
+protected:
+	virtual bool on_expose_event( GdkEventExpose* );
+	};
+
+HEmbeddedRenderer::HEmbeddedRenderer( BaseObjectType* obj, Glib::RefPtr<Gnome::Glade::Xml> const& )
+	: Gtk::DrawingArea( obj )
+	{
+	}
+
+HEmbeddedRenderer::~HEmbeddedRenderer( void )
+	{
+	}
+
+bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* )
+	{
+	}
+
 class HWindowMain : public Gtk::Window, public HKeyboardEventListener
 	{
 	class HLocker
@@ -60,6 +82,7 @@ protected:
 	Gtk::TreeModelColumn<Glib::ustring> f_oFormulasListFormulaColumn;
 	Gtk::TreeView* f_poFormulasListView;
 	Glib::Dispatcher f_oDispatcher;
+	HEmbeddedRenderer* f_poEmbeddedRenderer;
 	bool f_bRendererActive;
 	HRenderer f_oRenderer;
 	/*}*/
@@ -112,6 +135,8 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	f_poFormulasListView->grab_focus();
 	
 	f_oDispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
+
+	a_roResources->get_widget( "RENDERER", f_poEmbeddedRenderer );
 
 	/* NEW */
 	a_roResources->get_widget( "ID_TOOLBAR_NEW", l_poToolButton );
