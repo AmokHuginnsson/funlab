@@ -37,6 +37,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "version.h"
 #include "setup.h"
 #include "renderer.h"
+#include "events.h"
 
 using namespace std;
 using namespace yaal::hcore;

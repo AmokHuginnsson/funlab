@@ -30,7 +30,7 @@ Copyright:
 #include <yaal/hcore/hthread.h>
 #include <yaal/tools/hanalyser.h>
 #include "hsurface.h"
-#include "gui.h"
+#include "events.h"
 
 namespace funlab
 {

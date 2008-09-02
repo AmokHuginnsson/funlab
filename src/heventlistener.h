@@ -1,12 +1,12 @@
 /*
----             `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
+---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	gui.h - this file is integral part of `funlab' project.
+	heventlistener.h - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
 	    of this software.
-	
+
 Copyright:
 
  You are free to use this program as is, you can redistribute binary
@@ -24,15 +24,24 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __GUI_H
-#define __GUI_H
+#ifndef __FUNLAB_HEVENTLISTENER_H
+#define __FUNLAB_HEVENTLISTENER_H
 
 namespace funlab
 {
 
-int gui_start ( int, char * [] );
+template<typename event_t>
+class HEventListener
+	{
+public:
+	void on_event( event_t e )
+		{ do_on_event( e ); }
+	virtual ~HEventListener( void ) {}
+protected:
+	virtual void do_on_event( event_t ) = 0;
+	};
 
 }
 
-#endif /* not __GUI_H */
+#endif /* not __FUNLAB_HEVENTLISTENER_H */
 
