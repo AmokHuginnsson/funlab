@@ -36,7 +36,7 @@ M_VCSID( "$Id: "__ID__" $" )
 
 #include "version.h"
 #include "setup.h"
-#include "renderer.h"
+#include "hdetachedrenderer.h"
 #include "hembeddedrenderer.h"
 #include "events.h"
 
@@ -63,9 +63,9 @@ protected:
 	Gtk::TreeModelColumn<Glib::ustring> f_oFormulasListFormulaColumn;
 	Gtk::TreeView* f_poFormulasListView;
 	Glib::Dispatcher f_oDispatcher;
+	bool f_bDetachedRendererActive;
 	HEmbeddedRenderer* f_poEmbeddedRenderer;
-	bool f_bRendererActive;
-	HRenderer f_oRenderer;
+	HDetachedRenderer f_oRenderer;
 	/*}*/
 public:
 	/*{*/
@@ -97,7 +97,7 @@ protected:
 HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	Glib::RefPtr<Gnome::Glade::Xml> const& a_roResources ) : Gtk::Window( a_poBaseObject ),
 	f_bLock( false ), f_poFormulasListView( NULL ),
-	f_bRendererActive( false ), f_oRenderer( this )
+	f_bDetachedRendererActive( false ), f_oRenderer( this )
 	{
 	M_PROLOG
 	Gtk::ToolButton* l_poToolButton = NULL;
@@ -354,7 +354,7 @@ void HWindowMain::on_sel_changed( void )
 	M_PROLOG
 	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
 	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
-	if ( !f_bLock && f_bRendererActive && l_oIter )
+	if ( !f_bLock && f_bDetachedRendererActive && l_oIter )
 		f_oRenderer.render_surface( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
 
 	return;
@@ -381,7 +381,7 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 				HString l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str();
 				if ( f_oRenderer.render_surface( l_oFormula ) )
 					show_error_message( l_oFormula.raw(), f_oRenderer.error(), f_oRenderer.error_position() );
-				f_bRendererActive = true;
+				f_bDetachedRendererActive = true;
 				}
 			}
 		break;

@@ -35,11 +35,11 @@ Copyright:
 namespace funlab
 {
 
-class HRenderer;
+class HDetachedRenderer;
 
-typedef yaal::hcore::HThreadT<HRenderer> renderer_t;
+typedef yaal::hcore::HThreadT<HDetachedRenderer> renderer_t;
 
-class HRenderer
+class HDetachedRenderer
 	{
 protected:
 	/*{*/
@@ -66,8 +66,8 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HRenderer( HKeyboardEventListener* = NULL );
-	virtual ~HRenderer ( void );
+	HDetachedRenderer( HKeyboardEventListener* = NULL );
+	virtual ~HDetachedRenderer ( void );
 	bool render_surface( yaal::hcore::HString const& );
 	void draw_frame ( void );
 	char const * error ( void ) const;
@@ -102,8 +102,8 @@ private:
 	yaal::hcore::HSemaphore f_oSemaphore;
 	renderer_t f_oThread;
 	HKeyboardEventListener* f_poKeyboardEventListener;
-	HRenderer( const HRenderer& );
-	HRenderer& operator = ( const HRenderer& );
+	HDetachedRenderer( const HDetachedRenderer& );
+	HDetachedRenderer& operator = ( const HDetachedRenderer& );
 	/*}*/
 	};
 

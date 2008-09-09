@@ -33,7 +33,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "setup.h"
 #include "options.h"
 #include "gui.h"
-#include "renderer.h"
+#include "hdetachedrenderer.h"
 
 using namespace std;
 using namespace yaal;
@@ -70,7 +70,7 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 /* *BOOM* */
 		if ( !! setup.f_oFormula )
 			{
-			HRenderer l_oRenderer;
+			HDetachedRenderer l_oRenderer;
 			l_iOpt = l_oRenderer.render_surface( setup.f_oFormula ) ? 1 : 0;
 			if ( l_iOpt )
 				{

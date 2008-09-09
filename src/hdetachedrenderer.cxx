@@ -34,7 +34,7 @@ Copyright:
 #include <yaal/yaal.h>
 M_VCSID( "$Id: "__ID__" $" )
 
-#include "renderer.h"
+#include "hdetachedrenderer.h"
 #include "setup.h"
 
 using namespace std;
@@ -45,7 +45,7 @@ using namespace yaal::tools;
 namespace funlab
 {
 
-HRenderer::HRenderer( HKeyboardEventListener* a_poKeyboardEventListener )
+HDetachedRenderer::HDetachedRenderer( HKeyboardEventListener* a_poKeyboardEventListener )
 	: f_iRed( 0 ), f_iGreen( 0 ), f_iBlue( 0 ),
 	f_dLowerXEdge( 0 ), f_dLowerYEdge( 0 ), f_dSize( 0 ), f_dResolution( 0 ),
 	f_dAngleX( 0 ), f_dAngleY( 0 ), f_dAngleZ( 0 ),
@@ -77,7 +77,7 @@ HRenderer::HRenderer( HKeyboardEventListener* a_poKeyboardEventListener )
 	M_EPILOG
 	}
 
-HRenderer::~HRenderer( void )
+HDetachedRenderer::~HDetachedRenderer( void )
 	{
 	M_PROLOG
 	cout << "waiting ... " << flush;
@@ -109,7 +109,7 @@ HRenderer::~HRenderer( void )
 	M_EPILOG
 	}
 
-void HRenderer::makeland( void )
+void HDetachedRenderer::makeland( void )
 	{
 	M_PROLOG
 	int i, j;
@@ -135,7 +135,7 @@ void HRenderer::makeland( void )
 	M_EPILOG
 	}
 
-void HRenderer::precount ( void )
+void HDetachedRenderer::precount ( void )
 	{
 	f_dCosAlpha = cosq( static_cast<unsigned int>( f_dAngleX ) );
 	f_dSinAlpha = sinq( static_cast<unsigned int>( f_dAngleX ) );
@@ -150,7 +150,7 @@ void HRenderer::precount ( void )
 	return;
 	}
 
-double HRenderer::sinq( unsigned int a_iAngle )
+double HDetachedRenderer::sinq( unsigned int a_iAngle )
 	{
 	a_iAngle &= 4095;
 	if ( a_iAngle > 2047 )
@@ -165,12 +165,12 @@ double HRenderer::sinq( unsigned int a_iAngle )
 	return ( f_pdTrygo [ a_iAngle ] );
 	}
 
-double HRenderer::cosq( unsigned int a_iAngle )
+double HDetachedRenderer::cosq( unsigned int a_iAngle )
 	{
 	return ( sinq( a_iAngle + 1024 ) );
 	}
 
-bool HRenderer::T( double _x, double _y, double _z, int& _c, int& _r )
+bool HDetachedRenderer::T( double _x, double _y, double _z, int& _c, int& _r )
 	{
 	M_PROLOG
 	double x = 0, y = 0, z = 0;
@@ -207,7 +207,7 @@ bool HRenderer::T( double _x, double _y, double _z, int& _c, int& _r )
 	M_EPILOG
 	}
 
-void HRenderer::draw_frame ( void )
+void HDetachedRenderer::draw_frame ( void )
 	{
 	M_PROLOG
 	if ( f_bBusy || ! f_oThread.is_alive() )
@@ -265,7 +265,7 @@ void HRenderer::draw_frame ( void )
 	M_EPILOG
 	}
 
-bool HRenderer::render_surface( HString const& a_oFormula )
+bool HDetachedRenderer::render_surface( HString const& a_oFormula )
 	{
 	M_PROLOG
 	
@@ -304,7 +304,7 @@ bool HRenderer::render_surface( HString const& a_oFormula )
 	M_EPILOG
 	}
 
-int HRenderer::operator() ( HThread const* const a_poCaller )
+int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 	{
 	M_PROLOG
 	int dx = 0, dy = 0;
@@ -443,21 +443,21 @@ int HRenderer::operator() ( HThread const* const a_poCaller )
 	M_EPILOG
 	}
 
-char const* HRenderer::error( void ) const
+char const* HDetachedRenderer::error( void ) const
 	{
 	M_PROLOG
 	return ( f_oAnalyser.get_error() );
 	M_EPILOG
 	}
 
-int HRenderer::error_position( void ) const
+int HDetachedRenderer::error_position( void ) const
 	{
 	M_PROLOG
 	return ( f_oAnalyser.get_error_token() );
 	M_EPILOG
 	}
 
-void HRenderer::shutdown( void )
+void HDetachedRenderer::shutdown( void )
 	{
 	f_oThread.finish();
 	cout << __PRETTY_FUNCTION__ << endl;
