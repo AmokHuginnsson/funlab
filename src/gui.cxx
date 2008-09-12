@@ -65,7 +65,7 @@ protected:
 	Glib::Dispatcher f_oDispatcher;
 	bool f_bDetachedRendererActive;
 	HEmbeddedRenderer* f_poEmbeddedRenderer;
-	HDetachedRenderer f_oRenderer;
+	HDetachedRenderer f_oDetachedRenderer;
 	/*}*/
 public:
 	/*{*/
@@ -97,7 +97,7 @@ protected:
 HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	Glib::RefPtr<Gnome::Glade::Xml> const& a_roResources ) : Gtk::Window( a_poBaseObject ),
 	f_bLock( false ), f_poFormulasListView( NULL ),
-	f_bDetachedRendererActive( false ), f_oRenderer( this )
+	f_bDetachedRendererActive( false ), f_oDetachedRenderer( this )
 	{
 	M_PROLOG
 	Gtk::ToolButton* l_poToolButton = NULL;
@@ -354,8 +354,8 @@ void HWindowMain::on_sel_changed( void )
 	M_PROLOG
 	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
 	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
-	if ( !f_bLock && f_bDetachedRendererActive && l_oIter )
-		f_oRenderer.render_surface( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+	if ( ! f_bLock && f_bDetachedRendererActive && l_oIter )
+		f_oDetachedRenderer.render_surface( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
 
 	return;
 	M_EPILOG
@@ -379,8 +379,8 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 			if ( l_oIter )
 				{
 				HString l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str();
-				if ( f_oRenderer.render_surface( l_oFormula ) )
-					show_error_message( l_oFormula.raw(), f_oRenderer.error(), f_oRenderer.error_position() );
+				if ( f_oDetachedRenderer.render_surface( l_oFormula ) )
+					show_error_message( l_oFormula.raw(), f_oDetachedRenderer.error(), f_oDetachedRenderer.error_position() );
 				f_bDetachedRendererActive = true;
 				}
 			}
@@ -395,7 +395,7 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 void HWindowMain::shutdown_renderer( void )
 	{
 	cout << __PRETTY_FUNCTION__ << endl;
-	f_oRenderer.shutdown();
+	f_oDetachedRenderer.shutdown();
 	}
 
 void HWindowMain::do_on_event( HKeyboardEvent* e )

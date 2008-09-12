@@ -34,10 +34,17 @@ Copyright:
 namespace funlab
 {
 
-class HRendererInterface : public HKeyboardEventListener, public HMouseEventListener
+class HRendererEngineInterface : public HKeyboardEventListener, public HMouseEventListener
 	{
 public:
-	typedef yaal::hcore::HPointer<HRendererInterface> ptr_t;
+	typedef yaal::hcore::HPointer<HRendererEngineInterface> ptr_t;
+	};
+
+class HRendererSurfaceInterface
+	{
+public:
+	virtual ~HRendererSurfaceInterface( void ) {}
+	typedef yaal::hcore::HPointer<HRendererSurfaceInterface> ptr_t;
 	double get_width( void ) const;
 	double get_height( void ) const;
 	void clear( yaal::u32_t );
@@ -50,6 +57,14 @@ protected:
 	virtual void do_put_pixel( double, double, yaal::u32_t ) = 0;
 	virtual void do_line( double, double, double, double, yaal::u32_t ) = 0;
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t ) = 0;
+	};
+
+class HRendererSurfaceBase : public HRendererSurfaceInterface
+	{
+	HRendererEngineInterface::ptr_t f_oEngine;
+public:
+	virtual ~HRendererSurfaceBase( void ) {}
+	void set_engine( HRendererEngineInterface::ptr_t );
 	};
 
 }

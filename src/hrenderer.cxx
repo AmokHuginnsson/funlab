@@ -33,34 +33,42 @@ using namespace yaal;
 namespace funlab
 {
 
-double HRendererInterface::get_width( void ) const
+double HRendererSurfaceInterface::get_width( void ) const
 	{
 	return ( do_get_width() );
 	}
 
-double HRendererInterface::get_height( void ) const
+double HRendererSurfaceInterface::get_height( void ) const
 	{
 	return ( do_get_height() );
 	}
 
-void HRendererInterface::clear( u32_t c )
+void HRendererSurfaceInterface::clear( u32_t c )
 	{
 	fill_rect( 0, 0, get_width(), get_height(), c );
 	}
 
-void HRendererInterface::put_pixel( double x, double y, u32_t c )
+void HRendererSurfaceInterface::put_pixel( double x, double y, u32_t c )
 	{
 	do_put_pixel( x, y, c );
 	}
 
-void HRendererInterface::line( double x1, double y1, double x2, double y2, u32_t c )
+void HRendererSurfaceInterface::line( double x1, double y1, double x2, double y2, u32_t c )
 	{
 	do_line( x1, y1, x2, y2, c );
 	}
 
-void HRendererInterface::fill_rect( double x, double y, double w, double h, u32_t c )
+void HRendererSurfaceInterface::fill_rect( double x, double y, double w, double h, u32_t c )
 	{
 	do_fill_rect( x, y, w, h, c );
+	}
+
+void HRendererSurfaceBase::set_engine( HRendererEngineInterface::ptr_t engine )
+	{
+	M_PROLOG
+	f_oEngine = engine;
+	return;
+	M_EPILOG
 	}
 
 }

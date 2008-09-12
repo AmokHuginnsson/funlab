@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hembeddedrenderer.h - this file is integral part of `funlab' project.
+	hfunlab.h - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,35 +24,57 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __FUNLAB_HEMBEDDEDRENDERER_H
-#define __FUNLAB_HEMBEDDEDRENDERER_H
-
-#include <gtkmm.h>
-#include <libglademm/xml.h>
-#include <yaal/hcore/base.h>
+#ifndef __FUNLAB_HFUNLAB_H
+#define __FUNLAB_HFUNLAB_H
 
 #include "hrenderer.h"
 
 namespace funlab
 {
 
-class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea
+class HFunlab : public HRendererEngineInterface
 	{
+	int f_iRed;
+	int f_iGreen;
+	int f_iBlue;
+	int* f_ppiNode[ 3 ];
+	double f_dLowerXEdge;
+	double f_dLowerYEdge;
+	double f_dSize;
+	double f_dAngleX;
+	double f_dAngleY;
+	double f_dAngleZ;
+	double f_dDX;
+	double f_dDY;
+	double f_dDZ;
+	double f_dFOV;
+	double* f_pdXVariable;
+	double* f_pdYVariable;
+	double**	f_ppdLand;
+
+	yaal::u32_t f_ulColor;
+	double f_dCosAlpha;
+	double f_dSinAlpha;
+	double f_dCosBeta;
+	double f_dSinBeta;
+	double f_dCosGamma;
+	double f_dSinGamma;
+	double f_dPrecountA;
+	double f_dPrecountB;
+	double f_dPrecountC;
+	double* f_pdTrygo;
+	yaal::tools::HAnalyser f_oAnalyser;
+	HRendererSurfaceInterface* f_poRenderer;
 public:
-	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
-	virtual ~HEmbeddedRenderer( void );
+	HFunlab( HRendererSurfaceInterface* );
+	virtual ~HFunlab( void );
+	bool push_formula( yaal::hcore::HString const& );
 protected:
-	virtual bool on_expose_event( GdkEventExpose* );
-	virtual double do_get_width( void ) const;
-	virtual double do_get_height( void ) const;
-	virtual void do_put_pixel( double, double, yaal::u32_t );
-	virtual void do_line( double, double, double, double, yaal::u32_t );
-	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
-	virtual void do_on_event( HKeyboardEvent* );
 	virtual void do_on_event( HMouseEvent* );
+	virtual void do_on_event( HKeyboardEvent* );
 	};
 
 }
 
-#endif /* not __FUNLAB_HEMBEDDEDRENDERER_H */
+#endif /* not __FUNLAB_HFUNLAB_H */
 

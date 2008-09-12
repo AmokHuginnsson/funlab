@@ -43,42 +43,24 @@ class HDetachedRenderer
 	{
 protected:
 	/*{*/
-	int f_iRed;
-	int f_iGreen;
-	int f_iBlue;
-	int* f_ppiNode[ 3 ];
-	double f_dLowerXEdge;
-	double f_dLowerYEdge;
-	double f_dSize;
 	double f_dResolution;
-	double f_dAngleX;
-	double f_dAngleY;
-	double f_dAngleZ;
-	double f_dDX;
-	double f_dDY;
-	double f_dDZ;
-	double f_dFOV;
-	double* f_pdXVariable;
-	double* f_pdYVariable;
-	double**	f_ppdLand;
-	yaal::tools::HAnalyser f_oAnalyser;
 	HSurface::ptr_t f_oSurface;
 	/*}*/
 public:
 	/*{*/
 	HDetachedRenderer( HKeyboardEventListener* = NULL );
 	virtual ~HDetachedRenderer ( void );
-	bool render_surface( yaal::hcore::HString const& );
-	void draw_frame ( void );
-	char const * error ( void ) const;
-	int error_position ( void ) const;
+	bool render_surface( void );
+	void draw_frame( void );
+	char const* error( void ) const;
+	int error_position( void ) const;
 	int operator() ( yaal::hcore::HThread const* const );
 	void shutdown( void );
 	/*}*/
 protected:
 	/*{*/
-	void makeland ( void );
-	void precount ( void );
+	void makeland( void );
+	void precount( void );
 	double sinq( unsigned int );
 	double cosq( unsigned int );
 	bool T( double, double, double, int& _c, int& _r );
@@ -87,17 +69,6 @@ private:
 	/*{*/
 	bool f_bLoop;
 	bool f_bBusy;
-	yaal::u32_t f_ulColor;
-	double f_dCosAlpha;
-	double f_dSinAlpha;
-	double f_dCosBeta;
-	double f_dSinBeta;
-	double f_dCosGamma;
-	double f_dSinGamma;
-	double f_dPrecountA;
-	double f_dPrecountB;
-	double f_dPrecountC;
-	double* f_pdTrygo;
 	yaal::hcore::HMutex f_oMutex;
 	yaal::hcore::HSemaphore f_oSemaphore;
 	renderer_t f_oThread;
