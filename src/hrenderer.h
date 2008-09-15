@@ -51,7 +51,9 @@ public:
 	void put_pixel( double, double, yaal::u32_t );
 	void line( double, double, double, double, yaal::u32_t );
 	void fill_rect( double, double, double, double, yaal::u32_t );
+	HRendererEngineInterface::ptr_t get_engine( void );
 protected:
+	virtual HRendererEngineInterface::ptr_t do_get_engine( void ) = 0;
 	virtual double do_get_width( void ) const = 0;
 	virtual double do_get_height( void ) const = 0;
 	virtual void do_put_pixel( double, double, yaal::u32_t ) = 0;
@@ -61,10 +63,13 @@ protected:
 
 class HRendererSurfaceBase : public HRendererSurfaceInterface
 	{
+protected:
 	HRendererEngineInterface::ptr_t f_oEngine;
 public:
 	virtual ~HRendererSurfaceBase( void ) {}
 	void set_engine( HRendererEngineInterface::ptr_t );
+protected:
+	virtual HRendererEngineInterface::ptr_t do_get_engine( void );
 	};
 
 }

@@ -71,5 +71,12 @@ void HRendererSurfaceBase::set_engine( HRendererEngineInterface::ptr_t engine )
 	M_EPILOG
 	}
 
+HRendererEngineInterface::ptr_t HRendererSurfaceBase::do_get_engine( void )
+	{
+	M_PROLOG
+	return ( f_oEngine );
+	M_EPILOG
+	}
+
 }
 

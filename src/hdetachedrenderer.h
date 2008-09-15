@@ -29,6 +29,8 @@ Copyright:
 
 #include <yaal/hcore/hthread.h>
 #include <yaal/tools/hanalyser.h>
+
+#include "hrenderer.h"
 #include "hsurface.h"
 #include "events.h"
 
@@ -39,7 +41,7 @@ class HDetachedRenderer;
 
 typedef yaal::hcore::HThreadT<HDetachedRenderer> renderer_t;
 
-class HDetachedRenderer
+class HDetachedRenderer : public HRendererSurfaceBase
 	{
 protected:
 	/*{*/
@@ -59,11 +61,12 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	void makeland( void );
-	void precount( void );
-	double sinq( unsigned int );
-	double cosq( unsigned int );
-	bool T( double, double, double, int& _c, int& _r );
+	virtual HRendererEngineInterface::ptr_t do_get_engine( void );
+	virtual double do_get_width( void ) const;
+	virtual double do_get_height( void ) const;
+	virtual void do_put_pixel( double, double, yaal::u32_t );
+	virtual void do_line( double, double, double, double, yaal::u32_t );
+	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
 	/*}*/
 private:
 	/*{*/

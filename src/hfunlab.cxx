@@ -253,14 +253,99 @@ void HFunlab::do_on_event( HMouseEvent* e )
 				}
 			}
 		break;
+		case ( HMouseEvent::TYPE::D_MOVE ):
+			{
+			switch ( e.get_button() )
+				{
+				case ( HMouseEvent::BUTTON::D_1 ):
+					f_dAngleZ += e.get_x() << 2;
+					f_dAngleX -= e.get_y() << 2;
+				break;
+				case ( HMouseEvent::BUTTON::D_2 ):
+					f_dSize += e.get_x();
+					makeland();
+				break;
+				case ( HMouseEvent::BUTTON::D_3 ):
+					f_dAngleY += e.get_x() << 2;
+				break;
+				default:
+				break;
+				}
+			}
 		default:
 		break;
 		}
 	return;
 	}
 
-void HFunlab::do_on_event( HKeyboardEvent* )
+void HFunlab::do_on_event( HKeyboardEvent* e )
 	{
+	switch ( e.get_code() )
+		{
+		case ( 'q' ):
+			{
+			if ( f_poKeyboardEventListener )
+				{
+				HKeyboardEvent e;
+				e.set_code( l_uEvent.key.keysym.sym );
+				f_poKeyboardEventListener->on_event( &e );
+				}
+			else
+				{
+				f_bLoop = false;
+				f_oSurface->down();
+				f_oSemaphore.signal();
+				}
+			}
+		break;
+		case ( 'f' ):
+			f_oSurface->toggle_fullscreen();
+		break;
+		case ( 'r' ):
+			{
+			if ( e.get_mod() & HKeyboardEvent::MOD::D_SHIFT )
+				{
+				f_iRed += 240;
+				f_iRed %= 256;
+				}
+			else
+				{
+				f_iRed += 16;
+				f_iRed %= 256;
+				}
+			}
+		break;
+		case ( 'g' ):
+			{
+			if ( e.get_mod() & ( HKeyboardEvent::MOD::D_SHIFT ) )
+				{
+				f_iGreen += 240;
+				f_iGreen %= 256;
+				}
+			else
+				{
+				f_iGreen += 16;
+				f_iGreen %= 256;
+				}
+			}
+		break;
+		case ( 'b' ):
+			{
+			if ( e.get_mod() & ( HKeyboardEvent::MOD::D_SHIFT ) )
+				{
+				f_iBlue += 240;
+				f_iBlue %= 256;
+				}
+			else
+				{
+				f_iBlue += 16;
+				f_iBlue %= 256;
+				}
+			}
+		break;
+		default:
+		break;
+		}
 	}
 
 bool HFunlab::push_formula( HString const& a_oFormula )

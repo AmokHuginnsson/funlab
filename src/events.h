@@ -38,9 +38,15 @@ class HKeyboardEvent
 		{
 		typedef enum
 			{
-			D_SHIFT = 0x01,
-			D_CONTROL = 0x02,
-			D_ALT = 0x04
+			D_LSHIFT = 0x0001,
+			D_RSHIFT = 0x0002,
+			D_SHIFT = D_LSHIFT | D_RSHIFT,
+			D_LCONTROL = 0x0004,
+			D_RCONTROL = 0x0008,
+			D_CONTROL = D_LCONTROL | D_RCONTROL,
+			D_LALT = 0x0010,
+			D_RALT = 0x0020,
+			D_ALT = D_LALT | D_RALT
 			} mod_t;
 		};
 	int f_iCode;
@@ -53,6 +59,7 @@ public:
 
 class HMouseEvent
 	{
+public:
 	struct TYPE
 		{
 		typedef enum
@@ -78,6 +85,7 @@ class HMouseEvent
 			D_8 = 0x80
 			} button_t;
 		};
+private:
 	TYPE::type_t f_eType;
 	BUTTON::button_t f_eButton;
 	int f_iX;

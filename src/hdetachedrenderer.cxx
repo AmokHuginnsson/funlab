@@ -103,32 +103,31 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 		if ( SDL_WaitEvent( &l_uEvent ) && f_oSurface->is_valid() )
 			{
 			HLock l_oLock( f_oMutex );
-			HKeyboardEvent e;
-			e.set_code( l_uEvent.key.keysym.sym );
 			switch ( l_uEvent.type )
 				{
 				case ( SDL_MOUSEMOTION ):
 					{
-					dx = l_uEvent.motion.xrel > 0 ? l_uEvent.motion.xrel : - l_uEvent.motion.xrel;
-					dy = l_uEvent.motion.yrel > 0 ? l_uEvent.motion.yrel : - l_uEvent.motion.yrel;
+					HMouseEvent e( HMouseEvent::TYPE::D_MOVE );
+					dx = yaal::abs( l_uEvent.motion.xrel );
+					dy = yaal::abs( l_uEvent.motion.yrel );
+					e.set_pos( dx, dy );
 					if ( ( dx < ( setup.f_iResolutionX >> 1 ) ) && ( dy < ( setup.f_iResolutionY >> 1 ) ) )
 						{
 						switch ( l_uEvent.motion.state )
 							{
 							case ( SDL_BUTTON( 1 ) ):
-								f_dAngleZ += l_uEvent.motion.xrel << 2;
-								f_dAngleX -= l_uEvent.motion.yrel << 2;
+								e.set_button( HMouseEvent::BUTTON::D_1 );
 							break;
 							case ( SDL_BUTTON( 2 ) ):
-								f_dSize += l_uEvent.motion.xrel;
-								makeland();
+								e.set_button( HMouseEvent::BUTTON::D_2 );
 							break;
 							case ( SDL_BUTTON( 3 ) ):
-								f_dAngleY += l_uEvent.motion.xrel << 2;
+								e.set_button( HMouseEvent::BUTTON::D_3 );
 							break;
 							default:
 							break;
 							}
+						f_oEngine->on_event( &e );
 						}
 					break;
 					}
@@ -137,88 +136,22 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 					HMouseEvent e( HMouseEvent::TYPE::D_PRESS );
 					switch ( l_uEvent.button.button )
 						{
-						case ( 4 ):
-							e.set_button( HMouseEvent::BUTTONS::D_4 );
-							f_dDY ++;
+						case ( SDL_BUTTON( 4 ) ):
+							e.set_button( HMouseEvent::BUTTON::D_4 );
 						break;
-						case ( 5 ):
-							e.set_button( HMouseEvent::BUTTONS::D_5 );
-							f_dDY --;
+						case ( SDL_BUTTON( 5 ) ):
+							e.set_button( HMouseEvent::BUTTON::D_5 );
 						break;
 						default:
 						break;
 						}
-					f_oEngine.on_event( &e );
+					f_oEngine->on_event( &e );
 					}
 				break;
 				case ( SDL_KEYUP ):
 					{
-					switch ( l_uEvent.key.keysym.sym )
-						{
-						case ( 'q' ):
-							{
-							if ( f_poKeyboardEventListener )
-								{
-								HKeyboardEvent e;
-								e.set_code( l_uEvent.key.keysym.sym );
-								f_poKeyboardEventListener->on_event( &e );
-								}
-							else
-								{
-								f_bLoop = false;
-								f_oSurface->down();
-								f_oSemaphore.signal();
-								}
-							}
-						break;
-						case ( 'f' ):
-							f_oSurface->toggle_fullscreen();
-						break;
-						case ( 'r' ):
-							{
-							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
-								{
-								f_iRed += 240;
-								f_iRed %= 256;
-								}
-							else
-								{
-								f_iRed += 16;
-								f_iRed %= 256;
-								}
-							}
-						break;
-						case ( 'g' ):
-							{
-							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
-								{
-								f_iGreen += 240;
-								f_iGreen %= 256;
-								}
-							else
-								{
-								f_iGreen += 16;
-								f_iGreen %= 256;
-								}
-							}
-						break;
-						case ( 'b' ):
-							{
-							if ( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
-								{
-								f_iBlue += 240;
-								f_iBlue %= 256;
-								}
-							else
-								{
-								f_iBlue += 16;
-								f_iBlue %= 256;
-								}
-							}
-						break;
-						default:
-						break;
-						}
+					HKeyboardEvent e( l_uEvent.key.keysym.sym, l_uEvent.key.keysym.mod );
+					f_oEngine->on_event( &e );
 					}
 				break;
 				default:

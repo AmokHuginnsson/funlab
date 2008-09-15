@@ -39,6 +39,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hdetachedrenderer.h"
 #include "hembeddedrenderer.h"
 #include "events.h"
+#include "hfunlab.h"
 
 using namespace std;
 using namespace yaal::hcore;
@@ -103,6 +104,9 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	Gtk::ToolButton* l_poToolButton = NULL;
 	Gtk::MenuItem* l_poMenuItem = NULL;
 
+	HRendererEngineInterface::ptr_t dre( new HFunlab( &f_oDetachedRenderer ) );
+	f_oDetachedRenderer.set_engine( dre );
+
 	/* FORMULAS LIST */
 	a_roResources->get_widget( "TREE_FORMULAS", f_poFormulasListView );
 	f_oFormulasListColumns.add( f_oFormulasListFormulaColumn );
@@ -118,6 +122,8 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	f_oDispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
 
 	a_roResources->get_widget_derived( "RENDERER", f_poEmbeddedRenderer );
+	HRendererEngineInterface::ptr_t ere( new HFunlab( f_poEmbeddedRenderer ) );
+	f_poEmbeddedRenderer->set_engine( ere );
 
 	/* NEW */
 	a_roResources->get_widget( "ID_TOOLBAR_NEW", l_poToolButton );
@@ -355,7 +361,7 @@ void HWindowMain::on_sel_changed( void )
 	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
 	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
 	if ( ! f_bLock && f_bDetachedRendererActive && l_oIter )
-		f_oDetachedRenderer.render_surface( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+		dynamic_cast<HFunlab*>( &(*f_oDetachedRenderer.get_engine()) )->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
 
 	return;
 	M_EPILOG
@@ -379,7 +385,7 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 			if ( l_oIter )
 				{
 				HString l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str();
-				if ( f_oDetachedRenderer.render_surface( l_oFormula ) )
+				if ( dynamic_cast<HFunlab*>( &(*f_oDetachedRenderer.get_engine() ) )->push_formula( l_oFormula ) )
 					show_error_message( l_oFormula.raw(), f_oDetachedRenderer.error(), f_oDetachedRenderer.error_position() );
 				f_bDetachedRendererActive = true;
 				}
