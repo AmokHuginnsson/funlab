@@ -50,6 +50,7 @@ public:
 	double get_width( void ) const;
 	double get_height( void ) const;
 	void clear( yaal::u32_t );
+	void commit( void );
 	yaal::u32_t RGB( int, int, int );
 	void put_pixel( double, double, yaal::u32_t );
 	void line( double, double, double, double, yaal::u32_t );
@@ -59,6 +60,7 @@ protected:
 	virtual HRendererEngineInterface::ptr_t do_get_engine( void ) = 0;
 	virtual double do_get_width( void ) const = 0;
 	virtual double do_get_height( void ) const = 0;
+	virtual void do_commit( void ) = 0;
 	virtual void do_put_pixel( double, double, yaal::u32_t ) = 0;
 	virtual void do_line( double, double, double, double, yaal::u32_t ) = 0;
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t ) = 0;

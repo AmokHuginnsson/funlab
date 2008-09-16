@@ -150,24 +150,34 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 				break;
 				case ( SDL_KEYUP ):
 					{
-					if ( l_uEvent.key.keysym.sym == 'q' )
+					switch ( l_uEvent.key.keysym.sym )
 						{
-						if ( f_poKeyboardEventListener )
+						case ( 'q' ):
 							{
-							HKeyboardEvent e( static_cast<int>( l_uEvent.key.keysym.sym ) );
-							f_poKeyboardEventListener->on_event( &e );
+							if ( f_poKeyboardEventListener )
+								{
+								HKeyboardEvent e( static_cast<int>( l_uEvent.key.keysym.sym ) );
+								f_poKeyboardEventListener->on_event( &e );
+								}
+							else
+								{
+								f_bLoop = false;
+								f_oSurface->down();
+								f_oSemaphore.signal();
+								}
 							}
-						else
-							{
-							f_bLoop = false;
-							f_oSurface->down();
-							f_oSemaphore.signal();
-							}
+						break;
+						case ( 'f' ):
+							f_oSurface->toggle_fullscreen();
+						break;
+						default:
+							HKeyboardEvent e( static_cast<int>( l_uEvent.key.keysym.sym ),
+									( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
+										? HKeyboardEvent::MOD::D_SHIFT : HKeyboardEvent::MOD::D_NONE );
+							f_oEngine->on_event( &e );
+						break;
 						}
 					break;
-					HKeyboardEvent e( static_cast<int>( l_uEvent.key.keysym.sym ),
-							( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) ) ? HKeyboardEvent::MOD::D_SHIFT : HKeyboardEvent::MOD::D_NONE );
-					f_oEngine->on_event( &e );
 					}
 				break;
 				default:

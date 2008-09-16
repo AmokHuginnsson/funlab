@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hembeddedrenderer.h - this file is integral part of `funlab' project.
+	events.cxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,36 +24,46 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __FUNLAB_HEMBEDDEDRENDERER_H
-#define __FUNLAB_HEMBEDDEDRENDERER_H
+#include <yaal/yaal.h>
+M_VCSID( "$Id: "__ID__" $" )
+#include "events.h"
 
-#include <gtkmm.h>
-#include <libglademm/xml.h>
-#include <yaal/hcore/base.h>
-
-#include "hrenderer.h"
+using namespace yaal;
+using namespace yaal::hcore;
 
 namespace funlab
 {
 
-class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea
+int HMouseEvent::get_x( void ) const
 	{
-public:
-	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
-	virtual ~HEmbeddedRenderer( void );
-protected:
-	virtual bool on_expose_event( GdkEventExpose* );
-	virtual double do_get_width( void ) const;
-	virtual double do_get_height( void ) const;
-	virtual void do_commit( void );
-	virtual void do_put_pixel( double, double, yaal::u32_t );
-	virtual void do_line( double, double, double, double, yaal::u32_t );
-	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
-	virtual void do_on_event( HKeyboardEvent* );
-	virtual void do_on_event( HMouseEvent* );
-	};
+	return ( f_iX );
+	}
+
+int HMouseEvent::get_y( void ) const
+	{
+	return ( f_iY );
+	}
+
+HMouseEvent::TYPE::type_t HMouseEvent::get_type( void ) const
+	{
+	return ( f_eType );
+	}
+
+HMouseEvent::BUTTON::button_t HMouseEvent::get_button( void ) const
+	{
+	return ( f_eButton );
+	}
+
+void HMouseEvent::set_pos( int const& x, int const& y )
+	{
+	f_iX = x;
+	f_iY = y;
+	}
+
+void HMouseEvent::set_button( BUTTON::button_t const& b )
+	{
+	f_eButton = b;
+	}
 
 }
-
-#endif /* not __FUNLAB_HEMBEDDEDRENDERER_H */
 

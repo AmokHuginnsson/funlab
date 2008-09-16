@@ -75,11 +75,12 @@ protected:
 	virtual void do_on_event( HMouseEvent const* );
 	virtual void do_on_event( HKeyboardEvent const* );
 private:
-	void makeland( void );
-	void precount( void );
 	double sinq( int unsigned );
 	double cosq( int unsigned );
 	bool T( double, double, double, int&, int& );
+	void precount( void );
+	void makeland( void );
+	void draw_frame( void );
 	};
 
 }

@@ -97,6 +97,7 @@ public:
 	HMouseEvent( TYPE::type_t const& );
 	void set_pos( int const&, int const& );
 	void set_button( BUTTON::button_t const& );
+	TYPE::type_t get_type( void ) const;
 	int get_x( void ) const;
 	int get_y( void ) const;
 	BUTTON::button_t get_button( void ) const;

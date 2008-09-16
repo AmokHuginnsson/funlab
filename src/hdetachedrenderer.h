@@ -59,9 +59,9 @@ public:
 	/*}*/
 protected:
 	/*{*/
-	virtual HRendererEngineInterface::ptr_t do_get_engine( void );
 	virtual double do_get_width( void ) const;
 	virtual double do_get_height( void ) const;
+	virtual void do_commit( void );
 	virtual void do_put_pixel( double, double, yaal::u32_t );
 	virtual void do_line( double, double, double, double, yaal::u32_t );
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );

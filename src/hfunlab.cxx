@@ -182,7 +182,6 @@ bool HFunlab::T( double _x, double _y, double _z, int& _c, int& _r )
 void HFunlab::draw_frame( void )
 	{
 	M_PROLOG
-	f_bBusy = true;
 	bool valid = false, oldvalid = false;
 	int f = 0, i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
 	double x = 0, y = 0;
@@ -191,7 +190,7 @@ void HFunlab::draw_frame( void )
 		for ( i = 0; i < setup.f_iDensity; i++ )
 			f_ppiNode[ j ][ i ] = 0;
 	f_dFOV = 240.0;
-	f_poRenderer->clear();
+	f_poRenderer->clear( f_poRenderer->RGB( 0, 0, 0 ) );
 	precount();
 	if ( setup.f_bStereo )
 		{
@@ -231,8 +230,7 @@ void HFunlab::draw_frame( void )
 			}
 		}
 	usleep( 1000 );
-	f_poRenderer->refresh();
-	f_bBusy = false;
+	f_poRenderer->commit();
 	return;
 	M_EPILOG
 	}
@@ -285,9 +283,6 @@ void HFunlab::do_on_event( HKeyboardEvent const* e )
 	{
 	switch ( e->get_code() )
 		{
-		case ( 'f' ):
-			f_oSurface->toggle_fullscreen();
-		break;
 		case ( 'r' ):
 			{
 			if ( e->get_mod() & HKeyboardEvent::MOD::D_SHIFT )

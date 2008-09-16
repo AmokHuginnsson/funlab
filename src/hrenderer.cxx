@@ -48,6 +48,11 @@ void HRendererSurfaceInterface::clear( u32_t c )
 	fill_rect( 0, 0, get_width(), get_height(), c );
 	}
 
+void HRendererSurfaceInterface::commit( void )
+	{
+	do_commit();
+	}
+
 void HRendererSurfaceInterface::put_pixel( double x, double y, u32_t c )
 	{
 	do_put_pixel( x, y, c );
@@ -68,6 +73,13 @@ void HRendererSurfaceBase::set_engine( HRendererEngineInterface::ptr_t engine )
 	M_PROLOG
 	f_oEngine = engine;
 	return;
+	M_EPILOG
+	}
+
+HRendererEngineInterface::ptr_t HRendererSurfaceInterface::get_engine( void )
+	{
+	M_PROLOG
+	return ( do_get_engine() );
 	M_EPILOG
 	}
 

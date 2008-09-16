@@ -34,6 +34,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "options.h"
 #include "gui.h"
 #include "hdetachedrenderer.h"
+#include "hfunlab.h"
 
 using namespace std;
 using namespace yaal;
@@ -71,15 +72,22 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 		if ( !! setup.f_oFormula )
 			{
 			HDetachedRenderer l_oRenderer;
-			l_iOpt = l_oRenderer.render_surface( setup.f_oFormula ) ? 1 : 0;
+			HFunlab* pf = NULL;
+			HFunlab::ptr_t f( pf = new HFunlab( &l_oRenderer ) );
+			l_iOpt = pf->push_formula( setup.f_oFormula ) ? 1 : 0;
 			if ( l_iOpt )
 				{
-				l_iPosition = l_oRenderer.error_position();
+				l_iPosition = pf->error_position();
 				for ( l_iCtr = 0; l_iCtr < l_iPosition; l_iCtr ++ )
 					l_oArrow += '-';
 				l_oArrow += 'v';
 				::fprintf( stderr, _( "Formula syntax error ...\n%s at this place:\n%s\n%s\n" ),
-						l_oRenderer.error(), l_oArrow.raw(), setup.f_oFormula.raw() );
+						pf->error(), l_oArrow.raw(), setup.f_oFormula.raw() );
+				}
+			else
+				{
+				l_oRenderer.set_engine( f );
+				l_oRenderer.render_surface();
 				}
 			}
 		else
