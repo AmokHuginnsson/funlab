@@ -34,10 +34,12 @@ namespace funlab
 
 class HKeyboardEvent
 	{
+public:
 	struct MOD
 		{
 		typedef enum
 			{
+			D_NONE = 0x0000,
 			D_LSHIFT = 0x0001,
 			D_RSHIFT = 0x0002,
 			D_SHIFT = D_LSHIFT | D_RSHIFT,
@@ -49,10 +51,11 @@ class HKeyboardEvent
 			D_ALT = D_LALT | D_RALT
 			} mod_t;
 		};
+private:
 	int f_iCode;
 	MOD::mod_t f_eMod;
 public:
-	HKeyboardEvent( int const& code, MOD::mod_t const& a_eMod ) : f_iCode( code ), f_eMod( a_eMod ) { }
+	HKeyboardEvent( int const& code, MOD::mod_t const& a_eMod = MOD::D_NONE ) : f_iCode( code ), f_eMod( a_eMod ) { }
 	int get_code( void ) const { return ( f_iCode ); }
 	MOD::mod_t get_mod( void ) const { return ( f_eMod ); }
 	};
@@ -94,13 +97,13 @@ public:
 	HMouseEvent( TYPE::type_t const& );
 	void set_pos( int const&, int const& );
 	void set_button( BUTTON::button_t const& );
-	int get_x( void );
-	int get_y( void );
-	BUTTON::button_t get_button( void );
+	int get_x( void ) const;
+	int get_y( void ) const;
+	BUTTON::button_t get_button( void ) const;
 	};
 
-typedef HEventListener<HKeyboardEvent*> HKeyboardEventListener;
-typedef HEventListener<HMouseEvent*> HMouseEventListener;
+typedef HEventListener<HKeyboardEvent const*> HKeyboardEventListener;
+typedef HEventListener<HMouseEvent const*> HMouseEventListener;
 
 }
 

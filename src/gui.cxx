@@ -86,7 +86,7 @@ protected:
 	void on_remove( void );
 	void on_sel_changed( void );
 	bool on_key_press( GdkEventKey* );
-	virtual void do_on_event( HKeyboardEvent* );
+	virtual void do_on_event( HKeyboardEvent const* );
 	void show_error_message( char const* const, char const* const, int );
 	void set_font_all( Pango::FontDescription const&, Gtk::Widget* );
 	void open( HString const& );
@@ -385,8 +385,9 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 			if ( l_oIter )
 				{
 				HString l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str();
-				if ( dynamic_cast<HFunlab*>( &(*f_oDetachedRenderer.get_engine() ) )->push_formula( l_oFormula ) )
-					show_error_message( l_oFormula.raw(), f_oDetachedRenderer.error(), f_oDetachedRenderer.error_position() );
+				HFunlab* f = dynamic_cast<HFunlab*>( &(*f_oDetachedRenderer.get_engine() ) );
+				if ( f && f->push_formula( l_oFormula ) )
+					show_error_message( l_oFormula.raw(), f->error(), f->error_position() );
 				f_bDetachedRendererActive = true;
 				}
 			}
@@ -404,7 +405,7 @@ void HWindowMain::shutdown_renderer( void )
 	f_oDetachedRenderer.shutdown();
 	}
 
-void HWindowMain::do_on_event( HKeyboardEvent* e )
+void HWindowMain::do_on_event( HKeyboardEvent const* e )
 	{
 	cout << __PRETTY_FUNCTION__ << endl;
 	if ( e->get_code() == 'q' )

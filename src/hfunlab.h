@@ -69,9 +69,17 @@ public:
 	HFunlab( HRendererSurfaceInterface* );
 	virtual ~HFunlab( void );
 	bool push_formula( yaal::hcore::HString const& );
+	char const* error( void ) const;
+	int error_position( void ) const;
 protected:
-	virtual void do_on_event( HMouseEvent* );
-	virtual void do_on_event( HKeyboardEvent* );
+	virtual void do_on_event( HMouseEvent const* );
+	virtual void do_on_event( HKeyboardEvent const* );
+private:
+	void makeland( void );
+	void precount( void );
+	double sinq( int unsigned );
+	double cosq( int unsigned );
+	bool T( double, double, double, int&, int& );
 	};
 
 }

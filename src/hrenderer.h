@@ -37,6 +37,8 @@ namespace funlab
 class HRendererEngineInterface : public HKeyboardEventListener, public HMouseEventListener
 	{
 public:
+	using HKeyboardEventListener::on_event;
+	using HMouseEventListener::on_event;
 	typedef yaal::hcore::HPointer<HRendererEngineInterface> ptr_t;
 	};
 
@@ -48,6 +50,7 @@ public:
 	double get_width( void ) const;
 	double get_height( void ) const;
 	void clear( yaal::u32_t );
+	yaal::u32_t RGB( int, int, int );
 	void put_pixel( double, double, yaal::u32_t );
 	void line( double, double, double, double, yaal::u32_t );
 	void fill_rect( double, double, double, double, yaal::u32_t );

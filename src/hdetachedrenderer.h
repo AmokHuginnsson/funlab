@@ -54,8 +54,6 @@ public:
 	virtual ~HDetachedRenderer ( void );
 	bool render_surface( void );
 	void draw_frame( void );
-	char const* error( void ) const;
-	int error_position( void ) const;
 	int operator() ( yaal::hcore::HThread const* const );
 	void shutdown( void );
 	/*}*/

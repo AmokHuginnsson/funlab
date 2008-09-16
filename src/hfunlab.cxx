@@ -28,6 +28,11 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hfunlab.h"
 
+#include "setup.h"
+
+using namespace yaal;
+using namespace yaal::hcore;
+
 namespace funlab
 {
 
@@ -37,12 +42,12 @@ HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	f_dAngleX( 0 ), f_dAngleY( 0 ), f_dAngleZ( 0 ),
 	f_dDX( 0 ), f_dDY( 0 ), f_dDZ( 0 ), f_dFOV( 0 ),
 	f_pdXVariable( NULL ), f_pdYVariable( NULL ),
-	f_ppdLand( NULL ), f_oAnalyser(),
+	f_ppdLand( NULL ),
 	f_ulColor( 0 ), f_dCosAlpha( 0 ), f_dSinAlpha( 0 ),
 	f_dCosBeta( 0 ), f_dSinBeta( 0 ),
 	f_dCosGamma( 0 ), f_dSinGamma( 0 ),
 	f_dPrecountA( 0 ), f_dPrecountB( 0 ), f_dPrecountC( 0 ), f_pdTrygo( NULL ),
-	f_poRenderer( a_poRenderer )
+	f_oAnalyser(), f_poRenderer( a_poRenderer )
 	{
 	int l_iCtr = 0;
 	f_ppdLand = xcalloc<double*> ( setup.f_iDensity );
@@ -81,11 +86,10 @@ void HFunlab::makeland( void )
 	{
 	M_PROLOG
 	int i, j;
-	double E, x, y;
+	double x, y;
 	f_dLowerXEdge = - f_dSize;
 	f_dLowerYEdge = - f_dSize;
-	E = f_dSize;
-	f_dResolution = ( E - f_dLowerYEdge ) / ( double ) setup.f_iDensity;
+	double gridSize = ( f_dSize - f_dLowerYEdge ) / static_cast<double>( setup.f_iDensity );
 	y = f_dLowerXEdge;
 	for ( j = 0; j < setup.f_iDensity; j ++ )
 		{
@@ -95,22 +99,22 @@ void HFunlab::makeland( void )
 			{
 			( * f_pdXVariable ) = x;
 			f_ppdLand[ i ][ j ] = f_oAnalyser.count();
-			x += f_dResolution;
+			x += gridSize;
 			}
-		y += f_dResolution;
+		y += gridSize;
 		}
 	return;
 	M_EPILOG
 	}
 
-void HFunlab::precount ( void )
+void HFunlab::precount( void )
 	{
-	f_dCosAlpha = cosq( static_cast<unsigned int>( f_dAngleX ) );
-	f_dSinAlpha = sinq( static_cast<unsigned int>( f_dAngleX ) );
-	f_dCosBeta = cosq( static_cast<unsigned int>( f_dAngleY ) );
-	f_dSinBeta = sinq( static_cast<unsigned int>( f_dAngleY ) );
-	f_dCosGamma = cosq( static_cast<unsigned int>( f_dAngleZ ) );
-	f_dSinGamma = sinq( static_cast<unsigned int>( f_dAngleZ ) );
+	f_dCosAlpha = cosq( static_cast<int unsigned>( f_dAngleX ) );
+	f_dSinAlpha = sinq( static_cast<int unsigned>( f_dAngleX ) );
+	f_dCosBeta = cosq( static_cast<int unsigned>( f_dAngleY ) );
+	f_dSinBeta = sinq( static_cast<int unsigned>( f_dAngleY ) );
+	f_dCosGamma = cosq( static_cast<int unsigned>( f_dAngleZ ) );
+	f_dSinGamma = sinq( static_cast<int unsigned>( f_dAngleZ ) );
 	f_dPrecountA = f_dCosAlpha * f_dSinGamma;
 	f_dPrecountB = f_dSinAlpha * f_dSinBeta;
 	f_dPrecountC = f_dCosAlpha * f_dCosGamma;
@@ -118,7 +122,7 @@ void HFunlab::precount ( void )
 	return;
 	}
 
-double HFunlab::sinq( unsigned int a_iAngle )
+double HFunlab::sinq( int unsigned a_iAngle )
 	{
 	a_iAngle &= 4095;
 	if ( a_iAngle > 2047 )
@@ -133,7 +137,7 @@ double HFunlab::sinq( unsigned int a_iAngle )
 	return ( f_pdTrygo [ a_iAngle ] );
 	}
 
-double HFunlab::cosq( unsigned int a_iAngle )
+double HFunlab::cosq( int unsigned a_iAngle )
 	{
 	return ( sinq( a_iAngle + 1024 ) );
 	}
@@ -175,11 +179,9 @@ bool HFunlab::T( double _x, double _y, double _z, int& _c, int& _r )
 	M_EPILOG
 	}
 
-void HFunlab::draw_frame ( void )
+void HFunlab::draw_frame( void )
 	{
 	M_PROLOG
-	if ( f_bBusy || ! f_oThread.is_alive() )
-		return;
 	f_bBusy = true;
 	bool valid = false, oldvalid = false;
 	int f = 0, i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
@@ -196,6 +198,7 @@ void HFunlab::draw_frame ( void )
 		l_iRed = f_poRenderer->RGB( 0xff, 0, 0 );
 		l_iBlue = f_poRenderer->RGB( 0, 0, 0xff );
 		}
+	double gridSize = ( f_dSize - f_dLowerYEdge ) / static_cast<double>( setup.f_iDensity );
 	for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
 		{
 		f_dDX = setup.f_bStereo ? ( f ? - 4 : 4 ) : 0;
@@ -222,9 +225,9 @@ void HFunlab::draw_frame ( void )
 				oldc = c;
 				oldr = r;
 				oldvalid = valid;
-				x += f_dResolution;
+				x += gridSize;
 				}
-			y += f_dResolution;
+			y += gridSize;
 			}
 		}
 	usleep( 1000 );
@@ -234,13 +237,13 @@ void HFunlab::draw_frame ( void )
 	M_EPILOG
 	}
 
-void HFunlab::do_on_event( HMouseEvent* e )
+void HFunlab::do_on_event( HMouseEvent const* e )
 	{
-	switch ( e.get_type() )
+	switch ( e->get_type() )
 		{
 		case ( HMouseEvent::TYPE::D_PRESS ):
 			{
-			switch ( e.get_button() )
+			switch ( e->get_button() )
 				{
 				case ( HMouseEvent::BUTTON::D_4 ):
 					f_dDY ++;
@@ -255,18 +258,18 @@ void HFunlab::do_on_event( HMouseEvent* e )
 		break;
 		case ( HMouseEvent::TYPE::D_MOVE ):
 			{
-			switch ( e.get_button() )
+			switch ( e->get_button() )
 				{
 				case ( HMouseEvent::BUTTON::D_1 ):
-					f_dAngleZ += e.get_x() << 2;
-					f_dAngleX -= e.get_y() << 2;
+					f_dAngleZ += e->get_x() << 2;
+					f_dAngleX -= e->get_y() << 2;
 				break;
 				case ( HMouseEvent::BUTTON::D_2 ):
-					f_dSize += e.get_x();
+					f_dSize += e->get_x();
 					makeland();
 				break;
 				case ( HMouseEvent::BUTTON::D_3 ):
-					f_dAngleY += e.get_x() << 2;
+					f_dAngleY += e->get_x() << 2;
 				break;
 				default:
 				break;
@@ -278,32 +281,16 @@ void HFunlab::do_on_event( HMouseEvent* e )
 	return;
 	}
 
-void HFunlab::do_on_event( HKeyboardEvent* e )
+void HFunlab::do_on_event( HKeyboardEvent const* e )
 	{
-	switch ( e.get_code() )
+	switch ( e->get_code() )
 		{
-		case ( 'q' ):
-			{
-			if ( f_poKeyboardEventListener )
-				{
-				HKeyboardEvent e;
-				e.set_code( l_uEvent.key.keysym.sym );
-				f_poKeyboardEventListener->on_event( &e );
-				}
-			else
-				{
-				f_bLoop = false;
-				f_oSurface->down();
-				f_oSemaphore.signal();
-				}
-			}
-		break;
 		case ( 'f' ):
 			f_oSurface->toggle_fullscreen();
 		break;
 		case ( 'r' ):
 			{
-			if ( e.get_mod() & HKeyboardEvent::MOD::D_SHIFT )
+			if ( e->get_mod() & HKeyboardEvent::MOD::D_SHIFT )
 				{
 				f_iRed += 240;
 				f_iRed %= 256;
@@ -317,7 +304,7 @@ void HFunlab::do_on_event( HKeyboardEvent* e )
 		break;
 		case ( 'g' ):
 			{
-			if ( e.get_mod() & ( HKeyboardEvent::MOD::D_SHIFT ) )
+			if ( e->get_mod() & ( HKeyboardEvent::MOD::D_SHIFT ) )
 				{
 				f_iGreen += 240;
 				f_iGreen %= 256;
@@ -331,7 +318,7 @@ void HFunlab::do_on_event( HKeyboardEvent* e )
 		break;
 		case ( 'b' ):
 			{
-			if ( e.get_mod() & ( HKeyboardEvent::MOD::D_SHIFT ) )
+			if ( e->get_mod() & ( HKeyboardEvent::MOD::D_SHIFT ) )
 				{
 				f_iBlue += 240;
 				f_iBlue %= 256;
@@ -367,6 +354,20 @@ bool HFunlab::push_formula( HString const& a_oFormula )
 	f_iBlue = 0xf8;
 	makeland();
 	return ( false );
+	M_EPILOG
+	}
+
+char const* HFunlab::error( void ) const
+	{
+	M_PROLOG
+	return ( f_oAnalyser.get_error() );
+	M_EPILOG
+	}
+
+int HFunlab::error_position( void ) const
+	{
+	M_PROLOG
+	return ( f_oAnalyser.get_error_token() );
 	M_EPILOG
 	}
 

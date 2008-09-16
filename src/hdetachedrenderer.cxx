@@ -150,7 +150,23 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 				break;
 				case ( SDL_KEYUP ):
 					{
-					HKeyboardEvent e( l_uEvent.key.keysym.sym, l_uEvent.key.keysym.mod );
+					if ( l_uEvent.key.keysym.sym == 'q' )
+						{
+						if ( f_poKeyboardEventListener )
+							{
+							HKeyboardEvent e( static_cast<int>( l_uEvent.key.keysym.sym ) );
+							f_poKeyboardEventListener->on_event( &e );
+							}
+						else
+							{
+							f_bLoop = false;
+							f_oSurface->down();
+							f_oSemaphore.signal();
+							}
+						}
+					break;
+					HKeyboardEvent e( static_cast<int>( l_uEvent.key.keysym.sym ),
+							( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) ) ? HKeyboardEvent::MOD::D_SHIFT : HKeyboardEvent::MOD::D_NONE );
 					f_oEngine->on_event( &e );
 					}
 				break;
@@ -166,20 +182,6 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 			}
 		}
 	return ( 0 );
-	M_EPILOG
-	}
-
-char const* HDetachedRenderer::error( void ) const
-	{
-	M_PROLOG
-	return ( f_oAnalyser.get_error() );
-	M_EPILOG
-	}
-
-int HDetachedRenderer::error_position( void ) const
-	{
-	M_PROLOG
-	return ( f_oAnalyser.get_error_token() );
 	M_EPILOG
 	}
 
