@@ -97,7 +97,7 @@ HRendererEngineInterface::ptr_t HRendererSurfaceBase::do_get_engine( void )
 
 yaal::u32_t HRendererSurfaceInterface::RGB( int r, int g, int b )
 	{
-	return ( do_RGB( r, g ,b ) );
+	return ( do_RGB( static_cast<u8_t>( r ), static_cast<u8_t>( g ), static_cast<u8_t>( b ) ) );
 	}
 
 }

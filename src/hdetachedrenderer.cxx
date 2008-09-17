@@ -534,15 +534,12 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 	M_EPILOG
 	}
 
-u32_t HDetachedRenderer::do_RGB( int a_iRed, int a_iGreen, int a_iBlue )
+u32_t HDetachedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue )
 	{
 	M_PROLOG
 	u32_t l_ulValue = 0;
-	SDL_Surface * l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
-	l_ulValue = SDL_MapRGB( l_psSurface->format,
-			static_cast<Uint8>( a_iRed ),
-			static_cast<Uint8>( a_iGreen ),
-			static_cast<Uint8>( a_iBlue ) );
+	SDL_Surface* l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
+	l_ulValue = SDL_MapRGB( l_psSurface->format, red, green, blue );
 	return ( l_ulValue );
 	M_EPILOG
 	}

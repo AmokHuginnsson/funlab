@@ -81,7 +81,7 @@ protected:
 	virtual yaal::u32_t do_get_pixel( double, double );
 	virtual void do_line( double, double, double, double, yaal::u32_t );
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
-	virtual yaal::u32_t do_RGB( int, int, int );
+	virtual yaal::u32_t do_RGB( yaal::u8_t, yaal::u8_t, yaal::u8_t );
 	/*}*/
 private:
 	HDetachedRenderer( const HDetachedRenderer& );

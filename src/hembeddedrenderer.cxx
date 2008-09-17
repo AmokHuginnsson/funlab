@@ -28,6 +28,8 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hembeddedrenderer.h"
 
+using namespace yaal;
+
 namespace funlab
 {
 
@@ -117,9 +119,9 @@ void HEmbeddedRenderer::do_commit( void )
 	{
 	}
 
-yaal::u32_t HEmbeddedRenderer::do_RGB( int a_iRed, int a_iGreen, int a_iBlue )
+yaal::u32_t HEmbeddedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue )
 	{
-	yaal::u8_t c[] = { a_iRed, a_iGreen, a_iBlue, 0 };
+	yaal::u8_t c[] = { red, green, blue, 0 };
 	yaal::u8_t const* pc = c;
 	return ( *reinterpret_cast<yaal::u32_t const*>( pc ) );
 	}
