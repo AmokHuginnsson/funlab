@@ -39,7 +39,10 @@ class HRendererEngineInterface : public HKeyboardEventListener, public HMouseEve
 public:
 	using HKeyboardEventListener::on_event;
 	using HMouseEventListener::on_event;
+	void draw_frame( void );
 	typedef yaal::hcore::HPointer<HRendererEngineInterface> ptr_t;
+protected:
+	virtual void do_draw_frame( void ) = 0;
 	};
 
 class HRendererSurfaceInterface
@@ -61,6 +64,7 @@ protected:
 	virtual double do_get_width( void ) const = 0;
 	virtual double do_get_height( void ) const = 0;
 	virtual void do_commit( void ) = 0;
+	virtual yaal::u32_t do_RGB( int, int, int ) = 0;
 	virtual void do_put_pixel( double, double, yaal::u32_t ) = 0;
 	virtual void do_line( double, double, double, double, yaal::u32_t ) = 0;
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t ) = 0;

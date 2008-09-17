@@ -24,14 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __RENDERER_H
-#define __RENDERER_H
+#ifndef __FUNLAB_HDETACHEDRENDERER_H
+#define __FUNLAB_HDETACHEDRENDERER_H
 
 #include <yaal/hcore/hthread.h>
 #include <yaal/tools/hanalyser.h>
 
 #include "hrenderer.h"
-#include "hsurface.h"
 #include "events.h"
 
 namespace funlab
@@ -45,8 +44,16 @@ class HDetachedRenderer : public HRendererSurfaceBase
 	{
 protected:
 	/*{*/
-	double f_dResolution;
-	HSurface::ptr_t f_oSurface;
+	bool f_bLoop;
+	void* f_pvHandler;
+	int	f_iWidth;
+	int f_iHeight;
+	int f_iBPP;
+	yaal::hcore::HMutex f_oMutex;
+	yaal::hcore::HSemaphore f_oSemaphore;
+	renderer_t f_oThread;
+	HKeyboardEventListener* f_poKeyboardEventListener;
+	static int f_iActiveSurfaces;
 	/*}*/
 public:
 	/*{*/
@@ -57,28 +64,31 @@ public:
 	int operator() ( yaal::hcore::HThread const* const );
 	void shutdown( void );
 	/*}*/
+private:
+	int init( int, int, int = 32 );
+	void down( void );
+	void refresh( void );
+	void clear( void );
+	bool is_valid( void );
+	void toggle_fullscreen( void );
+	static int surface_count( void );
 protected:
 	/*{*/
 	virtual double do_get_width( void ) const;
 	virtual double do_get_height( void ) const;
 	virtual void do_commit( void );
 	virtual void do_put_pixel( double, double, yaal::u32_t );
+	virtual yaal::u32_t do_get_pixel( double, double );
 	virtual void do_line( double, double, double, double, yaal::u32_t );
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
+	virtual yaal::u32_t do_RGB( int, int, int );
 	/*}*/
 private:
-	/*{*/
-	bool f_bLoop;
-	bool f_bBusy;
-	yaal::hcore::HMutex f_oMutex;
-	yaal::hcore::HSemaphore f_oSemaphore;
-	renderer_t f_oThread;
-	HKeyboardEventListener* f_poKeyboardEventListener;
 	HDetachedRenderer( const HDetachedRenderer& );
 	HDetachedRenderer& operator = ( const HDetachedRenderer& );
-	/*}*/
 	};
 
 }
 
-#endif /* not __RENDERER_H */
+#endif /* not __FUNLAB_HDETACHEDRENDERER_H */
+

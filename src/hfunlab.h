@@ -80,7 +80,7 @@ private:
 	bool T( double, double, double, int&, int& );
 	void precount( void );
 	void makeland( void );
-	void draw_frame( void );
+	virtual void do_draw_frame( void );
 	};
 
 }

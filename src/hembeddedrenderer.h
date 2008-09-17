@@ -49,8 +49,7 @@ protected:
 	virtual void do_put_pixel( double, double, yaal::u32_t );
 	virtual void do_line( double, double, double, double, yaal::u32_t );
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
-	virtual void do_on_event( HKeyboardEvent* );
-	virtual void do_on_event( HMouseEvent* );
+	virtual yaal::u32_t do_RGB( int, int, int );
 	};
 
 }

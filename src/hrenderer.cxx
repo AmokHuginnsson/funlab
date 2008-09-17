@@ -33,6 +33,11 @@ using namespace yaal;
 namespace funlab
 {
 
+void HRendererEngineInterface::draw_frame( void )
+	{
+	do_draw_frame();
+	}
+
 double HRendererSurfaceInterface::get_width( void ) const
 	{
 	return ( do_get_width() );
@@ -88,6 +93,11 @@ HRendererEngineInterface::ptr_t HRendererSurfaceBase::do_get_engine( void )
 	M_PROLOG
 	return ( f_oEngine );
 	M_EPILOG
+	}
+
+yaal::u32_t HRendererSurfaceInterface::RGB( int r, int g, int b )
+	{
+	return ( do_RGB( r, g ,b ) );
 	}
 
 }

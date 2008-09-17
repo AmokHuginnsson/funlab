@@ -179,7 +179,7 @@ bool HFunlab::T( double _x, double _y, double _z, int& _c, int& _r )
 	M_EPILOG
 	}
 
-void HFunlab::draw_frame( void )
+void HFunlab::do_draw_frame( void )
 	{
 	M_PROLOG
 	bool valid = false, oldvalid = false;

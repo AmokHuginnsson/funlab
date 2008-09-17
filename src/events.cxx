@@ -34,6 +34,10 @@ using namespace yaal::hcore;
 namespace funlab
 {
 
+HMouseEvent::HMouseEvent( TYPE::type_t const& type ) : f_eType( type )
+	{
+	}
+
 int HMouseEvent::get_x( void ) const
 	{
 	return ( f_iX );

@@ -113,12 +113,15 @@ void HEmbeddedRenderer::do_fill_rect( double, double, double, double, yaal::u32_
 	{
 	}
 
-void HEmbeddedRenderer::do_on_event( HKeyboardEvent* )
+void HEmbeddedRenderer::do_commit( void )
 	{
 	}
 
-void HEmbeddedRenderer::do_on_event( HMouseEvent* )
+yaal::u32_t HEmbeddedRenderer::do_RGB( int a_iRed, int a_iGreen, int a_iBlue )
 	{
+	yaal::u8_t c[] = { a_iRed, a_iGreen, a_iBlue, 0 };
+	yaal::u8_t const* pc = c;
+	return ( *reinterpret_cast<yaal::u32_t const*>( pc ) );
 	}
 
 }
