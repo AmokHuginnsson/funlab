@@ -66,7 +66,7 @@ protected:
 	Glib::Dispatcher f_oDispatcher;
 	bool f_bDetachedRendererActive;
 	HEmbeddedRenderer* f_poEmbeddedRenderer;
-	HDetachedRenderer f_oDetachedRenderer;
+	HDetachedRenderer::ptr_t f_oDetachedRenderer;
 	/*}*/
 public:
 	/*{*/
@@ -98,14 +98,15 @@ protected:
 HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	Glib::RefPtr<Gnome::Glade::Xml> const& a_roResources ) : Gtk::Window( a_poBaseObject ),
 	f_bLock( false ), f_poFormulasListView( NULL ),
-	f_bDetachedRendererActive( false ), f_oDetachedRenderer( this )
+	f_bDetachedRendererActive( false ), f_oDetachedRenderer()
 	{
 	M_PROLOG
 	Gtk::ToolButton* l_poToolButton = NULL;
 	Gtk::MenuItem* l_poMenuItem = NULL;
 
-	HRendererEngineInterface::ptr_t dre( new HFunlab( &f_oDetachedRenderer ) );
-	f_oDetachedRenderer.set_engine( dre );
+	a_roResources->get_widget_derived( "RENDERER", f_poEmbeddedRenderer );
+	HRendererEngineInterface::ptr_t ere( new HFunlab( f_poEmbeddedRenderer ) );
+	f_poEmbeddedRenderer->set_engine( ere );
 
 	/* FORMULAS LIST */
 	a_roResources->get_widget( "TREE_FORMULAS", f_poFormulasListView );
@@ -120,10 +121,6 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	f_poFormulasListView->grab_focus();
 	
 	f_oDispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
-
-	a_roResources->get_widget_derived( "RENDERER", f_poEmbeddedRenderer );
-	HRendererEngineInterface::ptr_t ere( new HFunlab( f_poEmbeddedRenderer ) );
-	f_poEmbeddedRenderer->set_engine( ere );
 
 	/* NEW */
 	a_roResources->get_widget( "ID_TOOLBAR_NEW", l_poToolButton );
@@ -361,8 +358,7 @@ void HWindowMain::on_sel_changed( void )
 	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
 	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
 	if ( ! f_bLock && f_bDetachedRendererActive && l_oIter )
-		dynamic_cast<HFunlab*>( &(*f_oDetachedRenderer.get_engine()) )->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
-
+		dynamic_cast<HFunlab*>( &(*dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer )->get_engine() ) )->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
 	return;
 	M_EPILOG
 	}
@@ -384,10 +380,16 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 			Gtk::TreeIter l_oIter = l_oSelection->get_selected();
 			if ( l_oIter )
 				{
-				HString l_oFormula = l_oIter->get_value ( f_oFormulasListFormulaColumn ).c_str();
-				HFunlab* f = dynamic_cast<HFunlab*>( &(*f_oDetachedRenderer.get_engine() ) );
+				HString l_oFormula = l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str();
+				HDetachedRenderer* dr = NULL;
+				f_oDetachedRenderer = HRendererSurfaceInterface::ptr_t( dr = new HDetachedRenderer( this ) );
+				HRendererEngineInterface::ptr_t dre( new HFunlab( &*f_oDetachedRenderer ) );
+				dr->set_engine( dre );
+				HFunlab* f = dynamic_cast<HFunlab*>( &(*dr->get_engine() ) );
 				if ( f && f->push_formula( l_oFormula ) )
 					show_error_message( l_oFormula.raw(), f->error(), f->error_position() );
+				else
+					dr->render_surface();
 				f_bDetachedRendererActive = true;
 				}
 			}
@@ -402,7 +404,9 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 void HWindowMain::shutdown_renderer( void )
 	{
 	cout << __PRETTY_FUNCTION__ << endl;
-	f_oDetachedRenderer.shutdown();
+	dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer )->shutdown();
+	f_oDetachedRenderer = HDetachedRenderer::ptr_t();
+	f_bDetachedRendererActive = false;
 	}
 
 void HWindowMain::do_on_event( HKeyboardEvent const* e )

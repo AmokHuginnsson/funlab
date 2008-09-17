@@ -48,8 +48,8 @@ protected:
 class HRendererSurfaceInterface
 	{
 public:
-	virtual ~HRendererSurfaceInterface( void ) {}
 	typedef yaal::hcore::HPointer<HRendererSurfaceInterface> ptr_t;
+	virtual ~HRendererSurfaceInterface( void ) {}
 	double get_width( void ) const;
 	double get_height( void ) const;
 	void clear( yaal::u32_t );

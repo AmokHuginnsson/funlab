@@ -49,7 +49,6 @@ protected:
 	int	f_iWidth;
 	int f_iHeight;
 	int f_iBPP;
-	yaal::hcore::HMutex f_oMutex;
 	yaal::hcore::HSemaphore f_oSemaphore;
 	renderer_t f_oThread;
 	HKeyboardEventListener* f_poKeyboardEventListener;
@@ -60,18 +59,13 @@ public:
 	HDetachedRenderer( HKeyboardEventListener* = NULL );
 	virtual ~HDetachedRenderer ( void );
 	bool render_surface( void );
-	void draw_frame( void );
 	int operator() ( yaal::hcore::HThread const* const );
 	void shutdown( void );
 	/*}*/
 private:
 	int init( int, int, int = 32 );
 	void down( void );
-	void refresh( void );
-	void clear( void );
-	bool is_valid( void );
 	void toggle_fullscreen( void );
-	static int surface_count( void );
 protected:
 	/*{*/
 	virtual double do_get_width( void ) const;

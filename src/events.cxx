@@ -34,7 +34,8 @@ using namespace yaal::hcore;
 namespace funlab
 {
 
-HMouseEvent::HMouseEvent( TYPE::type_t const& type ) : f_eType( type )
+HMouseEvent::HMouseEvent( TYPE::type_t const& type )
+	: f_eType( type ), f_eButton( BUTTON::D_NONE ), f_iX( 0 ), f_iY( 0 )
 	{
 	}
 

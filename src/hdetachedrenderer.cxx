@@ -48,7 +48,7 @@ int HDetachedRenderer::f_iActiveSurfaces = 0;
 
 HDetachedRenderer::HDetachedRenderer( HKeyboardEventListener* a_poKeyboardEventListener )
 	: f_bLoop( false ), f_pvHandler( NULL ), f_iWidth( 0 ), f_iHeight( 0 ), f_iBPP( 0 ),
-	f_oMutex(), f_oSemaphore(), f_oThread( *this ), f_poKeyboardEventListener( a_poKeyboardEventListener )
+	f_oSemaphore(), f_oThread( *this ), f_poKeyboardEventListener( a_poKeyboardEventListener )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -76,7 +76,7 @@ HDetachedRenderer::~HDetachedRenderer( void )
 	{
 	M_PROLOG
 	cout << "waiting ... " << flush;
-	if ( HDetachedRenderer::surface_count() )
+	if ( f_iActiveSurfaces )
 		f_oSemaphore.wait();
 	if ( f_pvHandler )
 		down();
@@ -144,23 +144,21 @@ int HDetachedRenderer::init( int a_iWidth, int a_iHeight, int a_iBpp )
 int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 	{
 	M_PROLOG
-	int dx = 0, dy = 0;
 	SDL_Event l_uEvent;
 	while ( f_bLoop && a_poCaller->is_alive() )
 		{
-		if ( SDL_WaitEvent( &l_uEvent ) && is_valid() )
+		if ( SDL_WaitEvent( &l_uEvent ) )
 			{
-			HLock l_oLock( f_oMutex );
 			switch ( l_uEvent.type )
 				{
 				case ( SDL_MOUSEMOTION ):
 					{
-					HMouseEvent e( HMouseEvent::TYPE::D_MOVE );
-					dx = yaal::abs( l_uEvent.motion.xrel );
-					dy = yaal::abs( l_uEvent.motion.yrel );
-					e.set_pos( dx, dy );
+					int dx = yaal::abs( l_uEvent.motion.xrel );
+					int dy = yaal::abs( l_uEvent.motion.yrel );
 					if ( ( dx < ( setup.f_iResolutionX >> 1 ) ) && ( dy < ( setup.f_iResolutionY >> 1 ) ) )
 						{
+						HMouseEvent e( HMouseEvent::TYPE::D_MOVE );
+						e.set_pos( l_uEvent.motion.xrel, l_uEvent.motion.yrel );
 						switch ( l_uEvent.motion.state )
 							{
 							case ( SDL_BUTTON( 1 ) ):
@@ -260,18 +258,10 @@ double HDetachedRenderer::do_get_height( void ) const
 	return ( f_iHeight );
 	}
 
-void HDetachedRenderer::do_fill_rect( double, double, double, double, yaal::u32_t )
-	{
-	}
-
-int HDetachedRenderer::surface_count( void )
-	{
-	return ( f_iActiveSurfaces );
-	}
-
 void HDetachedRenderer::down( void )
 	{
 	M_PROLOG
+	cout << __PRETTY_FUNCTION__ << endl;
 	SDL_Surface* l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
 	M_ASSERT( f_iActiveSurfaces > 0 );
 	if ( ! f_pvHandler )
@@ -280,7 +270,7 @@ void HDetachedRenderer::down( void )
 		SDL_UnlockSurface( l_psSurface );
 	SDL_FreeSurface( static_cast<SDL_Surface*>( f_pvHandler ) );
 	f_pvHandler = NULL;
-	f_iActiveSurfaces --;
+	-- f_iActiveSurfaces;
 	M_EPILOG
 	}
 
@@ -544,19 +534,12 @@ u32_t HDetachedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue )
 	M_EPILOG
 	}
 
-void HDetachedRenderer::clear ( void )
+void HDetachedRenderer::do_fill_rect( double, double, double, double, u32_t color )
 	{
 	M_PROLOG
 	SDL_Surface* l_psSurface = static_cast<SDL_Surface*>( f_pvHandler );
-	SDL_FillRect( l_psSurface, NULL, static_cast<int>( RGB( 0, 0, 0 ) ) );
+	SDL_FillRect( l_psSurface, NULL, color );
 	return;
-	M_EPILOG
-	}
-
-bool HDetachedRenderer::is_valid( void )
-	{
-	M_PROLOG
-	return ( f_pvHandler ? true : false );
 	M_EPILOG
 	}
 
