@@ -24,12 +24,15 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <iostream>
+
 #include <yaal/yaal.h>
 M_VCSID( "$Id: "__ID__" $" )
 #include "hfunlab.h"
 
 #include "setup.h"
 
+using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;

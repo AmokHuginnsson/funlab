@@ -149,7 +149,7 @@
                 <property name="stock_id">gtk-new</property>
               </widget>
               <packing>
-                <property name="homogeneous">True</property>
+                <property name="expand">False</property>
               </packing>
             </child>
             <child>
@@ -158,7 +158,7 @@
                 <property name="stock_id">gtk-open</property>
               </widget>
               <packing>
-                <property name="homogeneous">True</property>
+                <property name="expand">False</property>
               </packing>
             </child>
             <child>
@@ -167,7 +167,7 @@
                 <property name="stock_id">gtk-save-as</property>
               </widget>
               <packing>
-                <property name="homogeneous">True</property>
+                <property name="expand">False</property>
               </packing>
             </child>
             <child>
@@ -176,7 +176,7 @@
                 <property name="stock_id">gtk-add</property>
               </widget>
               <packing>
-                <property name="homogeneous">True</property>
+                <property name="expand">False</property>
               </packing>
             </child>
             <child>
@@ -185,7 +185,7 @@
                 <property name="stock_id">gtk-remove</property>
               </widget>
               <packing>
-                <property name="homogeneous">True</property>
+                <property name="expand">False</property>
               </packing>
             </child>
             <child>
@@ -194,7 +194,7 @@
                 <property name="stock_id">gtk-quit</property>
               </widget>
               <packing>
-                <property name="homogeneous">True</property>
+                <property name="expand">False</property>
               </packing>
             </child>
             <child>
@@ -203,7 +203,7 @@
                 <property name="stock_id">gtk-about</property>
               </widget>
               <packing>
-                <property name="homogeneous">True</property>
+                <property name="expand">False</property>
               </packing>
             </child>
           </widget>
@@ -222,6 +222,8 @@
             <child>
               <widget class="GtkDrawingArea" id="RENDERER">
                 <property name="visible">True</property>
+                <property name="app_paintable">True</property>
+                <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
               </widget>
               <packing>
                 <property name="resize">False</property>

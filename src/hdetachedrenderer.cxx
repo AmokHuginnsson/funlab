@@ -75,7 +75,6 @@ HDetachedRenderer::HDetachedRenderer( HKeyboardEventListener* a_poKeyboardEventL
 HDetachedRenderer::~HDetachedRenderer( void )
 	{
 	M_PROLOG
-	cout << "waiting ... " << flush;
 	if ( f_iActiveSurfaces )
 		f_oSemaphore.wait();
 	if ( f_pvHandler )
@@ -159,6 +158,7 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 						{
 						HMouseEvent e( HMouseEvent::TYPE::D_MOVE );
 						e.set_pos( l_uEvent.motion.xrel, l_uEvent.motion.yrel );
+						bool skip = false;
 						switch ( l_uEvent.motion.state )
 							{
 							case ( SDL_BUTTON( 1 ) ):
@@ -171,27 +171,32 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 								e.set_button( HMouseEvent::BUTTON::D_3 );
 							break;
 							default:
+								skip = true;
 							break;
 							}
-						f_oEngine->on_event( &e );
+						if ( ! skip )
+							f_oEngine->on_event( &e );
 						}
 					break;
 					}
 				case ( SDL_MOUSEBUTTONDOWN ):
 					{
+					bool skip = false;
 					HMouseEvent e( HMouseEvent::TYPE::D_PRESS );
 					switch ( l_uEvent.button.button )
 						{
-						case ( SDL_BUTTON( 4 ) ):
+						case ( 4 ):
 							e.set_button( HMouseEvent::BUTTON::D_4 );
 						break;
-						case ( SDL_BUTTON( 5 ) ):
+						case ( 5 ):
 							e.set_button( HMouseEvent::BUTTON::D_5 );
 						break;
 						default:
+							skip = true;
 						break;
 						}
-					f_oEngine->on_event( &e );
+					if ( ! skip )
+						f_oEngine->on_event( &e );
 					}
 				break;
 				case ( SDL_KEYUP ):

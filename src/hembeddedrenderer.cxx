@@ -24,17 +24,22 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <iostream>
+#include <gtkmm.h>
+
 #include <yaal/yaal.h>
 M_VCSID( "$Id: "__ID__" $" )
 #include "hembeddedrenderer.h"
+#include "setup.h"
 
+using namespace std;
 using namespace yaal;
 
 namespace funlab
 {
 
 HEmbeddedRenderer::HEmbeddedRenderer( BaseObjectType* obj, Glib::RefPtr<Gnome::Glade::Xml> const& )
-	: Gtk::DrawingArea( obj )
+	: Gtk::DrawingArea( obj ), _context()
 	{
 	}
 
@@ -50,45 +55,20 @@ bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event )
 		Gtk::Allocation allocation = get_allocation();
 		const int width = allocation.get_width();
 		const int height = allocation.get_height();
-		Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
+		_context = window->create_cairo_context();
 		if ( event )
 			{
 			// clip to the area indicated by the expose event so that we only
 			// redraw the portion of the window that needs to be redrawn
-			cr->rectangle(event->area.x, event->area.y,
-					event->area.width, event->area.height);
-			cr->clip();
+			_context->rectangle( event->area.x, event->area.y,
+					event->area.width, event->area.height );
+			_context->clip();
 			}
-		double m_line_width = 0.05;
-		double m_radius = 0.42;
-		// scale to unit square and translate (0, 0) to be (0.5, 0.5), i.e.
-		// the center of the window
-		cr->scale(width, height);
-		cr->translate(0.5, 0.5);
-		cr->set_line_width(m_line_width);
-
-		cr->save();
-		cr->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
-		cr->paint();
-		cr->restore();
-		cr->arc(0, 0, m_radius, 0, 2 * M_PI);
-		cr->save();
-		cr->set_source_rgba(1.0, 1.0, 1.0, 0.8);
-		cr->fill_preserve();
-		cr->restore();
-		cr->stroke_preserve();
-		cr->clip();
-
-		cr->save();
-		cr->set_line_cap(Cairo::LINE_CAP_ROUND);
-
-		// draw the hours hand
-		cr->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
-		cr->move_to(0, 0);
-		cr->line_to(sin(0) * (m_radius * 0.5),
-				-cos(0) * (m_radius * 0.5));
-		cr->stroke();
-		cr->restore();
+		_context->scale( width / static_cast<double>( setup.f_iResolutionX ),
+				height / static_cast<double>( setup.f_iResolutionY ) );
+		_context->set_line_width( 0.5 );
+		//_context->set_line_cap( Cairo::LINE_CAP_ROUND );
+		f_oEngine->draw_frame();
 		}
 	return ( false );
 	}
@@ -107,12 +87,23 @@ void HEmbeddedRenderer::do_put_pixel( double, double, yaal::u32_t )
 	{
 	}
 
-void HEmbeddedRenderer::do_line( double, double, double, double, yaal::u32_t )
+void HEmbeddedRenderer::do_line( double x1, double y1, double x2, double y2, yaal::u32_t c )
 	{
+	_context->save();
+	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
+	_context->move_to( x1, y1 );
+	_context->line_to( x2, y2 );
+	_context->stroke();
+	_context->restore();
 	}
 
-void HEmbeddedRenderer::do_fill_rect( double, double, double, double, yaal::u32_t )
+void HEmbeddedRenderer::do_fill_rect( double x, double y, double w, double h, yaal::u32_t c )
 	{
+	_context->save();
+	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
+	_context->rectangle( x, y, w, h );
+	_context->paint();
+	_context->restore();
 	}
 
 void HEmbeddedRenderer::do_commit( void )
@@ -121,9 +112,105 @@ void HEmbeddedRenderer::do_commit( void )
 
 yaal::u32_t HEmbeddedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue )
 	{
-	yaal::u8_t c[] = { red, green, blue, 0 };
-	yaal::u8_t const* pc = c;
-	return ( *reinterpret_cast<yaal::u32_t const*>( pc ) );
+	yaal::u8_t c[] = { 255, blue, green, red };
+	return ( *reinterpret_cast<yaal::u32_t const*>( c ) );
+	}
+
+double HEmbeddedRenderer::red( yaal::u32_t color )
+	{
+	double nominator = color >> 24;
+	double debominator = 0xff;
+	return ( nominator / debominator );
+	}
+
+double HEmbeddedRenderer::green( yaal::u32_t color )
+	{
+	double nominator = ( color >> 16 ) & 0xff;
+	double debominator = 0xff;
+	return ( nominator / debominator );
+	}
+
+double HEmbeddedRenderer::blue( yaal::u32_t color )
+	{
+	double nominator = ( color >> 8 ) & 0xff;
+	double debominator = 0xff;
+	return ( nominator / debominator );
+	}
+
+double HEmbeddedRenderer::alpha( yaal::u32_t color )
+	{
+	double nominator = color & 0xff;
+	double debominator = 0xff;
+	return ( nominator / debominator );
+	}
+
+bool HEmbeddedRenderer::on_scroll_event( GdkEventScroll* ev )
+	{
+	bool skip = false;
+	HMouseEvent e( HMouseEvent::TYPE::D_PRESS );
+	switch ( ev->state )
+		{
+		case ( GDK_SCROLL_UP ):
+			e.set_button( HMouseEvent::BUTTON::D_4 );
+		break;
+		case ( GDK_SCROLL_DOWN ):
+			e.set_button( HMouseEvent::BUTTON::D_5 );
+		break;
+		default:
+			skip = true;
+		break;
+		}
+	if ( ! skip )
+		{
+		f_oEngine->on_event( &e );
+		on_expose_event( NULL );
+		}
+	return ( false );
+	}
+
+bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev )
+	{
+	int nx = static_cast<int>( ev->x );
+	int ny = static_cast<int>( ev->y );
+	int dx = yaal::abs( nx - _move._x );
+	int dy = yaal::abs( ny - _move._y );
+
+	if ( ( dx < ( setup.f_iResolutionX >> 1 ) ) && ( dy < ( setup.f_iResolutionY >> 1 ) ) )
+		{
+		HMouseEvent e( HMouseEvent::TYPE::D_MOVE );
+		e.set_pos( nx - _move._x, ny - _move._y );
+		bool skip = false;
+		switch ( ev->state )
+			{
+			case ( GDK_BUTTON1_MASK ):
+				e.set_button( HMouseEvent::BUTTON::D_1 );
+			break;
+			case ( GDK_BUTTON2_MASK ):
+				e.set_button( HMouseEvent::BUTTON::D_2 );
+			break;
+			case ( GDK_BUTTON3_MASK ):
+				e.set_button( HMouseEvent::BUTTON::D_3 );
+			break;
+			default:
+				skip = true;
+			break;
+			}
+		if ( ! skip )
+			{
+			f_oEngine->on_event( &e );
+			on_expose_event( NULL );
+			}
+		}
+	_move._x = nx;
+	_move._y = ny;
+	return ( false );
+	}
+
+bool HEmbeddedRenderer::on_button_press_event( GdkEventButton* ev )
+	{
+	_move._x = static_cast<int>( ev->x );
+	_move._y = static_cast<int>( ev->y );
+	return ( false );
 	}
 
 }

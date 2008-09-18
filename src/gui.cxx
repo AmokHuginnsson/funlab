@@ -359,6 +359,19 @@ void HWindowMain::on_sel_changed( void )
 	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
 	if ( ! f_bLock && f_bDetachedRendererActive && l_oIter )
 		dynamic_cast<HFunlab*>( &(*dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer )->get_engine() ) )->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+	else
+		{
+		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( f_poEmbeddedRenderer );
+		if ( er )
+			{
+			HFunlab* f = dynamic_cast<HFunlab*>( &( *er->get_engine() ) );
+			if ( f )
+				{
+				f->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+				er->on_expose_event( NULL );
+				}
+			}
+		}
 	return;
 	M_EPILOG
 	}

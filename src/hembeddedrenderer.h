@@ -38,11 +38,21 @@ namespace funlab
 
 class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea
 	{
+	struct OMove
+		{
+		OMove( void ) : _x( 0 ), _y( 0 ) {}
+		int _x;
+		int _y;
+		} _move;
+	Cairo::RefPtr<Cairo::Context> _context;
 public:
 	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
 	virtual ~HEmbeddedRenderer( void );
-protected:
 	virtual bool on_expose_event( GdkEventExpose* );
+protected:
+	virtual bool on_button_press_event( GdkEventButton* );
+	virtual bool on_scroll_event( GdkEventScroll* );
+	virtual bool on_motion_notify_event( GdkEventMotion* );
 	virtual double do_get_width( void ) const;
 	virtual double do_get_height( void ) const;
 	virtual void do_commit( void );
@@ -50,6 +60,11 @@ protected:
 	virtual void do_line( double, double, double, double, yaal::u32_t );
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
 	virtual yaal::u32_t do_RGB( yaal::u8_t, yaal::u8_t, yaal::u8_t );
+private:
+	double red( yaal::u32_t );
+	double green( yaal::u32_t );
+	double blue( yaal::u32_t );
+	double alpha( yaal::u32_t );
 	};
 
 }
