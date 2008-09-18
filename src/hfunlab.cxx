@@ -32,9 +32,43 @@ M_VCSID( "$Id: "__ID__" $" )
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace funlab
 {
+
+HFunlab::HMesh::HMesh( void )
+	: f_iSize( 0 ), f_iSurfaces( 0 ),
+	f_oValues( f_iSize, values_t::D_AUTO_GROW ),
+	f_oValuesBackbone( f_iSize, values_backbone_t::D_AUTO_GROW )
+	{
+	}
+
+void HFunlab::HMesh::set_size( int size, int surfaces )
+	{
+	if ( ( surfaces > 0 ) && ( size > 0 ) )
+		{
+		f_iSize = size;
+		f_iSurfaces = surfaces;
+		f_oValues.pool_realloc( size * size * surfaces );
+		f_oValuesBackbone.pool_realloc( size * surfaces );
+		for ( int s = 0; s < surfaces; ++ s )
+			{
+			for ( int i = 0; i < size; ++ i )
+				f_oValuesBackbone[ s * size + i ] = f_oValues.raw() + s * size + i * size;
+			}
+		}
+	}
+
+int HFunlab::HMesh::get_size( void ) const
+	{
+	return ( f_iSize );
+	}
+
+HFunlab::HMesh::OValue** HFunlab::HMesh::fast( int surface )
+	{
+	return ( f_oValuesBackbone.raw() + f_iSize * surface );
+	}
 
 HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	: f_iRed( 0 ), f_iGreen( 0 ), f_iBlue( 0 ),
@@ -42,72 +76,72 @@ HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	f_dAngleX( 0 ), f_dAngleY( 0 ), f_dAngleZ( 0 ),
 	f_dDX( 0 ), f_dDY( 0 ), f_dDZ( 0 ), f_dFOV( 0 ),
 	f_pdXVariable( NULL ), f_pdYVariable( NULL ),
-	f_ppdLand( NULL ),
+	f_oMesh(),
 	f_ulColor( 0 ), f_dCosAlpha( 0 ), f_dSinAlpha( 0 ),
 	f_dCosBeta( 0 ), f_dSinBeta( 0 ),
 	f_dCosGamma( 0 ), f_dSinGamma( 0 ),
-	f_dPrecountA( 0 ), f_dPrecountB( 0 ), f_dPrecountC( 0 ), f_pdTrygo( NULL ),
+	f_oCache( 0, 0, 0 ), f_pdTrygo( NULL ),
 	f_oAnalyser(), f_poRenderer( a_poRenderer )
 	{
-	int l_iCtr = 0;
-	f_ppdLand = xcalloc<double*> ( setup.f_iDensity );
-	for ( l_iCtr = 0; l_iCtr < setup.f_iDensity; l_iCtr ++ )
-		f_ppdLand[ l_iCtr ] = xcalloc<double>( setup.f_iDensity );
-	for ( l_iCtr = 0; l_iCtr < 3; l_iCtr ++ )
-		f_ppiNode[ l_iCtr ] = xcalloc<int>( setup.f_iDensity );
+	int i = 0;
+	for ( i = 0; i < 3; i ++ )
+		f_ppiNode[ i ] = xcalloc<int>( setup.f_iDensity );
 	f_pdTrygo = xcalloc<double>( 1024 );
-	for ( l_iCtr = 0; l_iCtr < 1024; l_iCtr ++ )
-		f_pdTrygo[ l_iCtr ] = sin( ( ( double ) l_iCtr * M_PI ) / 2048. );
+	for ( i = 0; i < 1024; i ++ )
+		f_pdTrygo[ i ] = sin( ( ( double ) i * M_PI ) / 2048. );
 	}
 
 HFunlab::~HFunlab( void )
 	{
-	int l_iCtr = 0;
+	int i = 0;
 	if ( f_pdTrygo )
 		xfree ( f_pdTrygo );
-	for ( l_iCtr = 0; l_iCtr < 3; l_iCtr ++ )
+	for ( i = 0; i < 3; i ++ )
 		{
-		if ( f_ppiNode [ l_iCtr ] )
-			xfree ( f_ppiNode [ l_iCtr ] );
-		f_ppiNode [ l_iCtr ] = NULL;
+		if ( f_ppiNode [ i ] )
+			xfree ( f_ppiNode [ i ] );
+		f_ppiNode [ i ] = NULL;
 		}
-	for ( l_iCtr = 0; l_iCtr < setup.f_iDensity; l_iCtr ++ )
-		{
-		if ( f_ppdLand [ l_iCtr ] )
-			xfree ( f_ppdLand [ l_iCtr ] );
-		f_ppdLand [ l_iCtr ] = NULL;
-		}
-	if ( f_ppdLand )
-		xfree ( f_ppdLand );
-	f_ppdLand = NULL;
 	}
 
-void HFunlab::makeland( void )
+void HFunlab::generate_surface( void )
 	{
 	M_PROLOG
-	int i, j;
 	double x, y;
 	f_dLowerXEdge = - f_dSize;
 	f_dLowerYEdge = - f_dSize;
 	double gridSize = ( f_dSize - f_dLowerYEdge ) / static_cast<double>( setup.f_iDensity );
 	y = f_dLowerXEdge;
-	for ( j = 0; j < setup.f_iDensity; j ++ )
+	int size = f_oMesh.get_size();
+	if ( size )
 		{
-		x = f_dLowerYEdge;
-		( *f_pdYVariable ) = y;
-		for ( i = 0; i < setup.f_iDensity; i ++ )
+		HMesh::OValue** values = f_oMesh.fast( 0 );
+		for ( int j = 0; j < size; ++ j )
 			{
-			( * f_pdXVariable ) = x;
-			f_ppdLand[ i ][ j ] = f_oAnalyser.count();
-			x += gridSize;
+			x = f_dLowerYEdge;
+			( *f_pdYVariable ) = y;
+			for ( int i = 0; i < size; ++ i )
+				{
+				( * f_pdXVariable ) = x;
+				try
+					{
+					values[ i ][ j ]._value = f_oAnalyser.count();
+					values[ i ][ j ]._valid = true;
+					}
+				catch ( HAnalyserException& )
+					{
+					values[ i ][ j ]._valid = false;
+					}
+				x += gridSize;
+				}
+			y += gridSize;
 			}
-		y += gridSize;
 		}
 	return;
 	M_EPILOG
 	}
 
-void HFunlab::precount( void )
+void HFunlab::precalculate( void )
 	{
 	f_dCosAlpha = cosq( static_cast<int unsigned>( f_dAngleX ) );
 	f_dSinAlpha = sinq( static_cast<int unsigned>( f_dAngleX ) );
@@ -115,9 +149,9 @@ void HFunlab::precount( void )
 	f_dSinBeta = sinq( static_cast<int unsigned>( f_dAngleY ) );
 	f_dCosGamma = cosq( static_cast<int unsigned>( f_dAngleZ ) );
 	f_dSinGamma = sinq( static_cast<int unsigned>( f_dAngleZ ) );
-	f_dPrecountA = f_dCosAlpha * f_dSinGamma;
-	f_dPrecountB = f_dSinAlpha * f_dSinBeta;
-	f_dPrecountC = f_dCosAlpha * f_dCosGamma;
+	f_oCache.f_dPreCalcA = f_dCosAlpha * f_dSinGamma;
+	f_oCache.f_dPreCalcB = f_dSinAlpha * f_dSinBeta;
+	f_oCache.f_dPreCalcC = f_dCosAlpha * f_dCosGamma;
 	f_ulColor = f_poRenderer->RGB( f_iRed, f_iGreen, f_iBlue );
 	return;
 	}
@@ -147,11 +181,11 @@ bool HFunlab::T( double _x, double _y, double _z, int& _c, int& _r )
 	M_PROLOG
 	double x = 0, y = 0, z = 0;
 	x = _x * f_dCosBeta * f_dCosGamma - _y * f_dSinGamma * f_dCosBeta - _z * f_dSinBeta;
-	y = _x * ( f_dPrecountA - f_dPrecountB * f_dCosGamma )
-		+ _y * ( f_dPrecountC + f_dPrecountB * f_dSinGamma )
+	y = _x * ( f_oCache.f_dPreCalcA - f_oCache.f_dPreCalcB * f_dCosGamma )
+		+ _y * ( f_oCache.f_dPreCalcC + f_oCache.f_dPreCalcB * f_dSinGamma )
 		- _z * f_dSinAlpha * f_dCosBeta;
-	z = _x * ( f_dSinAlpha * f_dSinGamma + f_dSinBeta * f_dPrecountC )
-		+ _y * ( f_dSinAlpha * f_dCosGamma - f_dSinBeta * f_dPrecountA )
+	z = _x * ( f_dSinAlpha * f_dSinGamma + f_dSinBeta * f_oCache.f_dPreCalcC )
+		+ _y * ( f_dSinAlpha * f_dCosGamma - f_dSinBeta * f_oCache.f_dPreCalcA )
 		+ _z * f_dCosAlpha * f_dCosBeta;
 	x += f_dDX;
 	y += f_dDY;
@@ -191,42 +225,47 @@ void HFunlab::do_draw_frame( void )
 			f_ppiNode[ j ][ i ] = 0;
 	f_dFOV = 240.0;
 	f_poRenderer->clear( f_poRenderer->RGB( 0, 0, 0 ) );
-	precount();
+	precalculate();
 	if ( setup.f_bStereo )
 		{
 		l_iRed = f_poRenderer->RGB( 0xff, 0, 0 );
 		l_iBlue = f_poRenderer->RGB( 0, 0, 0xff );
 		}
 	double gridSize = ( f_dSize - f_dLowerYEdge ) / static_cast<double>( setup.f_iDensity );
-	for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
+	int size = f_oMesh.get_size();
+	if ( size )
 		{
-		f_dDX = setup.f_bStereo ? ( f ? - 4 : 4 ) : 0;
-		y = f_dLowerXEdge;
-		for ( j = 0; j < setup.f_iDensity; j ++ )
+		HMesh::OValue** values = f_oMesh.fast( 0 );
+		for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
 			{
-			x = f_dLowerYEdge;
-			for ( i = 0; i < setup.f_iDensity; i ++ )
+			f_dDX = setup.f_bStereo ? ( f ? - 4 : 4 ) : 0;
+			y = f_dLowerXEdge;
+			for ( j = 0; j < size; ++ j )
 				{
-				valid = T( x, y, f_ppdLand [ i ] [ j ], c, r );
-				if ( valid && oldvalid && f_ppiNode [ 2 ] [ i ] )
+				x = f_dLowerYEdge;
+				for ( i = 0; i < size; ++ i )
 					{
-					if ( i > 0 )
-						f_poRenderer->line( oldc, oldr, c, r,
-								setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
-					if ( j > 0 )
-						f_poRenderer->line( c, r, f_ppiNode [ 0 ] [ i ],
-								f_ppiNode [ 1 ] [ i ],
-								setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
+					valid = values[ i ][ j ]._valid && T( x, y, values[ i ][ j ]._value, c, r );
+					if ( valid && oldvalid && f_ppiNode [ 2 ] [ i ] )
+						{
+						if ( i > 0 )
+							f_poRenderer->line( oldc, oldr, c, r,
+									setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
+						if ( j > 0 )
+							f_poRenderer->line( c, r, f_ppiNode [ 0 ] [ i ],
+									f_ppiNode [ 1 ] [ i ],
+									setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
+						}
+					f_ppiNode[ 0 ][ i ] = c;
+					f_ppiNode[ 1 ][ i ] = r;
+					f_ppiNode[ 2 ][ i ] = valid;
+					oldc = c;
+					oldr = r;
+					oldvalid = valid;
+					x += gridSize;
 					}
-				f_ppiNode[ 0 ][ i ] = c;
-				f_ppiNode[ 1 ][ i ] = r;
-				f_ppiNode[ 2 ][ i ] = valid;
-				oldc = c;
-				oldr = r;
-				oldvalid = valid;
-				x += gridSize;
+				y += gridSize;
 				}
-			y += gridSize;
 			}
 		}
 	usleep( 1000 );
@@ -264,7 +303,7 @@ void HFunlab::do_on_event( HMouseEvent const* e )
 				break;
 				case ( HMouseEvent::BUTTON::D_2 ):
 					f_dSize += e->get_x();
-					makeland();
+					generate_surface();
 				break;
 				case ( HMouseEvent::BUTTON::D_3 ):
 					f_dAngleY += e->get_x() << 2;
@@ -347,7 +386,8 @@ bool HFunlab::push_formula( HString const& a_oFormula )
 	f_iRed = 8;
 	f_iGreen = 8;
 	f_iBlue = 0xf8;
-	makeland();
+	f_oMesh.set_size( setup.f_iDensity, 1 );
+	generate_surface();
 	return ( false );
 	M_EPILOG
 	}

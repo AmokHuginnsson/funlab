@@ -50,8 +50,30 @@ class HFunlab : public HRendererEngineInterface
 	double f_dFOV;
 	double* f_pdXVariable;
 	double* f_pdYVariable;
-	double**	f_ppdLand;
 
+	class HMesh
+		{
+	public:
+		struct OValue
+			{
+			bool _valid;
+			double _value;
+			};
+	private:
+		int f_iSize;
+		int f_iSurfaces;
+		typedef yaal::hcore::HPool<OValue> values_t;
+		values_t f_oValues;
+		typedef yaal::hcore::HPool<OValue*> values_backbone_t;
+		values_backbone_t f_oValuesBackbone;
+	public:
+		HMesh( void );
+		void set_size( int, int );
+		int get_size( void ) const;
+		OValue** fast( int );
+		};
+
+	HMesh f_oMesh;
 	yaal::u32_t f_ulColor;
 	double f_dCosAlpha;
 	double f_dSinAlpha;
@@ -59,9 +81,13 @@ class HFunlab : public HRendererEngineInterface
 	double f_dSinBeta;
 	double f_dCosGamma;
 	double f_dSinGamma;
-	double f_dPrecountA;
-	double f_dPrecountB;
-	double f_dPrecountC;
+	struct OCache
+		{
+		OCache( double a, double b, double c ) : f_dPreCalcA( a ), f_dPreCalcB( b ), f_dPreCalcC( c ) {}
+		double f_dPreCalcA;
+		double f_dPreCalcB;
+		double f_dPreCalcC;
+		} f_oCache;
 	double* f_pdTrygo;
 	yaal::tools::HAnalyser f_oAnalyser;
 	HRendererSurfaceInterface* f_poRenderer;
@@ -78,8 +104,8 @@ private:
 	double sinq( int unsigned );
 	double cosq( int unsigned );
 	bool T( double, double, double, int&, int& );
-	void precount( void );
-	void makeland( void );
+	void precalculate( void );
+	void generate_surface( void );
 	virtual void do_draw_frame( void );
 	};
 
