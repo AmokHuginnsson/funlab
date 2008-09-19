@@ -68,6 +68,7 @@ protected:
 	virtual void do_put_pixel( double, double, yaal::u32_t ) = 0;
 	virtual void do_line( double, double, double, double, yaal::u32_t ) = 0;
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t ) = 0;
+	virtual void do_clear( yaal::u32_t );
 	};
 
 class HRendererSurfaceBase : public HRendererSurfaceInterface

@@ -50,6 +50,11 @@ double HRendererSurfaceInterface::get_height( void ) const
 
 void HRendererSurfaceInterface::clear( u32_t c )
 	{
+	do_clear( c );
+	}
+
+void HRendererSurfaceInterface::do_clear( u32_t c )
+	{
 	fill_rect( 0, 0, get_width(), get_height(), c );
 	}
 

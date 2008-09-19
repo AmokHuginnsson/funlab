@@ -52,35 +52,33 @@ bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event )
 	Glib::RefPtr<Gdk::Window> window = get_window();
 	if ( window )
 		{
-		Gtk::Allocation allocation = get_allocation();
-		const int width = allocation.get_width();
-		const int height = allocation.get_height();
 		_context = window->create_cairo_context();
 		if ( event )
 			{
-			// clip to the area indicated by the expose event so that we only
-			// redraw the portion of the window that needs to be redrawn
 			_context->rectangle( event->area.x, event->area.y,
 					event->area.width, event->area.height );
 			_context->clip();
 			}
-		_context->scale( width / static_cast<double>( setup.f_iResolutionX ),
-				height / static_cast<double>( setup.f_iResolutionY ) );
+		Gtk::Allocation allocation = get_allocation();
+		
+		_context->scale( allocation.get_width() / static_cast<double>( setup.f_iResolutionX ),
+				allocation.get_height() / static_cast<double>( setup.f_iResolutionY ) );
 		_context->set_line_width( 0.5 );
-		//_context->set_line_cap( Cairo::LINE_CAP_ROUND );
+//		_context->set_antialias( Cairo::ANTIALIAS_NONE );
+//		_context->set_line_cap( Cairo::LINE_CAP_ROUND );
 		f_oEngine->draw_frame();
 		}
-	return ( false );
+	return ( true );
 	}
 
 double HEmbeddedRenderer::do_get_width( void ) const
 	{
-	return ( 0 );
+	return ( setup.f_iResolutionX );
 	}
 
 double HEmbeddedRenderer::do_get_height( void ) const
 	{
-	return ( 0 );
+	return ( setup.f_iResolutionY );
 	}
 
 void HEmbeddedRenderer::do_put_pixel( double, double, yaal::u32_t )
@@ -89,21 +87,23 @@ void HEmbeddedRenderer::do_put_pixel( double, double, yaal::u32_t )
 
 void HEmbeddedRenderer::do_line( double x1, double y1, double x2, double y2, yaal::u32_t c )
 	{
-	_context->save();
 	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
 	_context->move_to( x1, y1 );
 	_context->line_to( x2, y2 );
 	_context->stroke();
-	_context->restore();
 	}
 
 void HEmbeddedRenderer::do_fill_rect( double x, double y, double w, double h, yaal::u32_t c )
 	{
-	_context->save();
 	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
 	_context->rectangle( x, y, w, h );
+	_context->fill();
+	}
+
+void HEmbeddedRenderer::do_clear( yaal::u32_t c )
+	{
+	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
 	_context->paint();
-	_context->restore();
 	}
 
 void HEmbeddedRenderer::do_commit( void )
@@ -148,7 +148,7 @@ bool HEmbeddedRenderer::on_scroll_event( GdkEventScroll* ev )
 	{
 	bool skip = false;
 	HMouseEvent e( HMouseEvent::TYPE::D_PRESS );
-	switch ( ev->state )
+	switch ( ev->direction )
 		{
 		case ( GDK_SCROLL_UP ):
 			e.set_button( HMouseEvent::BUTTON::D_4 );
@@ -163,9 +163,9 @@ bool HEmbeddedRenderer::on_scroll_event( GdkEventScroll* ev )
 	if ( ! skip )
 		{
 		f_oEngine->on_event( &e );
-		on_expose_event( NULL );
+		invoke_refresh();
 		}
-	return ( false );
+	return ( true );
 	}
 
 bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev )
@@ -198,12 +198,12 @@ bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev )
 		if ( ! skip )
 			{
 			f_oEngine->on_event( &e );
-			on_expose_event( NULL );
+			invoke_refresh();
 			}
 		}
 	_move._x = nx;
 	_move._y = ny;
-	return ( false );
+	return ( true );
 	}
 
 bool HEmbeddedRenderer::on_button_press_event( GdkEventButton* ev )
@@ -211,6 +211,17 @@ bool HEmbeddedRenderer::on_button_press_event( GdkEventButton* ev )
 	_move._x = static_cast<int>( ev->x );
 	_move._y = static_cast<int>( ev->y );
 	return ( false );
+	}
+
+void HEmbeddedRenderer::invoke_refresh( void )
+	{
+  Glib::RefPtr<Gdk::Window> win = get_window();
+	if ( win )
+		{
+		Gdk::Rectangle r( 0, 0, get_allocation().get_width(),
+				get_allocation().get_height() );
+		win->invalidate_rect( r, false );
+		}
 	}
 
 }

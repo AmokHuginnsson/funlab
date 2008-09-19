@@ -368,7 +368,7 @@ void HWindowMain::on_sel_changed( void )
 			if ( f )
 				{
 				f->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
-				er->on_expose_event( NULL );
+				er->invoke_refresh();
 				}
 			}
 		}

@@ -48,8 +48,9 @@ class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea
 public:
 	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
 	virtual ~HEmbeddedRenderer( void );
-	virtual bool on_expose_event( GdkEventExpose* );
+	void invoke_refresh( void );
 protected:
+	virtual bool on_expose_event( GdkEventExpose* );
 	virtual bool on_button_press_event( GdkEventButton* );
 	virtual bool on_scroll_event( GdkEventScroll* );
 	virtual bool on_motion_notify_event( GdkEventMotion* );
@@ -59,6 +60,7 @@ protected:
 	virtual void do_put_pixel( double, double, yaal::u32_t );
 	virtual void do_line( double, double, double, double, yaal::u32_t );
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
+	virtual void do_clear( yaal::u32_t );
 	virtual yaal::u32_t do_RGB( yaal::u8_t, yaal::u8_t, yaal::u8_t );
 private:
 	double red( yaal::u32_t );
