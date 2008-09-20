@@ -47,21 +47,19 @@ struct OSetup
 	int f_iDensity;
 	int f_iResolutionX;
 	int f_iResolutionY;
+	double f_dAspect;
 	char * f_pcProgramName;
 	yaal::hcore::HString f_oLogPath;
+	yaal::hcore::HString f_oAspect;
 	yaal::hcore::HString f_oFormula;
 	yaal::hcore::HString f_oResourcePath;
 	yaal::hcore::HString f_oIconPath;
 	/* self-sufficient */
-	OSetup ( void ) : f_bQuiet ( false ), f_bVerbose ( false ),
-										f_bHelp ( false ), f_bStereo ( false ),
-										f_iDensity ( 32 ), f_iResolutionX ( 640 ),
-										f_iResolutionY ( 480 ), f_pcProgramName ( NULL ),
-										f_oLogPath ( ), f_oFormula ( ), f_oResourcePath ( ),
-										f_oIconPath ( ) {}
+	OSetup( void );
+	void test_setup( void );
 private:
-	OSetup ( OSetup const & );
-	OSetup & operator = ( OSetup const & );
+	OSetup( OSetup const& );
+	OSetup& operator = ( OSetup const& );
 	};
 
 extern OSetup setup;

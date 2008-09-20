@@ -66,7 +66,8 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 		setup.f_pcProgramName = a_ppcArgv [ 0 ];
 		process_funlabrc_file ( );
 		l_iOpt = decode_switches ( a_iArgc, a_ppcArgv );
-		hcore::log.rehash ( setup.f_oLogPath, setup.f_pcProgramName );
+		hcore::log.rehash( setup.f_oLogPath, setup.f_pcProgramName );
+		setup.test_setup();
 /*		if ( ! console::is_enabled ( ) )enter_curses (); / * enabling ncurses ablilities*/
 /* *BOOM* */
 		if ( !! setup.f_oFormula )
