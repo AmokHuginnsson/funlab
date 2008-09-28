@@ -44,10 +44,17 @@ struct OSetup
 	bool f_bVerbose;		/* --verbose */
 	bool f_bHelp;
 	bool f_bStereo;
+	bool f_b3D;
+	bool f_bShowAxis;
+	bool f_bMultiFormula;
 	int f_iDensity;
 	int f_iResolutionX;
 	int f_iResolutionY;
 	double f_dAspect;
+	double long f_dLowerBoundX;
+	double long f_dUpperBoundX;
+	double long f_dLowerBoundY;
+	double long f_dUpperBoundY;
 	char * f_pcProgramName;
 	yaal::hcore::HString f_oLogPath;
 	yaal::hcore::HString f_oFormula;
