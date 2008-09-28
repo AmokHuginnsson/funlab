@@ -128,7 +128,7 @@ void HFunlab::generate_surface( void )
 				( * f_pdXVariable ) = x;
 				try
 					{
-					values[ i ][ j ]._value = f_oAnalyser.count();
+					values[ i ][ j ]._value = static_cast<double>( f_oAnalyser.count() );
 					values[ i ][ j ]._valid = true;
 					}
 				catch ( HAnalyserException& )
@@ -378,7 +378,7 @@ bool HFunlab::push_formula( HString const& a_oFormula )
 	if ( ! a_oFormula )
 		return ( true );
 
-	double* l_pdVariables = NULL;
+	double long* l_pdVariables = NULL;
 	l_pdVariables = f_oAnalyser.analyse( a_oFormula );
 	if ( ! l_pdVariables )
 		return ( true );

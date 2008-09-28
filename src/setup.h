@@ -50,7 +50,6 @@ struct OSetup
 	double f_dAspect;
 	char * f_pcProgramName;
 	yaal::hcore::HString f_oLogPath;
-	yaal::hcore::HString f_oAspect;
 	yaal::hcore::HString f_oFormula;
 	yaal::hcore::HString f_oResourcePath;
 	yaal::hcore::HString f_oIconPath;

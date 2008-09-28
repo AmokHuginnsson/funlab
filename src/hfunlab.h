@@ -48,8 +48,8 @@ class HFunlab : public HRendererEngineInterface
 	double f_dDY;
 	double f_dDZ;
 	double f_dFOV;
-	double* f_pdXVariable;
-	double* f_pdYVariable;
+	double long* f_pdXVariable;
+	double long* f_pdYVariable;
 
 	class HMesh
 		{
