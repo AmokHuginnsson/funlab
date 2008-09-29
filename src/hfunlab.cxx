@@ -40,6 +40,8 @@ using namespace yaal::tools;
 namespace funlab
 {
 
+#define D_TRYGO_BASE 8192
+
 HFunlab::HMesh::HMesh( void )
 	: f_iSize( 0 ), f_iSurfaces( 0 ),
 	f_oValues( f_iSize, values_t::D_AUTO_GROW ),
@@ -86,9 +88,9 @@ HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	f_oAnalyser(), f_poRenderer( a_poRenderer )
 	{
 	int i = 0;
-	f_pdTrygo = xcalloc<double>( 1024 );
-	for ( i = 0; i < 1024; i ++ )
-		f_pdTrygo[ i ] = sin( ( ( double ) i * M_PI ) / 2048. );
+	f_pdTrygo = xcalloc<double>( D_TRYGO_BASE );
+	for ( i = 0; i < D_TRYGO_BASE; i ++ )
+		f_pdTrygo[ i ] = sin( ( ( double ) i * M_PI ) / static_cast<double>( 2 * D_TRYGO_BASE ) );
 	}
 
 HFunlab::~HFunlab( void )
@@ -146,22 +148,22 @@ void HFunlab::precalculate( void )
 
 double HFunlab::sinq( int unsigned a_iAngle )
 	{
-	a_iAngle &= 4095;
-	if ( a_iAngle > 2047 )
+	a_iAngle &= ( ( 4 * D_TRYGO_BASE ) - 1 );
+	if ( a_iAngle > ( ( 2 * D_TRYGO_BASE ) - 1 ) )
 		{
-		a_iAngle -= 2048;
-		if ( a_iAngle > 1023 )
-			a_iAngle = 2047 - a_iAngle;
+		a_iAngle -= ( 2 * D_TRYGO_BASE );
+		if ( a_iAngle > ( D_TRYGO_BASE - 1 ) )
+			a_iAngle = ( ( 2 * D_TRYGO_BASE ) - 1 ) - a_iAngle;
 		return ( - f_pdTrygo[ a_iAngle ] );
 		}
-	if ( a_iAngle > 1023 )
-		a_iAngle = 2047 - a_iAngle;
+	if ( a_iAngle > ( D_TRYGO_BASE - 1 ) )
+		a_iAngle = ( ( 2 * D_TRYGO_BASE ) - 1 ) - a_iAngle;
 	return ( f_pdTrygo [ a_iAngle ] );
 	}
 
 double HFunlab::cosq( int unsigned a_iAngle )
 	{
-	return ( sinq( a_iAngle + 1024 ) );
+	return ( sinq( a_iAngle + D_TRYGO_BASE ) );
 	}
 
 bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _r )
