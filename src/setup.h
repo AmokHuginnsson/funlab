@@ -51,10 +51,10 @@ struct OSetup
 	int f_iResolutionX;
 	int f_iResolutionY;
 	double f_dAspect;
-	double long f_dLowerBoundX;
-	double long f_dUpperBoundX;
-	double long f_dLowerBoundY;
-	double long f_dUpperBoundY;
+	double long f_dDomainLowerBound;
+	double long f_dDomainUpperBound;
+	double long f_dRangeLowerBound;
+	double long f_dRangeUpperBound;
 	char * f_pcProgramName;
 	yaal::hcore::HString f_oLogPath;
 	yaal::hcore::HString f_oFormula;

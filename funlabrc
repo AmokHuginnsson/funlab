@@ -12,10 +12,10 @@ stereo false
 3D true
 show-axis false
 multi-formula false
-lower-bound-x -1
-upper-bound-x 1
-lower-bound-y -1
-upper-bound-y 1
+domain-lower-bound -1
+domain-upper-bound 1
+range-lower-bound -1
+range-upper-bound 1
 
 # End of configuration file.
 

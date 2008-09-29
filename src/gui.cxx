@@ -63,6 +63,14 @@ protected:
 	Gtk::TreeModel::ColumnRecord f_oFormulasListColumns;
 	Gtk::TreeModelColumn<Glib::ustring> f_oFormulasListFormulaColumn;
 	Gtk::TreeView* f_poFormulasListView;
+	Gtk::Scale* f_poDensity;
+	Gtk::CheckButton* f_po3D;
+	Gtk::CheckButton* f_poMultiFormula;
+	Gtk::CheckButton* f_poShowAxis;
+	Gtk::SpinButton* f_poDomainLowerBound;
+	Gtk::SpinButton* f_poDomainUpperBound;
+	Gtk::SpinButton* f_poRangeLowerBound;
+	Gtk::SpinButton* f_poRangeUpperBound;
 	Glib::Dispatcher f_oDispatcher;
 	bool f_bDetachedRendererActive;
 	HEmbeddedRenderer* f_poEmbeddedRenderer;
@@ -85,6 +93,14 @@ protected:
 	void on_add( void );
 	void on_remove( void );
 	void on_sel_changed( void );
+	void on_density_changed( void );
+	void on_show_axis_changed( void );
+	void on_3d_changed( void );
+	void on_multi_changed( void );
+	void on_domain_lower_bound_changed( void );
+	void on_domain_upper_bound_changed( void );
+	void on_range_lower_bound_changed( void );
+	void on_range_upper_bound_changed( void );
 	bool on_key_press( GdkEventKey* );
 	virtual void do_on_event( HKeyboardEvent const* );
 	void show_error_message( char const* const, char const* const, int );
@@ -97,7 +113,8 @@ protected:
 
 HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	Glib::RefPtr<Gnome::Glade::Xml> const& a_roResources ) : Gtk::Window( a_poBaseObject ),
-	f_bLock( false ), f_poFormulasListView( NULL ),
+	f_bLock( false ), f_poFormulasListView( NULL ), f_poDensity( NULL ),
+	f_po3D( NULL ), f_poMultiFormula( NULL ), f_poShowAxis( NULL ),
 	f_bDetachedRendererActive( false ), f_oDetachedRenderer()
 	{
 	M_PROLOG
@@ -119,7 +136,39 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	l_oSelection->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_sel_changed ) );
 	f_poFormulasListView->signal_key_press_event().connect( sigc::mem_fun( *this, &HWindowMain::on_key_press ), false );
 	f_poFormulasListView->grab_focus();
-	
+
+	a_roResources->get_widget( "DENSITY", f_poDensity );
+	f_poDensity->set_value( setup.f_iDensity );
+	f_poDensity->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_density_changed ) );
+
+	a_roResources->get_widget( "AXIS", f_poShowAxis );
+	f_poShowAxis->set_active( setup.f_bShowAxis );
+	f_poShowAxis->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_show_axis_changed ) );
+
+	a_roResources->get_widget( "MULTI", f_poMultiFormula );
+	f_poMultiFormula->set_active( setup.f_bMultiFormula );
+	f_poMultiFormula->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_multi_changed ) );
+
+	a_roResources->get_widget( "DOMAIN_LOWER_BOUND", f_poDomainLowerBound );
+	f_poDomainLowerBound->set_value( static_cast<double>( setup.f_dDomainLowerBound ) );
+	f_poDomainLowerBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_domain_lower_bound_changed ) );
+
+	a_roResources->get_widget( "DOMAIN_UPPER_BOUND", f_poDomainUpperBound );
+	f_poDomainUpperBound->set_value( static_cast<double>( setup.f_dDomainUpperBound ) );
+	f_poDomainUpperBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_domain_upper_bound_changed ) );
+
+	a_roResources->get_widget( "RANGE_LOWER_BOUND", f_poRangeLowerBound );
+	f_poRangeLowerBound->set_value( static_cast<double>( setup.f_dRangeLowerBound ) );
+	f_poRangeLowerBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_range_lower_bound_changed ) );
+
+	a_roResources->get_widget( "RANGE_UPPER_BOUND", f_poRangeUpperBound );
+	f_poRangeUpperBound->set_value( static_cast<double>( setup.f_dRangeUpperBound ) );
+	f_poRangeUpperBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_range_upper_bound_changed ) );
+
+	a_roResources->get_widget( "MODE_3D", f_po3D );
+	f_po3D->set_active( setup.f_b3D );
+	f_po3D->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_3d_changed ) );
+
 	f_oDispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
 
 	/* NEW */
@@ -494,6 +543,62 @@ void HWindowMain::set_font_all( Pango::FontDescription const& a_oFontDesc,
 //	o.run();
 	return;
 	M_EPILOG
+	}
+
+void HWindowMain::on_density_changed( void )
+	{
+	setup.f_iDensity = static_cast<int>( f_poDensity->get_value() );
+	}
+
+void HWindowMain::on_show_axis_changed( void )
+	{
+	setup.f_bShowAxis = f_poShowAxis->get_active();
+	}
+
+void HWindowMain::on_3d_changed( void )
+	{
+	setup.f_b3D = f_po3D->get_active();
+	}
+
+void HWindowMain::on_multi_changed( void )
+	{
+	setup.f_bMultiFormula = f_poMultiFormula->get_active();
+	}
+
+void HWindowMain::on_domain_lower_bound_changed( void )
+	{
+	double nval = f_poDomainLowerBound->get_value();
+	if ( nval < setup.f_dDomainUpperBound )
+		setup.f_dDomainLowerBound = nval;
+	else
+		f_poDomainLowerBound->set_value( static_cast<double>( setup.f_dDomainLowerBound ) );
+	}
+
+void HWindowMain::on_domain_upper_bound_changed( void )
+	{
+	double nval = f_poDomainUpperBound->get_value();
+	if ( nval > setup.f_dDomainLowerBound )
+		setup.f_dDomainUpperBound = nval;
+	else
+		f_poDomainUpperBound->set_value( static_cast<double>( setup.f_dDomainUpperBound ) );
+	}
+
+void HWindowMain::on_range_lower_bound_changed( void )
+	{
+	double nval = f_poRangeLowerBound->get_value();
+	if ( nval < setup.f_dRangeUpperBound )
+		setup.f_dRangeLowerBound = nval;
+	else
+		f_poRangeLowerBound->set_value( static_cast<double>( setup.f_dRangeLowerBound ) );
+	}
+
+void HWindowMain::on_range_upper_bound_changed( void )
+	{
+	double nval = f_poRangeUpperBound->get_value();
+	if ( nval > setup.f_dRangeLowerBound )
+		setup.f_dRangeUpperBound = nval;
+	else
+		f_poRangeUpperBound->set_value( static_cast<double>( setup.f_dRangeUpperBound ) );
 	}
 
 int gui_start( int a_iArgc, char* a_ppcArgv[] )
