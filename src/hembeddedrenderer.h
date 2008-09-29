@@ -44,6 +44,13 @@ class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea
 		int _x;
 		int _y;
 		} _move;
+	struct OLineBuffer
+		{
+		bool _empty;
+		yaal::u32_t _lastColor;
+		OLineBuffer( void ) : _empty( true ), _lastColor( 0 ) {}
+		};
+	OLineBuffer _lineBuffer;
 	Cairo::RefPtr<Cairo::Context> _context;
 public:
 	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
@@ -63,6 +70,7 @@ protected:
 	virtual void do_clear( yaal::u32_t );
 	virtual yaal::u32_t do_RGB( yaal::u8_t, yaal::u8_t, yaal::u8_t );
 private:
+	void stroke_line_buffer( void );
 	double red( yaal::u32_t );
 	double green( yaal::u32_t );
 	double blue( yaal::u32_t );

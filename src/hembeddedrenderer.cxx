@@ -40,7 +40,7 @@ namespace funlab
 {
 
 HEmbeddedRenderer::HEmbeddedRenderer( BaseObjectType* obj, Glib::RefPtr<Gnome::Glade::Xml> const& )
-	: Gtk::DrawingArea( obj ), _context()
+	: Gtk::DrawingArea( obj ), _lineBuffer(), _context()
 	{
 	}
 
@@ -88,14 +88,18 @@ void HEmbeddedRenderer::do_put_pixel( double, double, yaal::u32_t )
 
 void HEmbeddedRenderer::do_line( double x1, double y1, double x2, double y2, yaal::u32_t c )
 	{
-	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
+	if ( ( c != _lineBuffer._lastColor ) && ( ! _lineBuffer._empty ) )
+		stroke_line_buffer();
 	_context->move_to( x1, y1 );
 	_context->line_to( x2, y2 );
-	_context->stroke();
+	_lineBuffer._empty = false;
+	_lineBuffer._lastColor = c;
 	}
 
 void HEmbeddedRenderer::do_fill_rect( double x, double y, double w, double h, yaal::u32_t c )
 	{
+	if ( ! _lineBuffer._empty )
+		stroke_line_buffer();
 	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
 	_context->rectangle( x, y, w, h );
 	_context->fill();
@@ -103,12 +107,16 @@ void HEmbeddedRenderer::do_fill_rect( double x, double y, double w, double h, ya
 
 void HEmbeddedRenderer::do_clear( yaal::u32_t c )
 	{
+	if ( ! _lineBuffer._empty )
+		stroke_line_buffer();
 	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
 	_context->paint();
 	}
 
 void HEmbeddedRenderer::do_commit( void )
 	{
+	if ( ! _lineBuffer._empty )
+		stroke_line_buffer();
 	}
 
 yaal::u32_t HEmbeddedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue )
@@ -229,6 +237,17 @@ void HEmbeddedRenderer::invoke_refresh( bool full )
 				get_allocation().get_height() );
 		win->invalidate_rect( r, false );
 		}
+	}
+
+void HEmbeddedRenderer::stroke_line_buffer( void )
+	{
+	_context->set_source_rgba(
+			red( _lineBuffer._lastColor ),
+			green( _lineBuffer._lastColor ),
+			blue( _lineBuffer._lastColor ),
+			alpha( _lineBuffer._lastColor ) );
+	_context->stroke();
+	_lineBuffer._empty = true;
 	}
 
 }

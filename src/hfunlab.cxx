@@ -226,6 +226,8 @@ void HFunlab::do_draw_frame( void )
 		for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
 			{
 			f_dDX = setup.f_bStereo ? ( f ? - 4 : 4 ) : 0;
+			if ( ! setup.f_bStereo && setup.f_bShowAxis )
+				draw_axis();
 			y = setup.f_dDomainLowerBound;
 			for ( j = 0; j < size; ++ j )
 				{
@@ -259,6 +261,68 @@ void HFunlab::do_draw_frame( void )
 	f_poRenderer->commit();
 	return;
 	M_EPILOG
+	}
+
+void HFunlab::draw_axis( void )
+	{
+	u32_t D_WHITE = 0xffffffff;
+	double long frac = 4.;
+	int x1, x2, y1, y2;
+	x1 = x2 = y1 = y2;
+	if ( T( 0, 0, 0, x1, y1 ) && T( 0, 0, setup.f_dDomainUpperBound, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( 0, 0, 0, x1, y1 ) && T( 0, setup.f_dDomainUpperBound, 0, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( 0, 0, 0, x1, y1 ) && T( setup.f_dDomainUpperBound, 0, 0, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	int size = f_oMesh.get_size();
+	double long gridSize = ( setup.f_dDomainUpperBound - setup.f_dDomainLowerBound ) / static_cast<double long>( size );
+	double long x = setup.f_dDomainLowerBound;
+	double long a = gridSize / frac;
+	for ( int i = 0; i < size; ++ i )
+		{
+		if ( T( x, - a, 0, x1, y1 ) && T( x, a, 0, x2, y2 ) )
+			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		if ( T( x, 0, - a, x1, y1 ) && T( x, 0, a, x2, y2 ) )
+			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		if ( T( - a, x, 0, x1, y1 ) && T( a, x, 0, x2, y2 ) )
+			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		if ( T( 0, x, - a, x1, y1 ) && T( 0, x, a, x2, y2 ) )
+			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		if ( T( - a, 0, x, x1, y1 ) && T( a, 0, x, x2, y2 ) )
+			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		if ( T( 0, - a, x, x1, y1 ) && T( 0, a, x, x2, y2 ) )
+			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		x += gridSize;
+		}
+	double long t = setup.f_dDomainUpperBound + a;
+	double long d = setup.f_dDomainUpperBound - a;
+	if ( T( t, 0, 0, x1, y1 ) && T( d, a, 0, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( t, 0, 0, x1, y1 ) && T( d, - a, 0, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( t, 0, 0, x1, y1 ) && T( d, 0, a, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( t, 0, 0, x1, y1 ) && T( d, 0, - a, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+
+	if ( T( 0, t, 0, x1, y1 ) && T( a, d, 0, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( 0, t, 0, x1, y1 ) && T( - a, d, 0, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( 0, t, 0, x1, y1 ) && T( 0, d, a, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( 0, t, 0, x1, y1 ) && T( 0, d, - a, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+
+	if ( T( 0, 0, t, x1, y1 ) && T( a, 0, d, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( 0, 0, t, x1, y1 ) && T( - a, 0, d, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( 0, 0, t, x1, y1 ) && T( 0, a, d, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+	if ( T( 0, 0, t, x1, y1 ) && T( 0, - a, d, x2, y2 ) )
+		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
 	}
 
 void HFunlab::do_on_event( HMouseEvent const* e )
