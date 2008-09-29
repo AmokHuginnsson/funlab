@@ -67,6 +67,7 @@ protected:
 	Gtk::CheckButton* f_po3D;
 	Gtk::CheckButton* f_poMultiFormula;
 	Gtk::CheckButton* f_poShowAxis;
+	Gtk::CheckButton* f_poStereo;
 	Gtk::SpinButton* f_poDomainLowerBound;
 	Gtk::SpinButton* f_poDomainUpperBound;
 	Gtk::SpinButton* f_poRangeLowerBound;
@@ -95,12 +96,14 @@ protected:
 	void on_sel_changed( void );
 	void on_density_changed( void );
 	void on_show_axis_changed( void );
+	void on_stereo_changed( void );
 	void on_3d_changed( void );
 	void on_multi_changed( void );
 	void on_domain_lower_bound_changed( void );
 	void on_domain_upper_bound_changed( void );
 	void on_range_lower_bound_changed( void );
 	void on_range_upper_bound_changed( void );
+	void update_drawing( bool = true );
 	bool on_key_press( GdkEventKey* );
 	virtual void do_on_event( HKeyboardEvent const* );
 	void show_error_message( char const* const, char const* const, int );
@@ -144,6 +147,10 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	a_roResources->get_widget( "AXIS", f_poShowAxis );
 	f_poShowAxis->set_active( setup.f_bShowAxis );
 	f_poShowAxis->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_show_axis_changed ) );
+
+	a_roResources->get_widget( "STEREO", f_poStereo );
+	f_poStereo->set_active( setup.f_bStereo );
+	f_poStereo->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_stereo_changed ) );
 
 	a_roResources->get_widget( "MULTI", f_poMultiFormula );
 	f_poMultiFormula->set_active( setup.f_bMultiFormula );
@@ -417,12 +424,27 @@ void HWindowMain::on_sel_changed( void )
 			if ( f )
 				{
 				f->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
-				er->invoke_refresh();
+				update_drawing( false );
 				}
 			}
 		}
 	return;
 	M_EPILOG
+	}
+
+void HWindowMain::update_drawing( bool full )
+	{
+	if ( ! f_bLock && f_bDetachedRendererActive )
+		{
+		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer );
+		M_ASSERT( dr );
+		}
+	else
+		{
+		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( f_poEmbeddedRenderer );
+		M_ASSERT( er );
+		er->invoke_refresh( full );
+		}
 	}
 
 bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
@@ -548,21 +570,31 @@ void HWindowMain::set_font_all( Pango::FontDescription const& a_oFontDesc,
 void HWindowMain::on_density_changed( void )
 	{
 	setup.f_iDensity = static_cast<int>( f_poDensity->get_value() );
+	update_drawing();
 	}
 
 void HWindowMain::on_show_axis_changed( void )
 	{
 	setup.f_bShowAxis = f_poShowAxis->get_active();
+	update_drawing();
+	}
+
+void HWindowMain::on_stereo_changed( void )
+	{
+	setup.f_bStereo = f_poStereo->get_active();
+	update_drawing();
 	}
 
 void HWindowMain::on_3d_changed( void )
 	{
 	setup.f_b3D = f_po3D->get_active();
+	update_drawing();
 	}
 
 void HWindowMain::on_multi_changed( void )
 	{
 	setup.f_bMultiFormula = f_poMultiFormula->get_active();
+	update_drawing();
 	}
 
 void HWindowMain::on_domain_lower_bound_changed( void )
@@ -572,6 +604,7 @@ void HWindowMain::on_domain_lower_bound_changed( void )
 		setup.f_dDomainLowerBound = nval;
 	else
 		f_poDomainLowerBound->set_value( static_cast<double>( setup.f_dDomainLowerBound ) );
+	update_drawing();
 	}
 
 void HWindowMain::on_domain_upper_bound_changed( void )
@@ -581,6 +614,7 @@ void HWindowMain::on_domain_upper_bound_changed( void )
 		setup.f_dDomainUpperBound = nval;
 	else
 		f_poDomainUpperBound->set_value( static_cast<double>( setup.f_dDomainUpperBound ) );
+	update_drawing();
 	}
 
 void HWindowMain::on_range_lower_bound_changed( void )
@@ -590,6 +624,7 @@ void HWindowMain::on_range_lower_bound_changed( void )
 		setup.f_dRangeLowerBound = nval;
 	else
 		f_poRangeLowerBound->set_value( static_cast<double>( setup.f_dRangeLowerBound ) );
+	update_drawing();
 	}
 
 void HWindowMain::on_range_upper_bound_changed( void )
@@ -599,6 +634,7 @@ void HWindowMain::on_range_upper_bound_changed( void )
 		setup.f_dRangeUpperBound = nval;
 	else
 		f_poRangeUpperBound->set_value( static_cast<double>( setup.f_dRangeUpperBound ) );
+	update_drawing();
 	}
 
 int gui_start( int a_iArgc, char* a_ppcArgv[] )

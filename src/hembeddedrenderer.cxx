@@ -31,6 +31,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hembeddedrenderer.h"
 #include "setup.h"
+#include "hfunlab.h"
 
 using namespace std;
 using namespace yaal;
@@ -163,7 +164,7 @@ bool HEmbeddedRenderer::on_scroll_event( GdkEventScroll* ev )
 	if ( ! skip )
 		{
 		f_oEngine->on_event( &e );
-		invoke_refresh();
+		invoke_refresh( false );
 		}
 	return ( true );
 	}
@@ -198,7 +199,7 @@ bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev )
 		if ( ! skip )
 			{
 			f_oEngine->on_event( &e );
-			invoke_refresh();
+			invoke_refresh( false );
 			}
 		}
 	_move._x = nx;
@@ -213,8 +214,14 @@ bool HEmbeddedRenderer::on_button_press_event( GdkEventButton* ev )
 	return ( false );
 	}
 
-void HEmbeddedRenderer::invoke_refresh( void )
+void HEmbeddedRenderer::invoke_refresh( bool full )
 	{
+	if ( full )
+		{
+		HFunlab* f = dynamic_cast<HFunlab*>( &*f_oEngine );
+		M_ASSERT( f );
+		f->regen_cache( setup.f_iDensity );
+		}
   Glib::RefPtr<Gdk::Window> win = get_window();
 	if ( win )
 		{

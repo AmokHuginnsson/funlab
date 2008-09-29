@@ -37,10 +37,6 @@ class HFunlab : public HRendererEngineInterface
 	int f_iRed;
 	int f_iGreen;
 	int f_iBlue;
-	int* f_ppiNode[ 3 ];
-	double f_dLowerXEdge;
-	double f_dLowerYEdge;
-	double f_dSize;
 	double f_dAngleX;
 	double f_dAngleY;
 	double f_dAngleZ;
@@ -57,7 +53,8 @@ class HFunlab : public HRendererEngineInterface
 		struct OValue
 			{
 			bool _valid;
-			double _value;
+			double long _value;
+			OValue( void ) : _valid( false ), _value( 0 ) {}
 			};
 	private:
 		int f_iSize;
@@ -72,8 +69,16 @@ class HFunlab : public HRendererEngineInterface
 		int get_size( void ) const;
 		OValue** fast( int );
 		};
-
 	HMesh f_oMesh;
+	struct ONode
+		{
+		int _col;
+		int _row;
+		int _valid;
+		ONode( void ) : _col( 0 ), _row( 0 ), _valid( 0 ) {}
+		};
+	typedef yaal::hcore::HPool<ONode> node_t;
+	node_t f_oNode;
 	yaal::u32_t f_ulColor;
 	double f_dCosAlpha;
 	double f_dSinAlpha;
@@ -97,13 +102,14 @@ public:
 	bool push_formula( yaal::hcore::HString const& );
 	char const* error( void ) const;
 	int error_position( void ) const;
+	void regen_cache( int );
 protected:
 	virtual void do_on_event( HMouseEvent const* );
 	virtual void do_on_event( HKeyboardEvent const* );
 private:
 	double sinq( int unsigned );
 	double cosq( int unsigned );
-	bool T( double, double, double, int&, int& );
+	bool T( double long, double long, double long, int&, int& );
 	void precalculate( void );
 	void generate_surface( void );
 	virtual void do_draw_frame( void );

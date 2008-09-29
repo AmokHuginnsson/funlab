@@ -48,7 +48,7 @@ class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea
 public:
 	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
 	virtual ~HEmbeddedRenderer( void );
-	void invoke_refresh( void );
+	void invoke_refresh( bool );
 protected:
 	virtual bool on_expose_event( GdkEventExpose* );
 	virtual bool on_button_press_event( GdkEventButton* );
