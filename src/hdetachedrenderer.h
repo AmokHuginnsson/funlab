@@ -28,7 +28,6 @@ Copyright:
 #define __FUNLAB_HDETACHEDRENDERER_H
 
 #include <yaal/hcore/hthread.h>
-#include <yaal/tools/hanalyser.h>
 
 #include "hrenderer.h"
 #include "events.h"

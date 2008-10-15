@@ -115,10 +115,10 @@ void HFunlab::generate_surface( void )
 				{
 				try
 					{
-					values[ i ][ j ]._value = static_cast<double>( f_oAnalyser.count() );
+					values[ i ][ j ]._value = static_cast<double>( f_oAnalyser.evaluate() );
 					values[ i ][ j ]._valid = true;
 					}
-				catch ( HAnalyserException& )
+				catch ( HExpressionException& )
 					{
 					values[ i ][ j ]._valid = false;
 					}
@@ -430,7 +430,7 @@ bool HFunlab::push_formula( HString const& a_oFormula )
 		return ( true );
 
 	double long* l_pdVariables = NULL;
-	l_pdVariables = f_oAnalyser.analyse( a_oFormula );
+	l_pdVariables = f_oAnalyser.compile( a_oFormula );
 	if ( ! l_pdVariables )
 		return ( true );
 	f_dDY = - 15.0;

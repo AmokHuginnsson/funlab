@@ -27,6 +27,8 @@ Copyright:
 #ifndef __FUNLAB_HFUNLAB_H
 #define __FUNLAB_HFUNLAB_H
 
+#include <yaal/tools/hexpression.h>
+
 #include "hrenderer.h"
 
 namespace funlab
@@ -94,7 +96,7 @@ class HFunlab : public HRendererEngineInterface
 		double f_dPreCalcC;
 		} f_oCache;
 	double* f_pdTrygo;
-	yaal::tools::HAnalyser f_oAnalyser;
+	yaal::tools::HExpression f_oAnalyser;
 	HRendererSurfaceInterface* f_poRenderer;
 public:
 	HFunlab( HRendererSurfaceInterface* );
