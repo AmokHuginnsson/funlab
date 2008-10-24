@@ -85,7 +85,7 @@ HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	f_dCosBeta( 0 ), f_dSinBeta( 0 ),
 	f_dCosGamma( 0 ), f_dSinGamma( 0 ),
 	f_oCache( 0, 0, 0 ), f_pdTrygo( NULL ),
-	f_oAnalyser(), f_poRenderer( a_poRenderer )
+	f_oExpressions(), f_poRenderer( a_poRenderer )
 	{
 	int i = 0;
 	f_pdTrygo = xcalloc<double>( D_TRYGO_BASE );
@@ -107,24 +107,30 @@ void HFunlab::generate_surface( void )
 	( *f_pdYVariable ) = setup.f_dDomainLowerBound;
 	if ( size )
 		{
-		HMesh::OValue** values = f_oMesh.fast( 0 );
-		for ( int j = 0; j < size; ++ j )
+		int formula = 0;
+		for ( expressions_t::iterator it = f_oExpressions.begin(); it != f_oExpressions.end(); ++ it, ++ formula )
 			{
-			( *f_pdXVariable ) = setup.f_dDomainLowerBound;
-			for ( int i = 0; i < size; ++ i )
+			f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
+			f_pdYVariable = ( l_pdVariables + 'Y' ) - 'A';
+			HMesh::OValue** values = f_oMesh.fast( formula );
+			for ( int j = 0; j < size; ++ j )
 				{
-				try
+				( *f_pdXVariable ) = setup.f_dDomainLowerBound;
+				for ( int i = 0; i < size; ++ i )
 					{
-					values[ i ][ j ]._value = static_cast<double>( f_oAnalyser.evaluate() );
-					values[ i ][ j ]._valid = true;
+					try
+						{
+						values[ i ][ j ]._value = static_cast<double>( it->evaluate() );
+						values[ i ][ j ]._valid = true;
+						}
+					catch ( HExpressionException& )
+						{
+						values[ i ][ j ]._valid = false;
+						}
+					( *f_pdXVariable ) += gridSize;
 					}
-				catch ( HExpressionException& )
-					{
-					values[ i ][ j ]._valid = false;
-					}
-				( *f_pdXVariable ) += gridSize;
+				( *f_pdYVariable ) += gridSize;
 				}
-			( *f_pdYVariable ) += gridSize;
 			}
 		}
 	return;
@@ -430,12 +436,10 @@ bool HFunlab::push_formula( HString const& a_oFormula )
 		return ( true );
 
 	double long* l_pdVariables = NULL;
-	l_pdVariables = f_oAnalyser.compile( a_oFormula );
+	l_pdVariables = f_oExpressions.compile( a_oFormula );
 	if ( ! l_pdVariables )
 		return ( true );
 	f_dDY = - 15.0;
-	f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
-	f_pdYVariable = ( l_pdVariables + 'Y' ) - 'A';
 	f_iRed = 8;
 	f_iGreen = 8;
 	f_iBlue = 0xf8;
@@ -448,20 +452,21 @@ void HFunlab::regen_cache( int size )
 	{
 	f_oNode.pool_realloc( size );
 	f_oMesh.set_size( size, 1 );
-	generate_surface();
+	if ( ! f_oExpressions.empty() )
+		generate_surface();
 	}
 
 char const* HFunlab::error( void ) const
 	{
 	M_PROLOG
-	return ( f_oAnalyser.get_error() );
+	return ( f_oExpressions.get_error() );
 	M_EPILOG
 	}
 
 int HFunlab::error_position( void ) const
 	{
 	M_PROLOG
-	return ( f_oAnalyser.get_error_token() );
+	return ( f_oExpressions.get_error_token() );
 	M_EPILOG
 	}
 

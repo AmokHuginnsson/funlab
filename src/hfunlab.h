@@ -96,7 +96,8 @@ class HFunlab : public HRendererEngineInterface
 		double f_dPreCalcC;
 		} f_oCache;
 	double* f_pdTrygo;
-	yaal::tools::HExpression f_oAnalyser;
+	typedef yaal::hcore::HList<yaal::tools::HExpression> expressions_t;
+	expressions_t f_oExpressions;
 	HRendererSurfaceInterface* f_poRenderer;
 public:
 	HFunlab( HRendererSurfaceInterface* );
