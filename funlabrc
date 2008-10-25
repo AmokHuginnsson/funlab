@@ -4,18 +4,18 @@
 log_path ${HOME}/src/funlab/x_funlab.log
 icon_path ${HOME}/src/funlab/res/funlab.xpm
 resource_path ${HOME}/src/funlab/res/funlab.glade
-resolution_x 640
-resolution_y 480
+resolution_x 800
+resolution_y 600
 aspect 1
 density 32
 stereo false
 3D true
 show-axis false
 multi-formula false
-domain-lower-bound -1
-domain-upper-bound 1
-range-lower-bound -1
-range-upper-bound 1
+domain-lower-bound -10
+domain-upper-bound 10
+range-lower-bound -10
+range-upper-bound 10
 
 # End of configuration file.
 

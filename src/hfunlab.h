@@ -99,6 +99,8 @@ class HFunlab : public HRendererEngineInterface
 	typedef yaal::hcore::HList<yaal::tools::HExpression> expressions_t;
 	expressions_t f_oExpressions;
 	HRendererSurfaceInterface* f_poRenderer;
+	yaal::hcore::HString f_oError;
+	int f_iErrorIndex;
 public:
 	HFunlab( HRendererSurfaceInterface* );
 	virtual ~HFunlab( void );
@@ -106,6 +108,7 @@ public:
 	char const* error( void ) const;
 	int error_position( void ) const;
 	void regen_cache( int );
+	void clear( void );
 protected:
 	virtual void do_on_event( HMouseEvent const* );
 	virtual void do_on_event( HKeyboardEvent const* );

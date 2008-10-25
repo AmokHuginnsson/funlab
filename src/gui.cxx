@@ -108,9 +108,10 @@ protected:
 	virtual void do_on_event( HKeyboardEvent const* );
 	void show_error_message( char const* const, char const* const, int );
 	void set_font_all( Pango::FontDescription const&, Gtk::Widget* );
+	void selected_row_callback( Gtk::TreeModel::iterator const& );
+	HFunlab* funlab( void );
 	void open( HString const& );
 	void save( HString const& );
-
 	/*}*/
 	};
 
@@ -408,24 +409,53 @@ void HWindowMain::on_remove( void )
 	M_EPILOG
 	}
 
-void HWindowMain::on_sel_changed( void )
+HFunlab* HWindowMain::funlab( void )
 	{
 	M_PROLOG
-	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
-	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
-	if ( ! f_bLock && f_bDetachedRendererActive && l_oIter )
-		dynamic_cast<HFunlab*>( &(*dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer )->get_engine() ) )->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+	HFunlab* f = NULL;
+	if ( ! f_bLock && f_bDetachedRendererActive )
+		{
+		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer );
+		if ( dr )
+			f = dynamic_cast<HFunlab*>( &( *dr->get_engine() ) );
+		}
 	else
 		{
 		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( f_poEmbeddedRenderer );
 		if ( er )
+			f = dynamic_cast<HFunlab*>( &( *er->get_engine() ) );
+		}
+	return ( f );
+	M_EPILOG
+	}
+
+void HWindowMain::selected_row_callback( Gtk::TreeModel::iterator const& iter )
+	{
+	M_PROLOG
+	HFunlab* f = NULL;
+	if ( iter && ( f = funlab() ) )
+		{
+		f->push_formula( iter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+		update_drawing( false );
+		}
+	M_EPILOG
+	}
+
+void HWindowMain::on_sel_changed( void )
+	{
+	M_PROLOG
+	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
+	HFunlab* f = funlab();
+	if ( f )
+		{
+		f->clear();
+		if ( l_oSelection->get_mode() == Gtk::SELECTION_MULTIPLE )
+			l_oSelection->selected_foreach_iter( sigc::mem_fun( *this, &HWindowMain::selected_row_callback ) );
+		else
 			{
-			HFunlab* f = dynamic_cast<HFunlab*>( &( *er->get_engine() ) );
-			if ( f )
-				{
-				f->push_formula( l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() );
-				update_drawing( false );
-				}
+			Gtk::TreeIter iter = l_oSelection->get_selected();
+			f->push_formula( iter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+			update_drawing( false );
 			}
 		}
 	return;
@@ -594,6 +624,8 @@ void HWindowMain::on_3d_changed( void )
 void HWindowMain::on_multi_changed( void )
 	{
 	setup.f_bMultiFormula = f_poMultiFormula->get_active();
+	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
+	l_oSelection->set_mode( setup.f_bMultiFormula ? Gtk::SELECTION_MULTIPLE : Gtk::SELECTION_SINGLE );
 	update_drawing();
 	}
 
