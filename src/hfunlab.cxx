@@ -105,7 +105,7 @@ void HFunlab::generate_surface( void )
 	M_PROLOG
 	int size = f_oMesh.get_size();
 	double long gridSize = ( setup.f_dDomainUpperBound - setup.f_dDomainLowerBound ) / static_cast<double long>( size );
-	if ( size )
+	if ( size && setup.f_b3D )
 		{
 		int formula = 0;
 		for ( expressions_t::iterator it = f_oExpressions.begin(); it != f_oExpressions.end(); ++ it, ++ formula )
@@ -225,48 +225,76 @@ void HFunlab::do_draw_frame( void )
 		l_iBlue = f_poRenderer->RGB( 0, 0, 0xff );
 		}
 	double long gridSize = ( setup.f_dDomainUpperBound - setup.f_dDomainLowerBound ) / static_cast<double long>( size );
-	if ( size )
+	if ( setup.f_b3D )
 		{
-		if ( ! setup.f_bStereo && setup.f_bShowAxis )
-			draw_axis();
-		int sfSize = f_oExpressions.size();
-		for ( int sf = 0; sf < sfSize; ++ sf )
+		if ( size )
 			{
-			bool valid = false, oldvalid = false;
-			int f = 0, i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
-			double long x = 0, y = 0;
-			HMesh::OValue** values = f_oMesh.fast( sf );
-			yaal::fill( f_oNode.raw(), f_oNode.raw() + size, ONode() );
-			for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
+			if ( ! setup.f_bStereo && setup.f_bShowAxis )
+				draw_axis();
+			int sfSize = f_oExpressions.size();
+			for ( int sf = 0; sf < sfSize; ++ sf )
 				{
-				f_dDX = setup.f_bStereo ? ( f ? - 4 : 4 ) : 0;
-				y = setup.f_dDomainLowerBound;
-				for ( j = 0; j < size; ++ j )
+				bool valid = false, oldvalid = false;
+				int f = 0, i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
+				double long x = 0, y = 0;
+				HMesh::OValue** values = f_oMesh.fast( sf );
+				yaal::fill( f_oNode.raw(), f_oNode.raw() + size, ONode() );
+				for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
 					{
-					x = setup.f_dDomainLowerBound;
-					for ( i = 0; i < size; ++ i )
+					f_dDX = setup.f_bStereo ? ( f ? - 4 : 4 ) : 0;
+					y = setup.f_dDomainLowerBound;
+					for ( j = 0; j < size; ++ j )
 						{
-						valid = values[ i ][ j ]._valid && T( x, y, values[ i ][ j ]._value, c, r );
-						if ( valid && oldvalid && f_oNode[ i ]._valid )
+						x = setup.f_dDomainLowerBound;
+						for ( i = 0; i < size; ++ i )
 							{
-							if ( i > 0 )
-								f_poRenderer->line( oldc, oldr, c, r,
-										setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
-							if ( j > 0 )
-								f_poRenderer->line( c, r, f_oNode[ i ]._col,
-										f_oNode[ i ]._row,
-										setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
+							valid = values[ i ][ j ]._valid && T( x, y, values[ i ][ j ]._value, c, r );
+							if ( valid && oldvalid && f_oNode[ i ]._valid )
+								{
+								if ( i > 0 )
+									f_poRenderer->line( oldc, oldr, c, r,
+											setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
+								if ( j > 0 )
+									f_poRenderer->line( c, r, f_oNode[ i ]._col,
+											f_oNode[ i ]._row,
+											setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
+								}
+							f_oNode[ i ]._col = c;
+							f_oNode[ i ]._row = r;
+							f_oNode[ i ]._valid = valid;
+							oldc = c;
+							oldr = r;
+							oldvalid = valid;
+							x += gridSize;
 							}
-						f_oNode[ i ]._col = c;
-						f_oNode[ i ]._row = r;
-						f_oNode[ i ]._valid = valid;
-						oldc = c;
-						oldr = r;
-						oldvalid = valid;
-						x += gridSize;
+						y += gridSize;
 						}
-					y += gridSize;
 					}
+				}
+			}
+		}
+	else
+		{
+		for ( expressions_t::iterator it = f_oExpressions.begin(); it != f_oExpressions.end(); ++ it )
+			{
+			double long* l_pdVariables = it->variables();
+			f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
+			( *f_pdXVariable ) = setup.f_dDomainLowerBound;
+			double long gridSize = ( setup.f_dDomainUpperBound - setup.f_dDomainLowerBound ) / static_cast<double long>( setup.f_iResolutionX );
+			double long oldVal = 0;
+			for ( int x = 0; x < setup.f_iResolutionX; ++ x )
+				{
+				try
+					{
+					double long val = static_cast<double long>( it->evaluate() ) * setup.f_iResolutionY;
+					if ( x )
+						f_poRenderer->line( x, - val + setup.f_iResolutionY / 2, x - 1, - oldVal + setup.f_iResolutionY / 2, f_ulColor );
+					oldVal = val;
+					}
+				catch ( HExpressionException& )
+					{
+					}
+				( *f_pdXVariable ) += gridSize;
 				}
 			}
 		}
