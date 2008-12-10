@@ -26,15 +26,15 @@ Copyright:
 
 #include <libintl.h>
 #include <unistd.h>
-#include <yaal/yaal.h> /* all hAPI headers */
+#include <yaal/yaal.hxx> /* all hAPI headers */
 M_VCSID( "$Id: "__ID__" $" )
 
-#include "version.h"
-#include "setup.h"
-#include "options.h"
-#include "gui.h"
-#include "hdetachedrenderer.h"
-#include "hfunlab.h"
+#include "version.hxx"
+#include "setup.hxx"
+#include "options.hxx"
+#include "gui.hxx"
+#include "hdetachedrenderer.hxx"
+#include "hfunlab.hxx"
 
 using namespace std;
 using namespace yaal;

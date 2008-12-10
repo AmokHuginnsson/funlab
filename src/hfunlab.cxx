@@ -26,11 +26,11 @@ Copyright:
 
 #include <iostream>
 
-#include <yaal/yaal.h>
+#include <yaal/yaal.hxx>
 M_VCSID( "$Id: "__ID__" $" )
-#include "hfunlab.h"
+#include "hfunlab.hxx"
 
-#include "setup.h"
+#include "setup.hxx"
 
 using namespace std;
 using namespace yaal;

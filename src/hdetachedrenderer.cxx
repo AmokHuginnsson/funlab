@@ -31,10 +31,10 @@ Copyright:
 #include <libintl.h>
 #include <SDL/SDL.h>
 
-#include <yaal/yaal.h>
+#include <yaal/yaal.hxx>
 M_VCSID( "$Id: "__ID__" $" )
-#include "hdetachedrenderer.h"
-#include "setup.h"
+#include "hdetachedrenderer.hxx"
+#include "setup.hxx"
 
 using namespace std;
 using namespace yaal;

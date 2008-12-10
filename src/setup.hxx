@@ -1,7 +1,7 @@
 /*
 ---            `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
 
-	setup.h - this file is integral part of `funlab' project.
+	setup.hxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -28,7 +28,7 @@ Copyright:
 #define __SETUP_H
 
 #include <iostream>
-#include <yaal/yaal.h>
+#include <yaal/yaal.hxx>
 
 #define out ( cout << __FILE__ + OSetup::PATH_OFFSET << ":" << __LINE__ << ": " )
 

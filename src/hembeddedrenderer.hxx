@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hembeddedrenderer.h - this file is integral part of `funlab' project.
+	hembeddedrenderer.hxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -29,9 +29,9 @@ Copyright:
 
 #include <gtkmm.h>
 #include <libglademm/xml.h>
-#include <yaal/hcore/base.h>
+#include <yaal/hcore/base.hxx>
 
-#include "hrenderer.h"
+#include "hrenderer.hxx"
 
 namespace funlab
 {

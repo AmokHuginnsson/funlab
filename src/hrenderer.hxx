@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hrenderer.h - this file is integral part of `funlab' project.
+	hrenderer.hxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -27,9 +27,9 @@ Copyright:
 #ifndef __FUNLAB_HRENDERER_H
 #define __FUNLAB_HRENDERER_H
 
-#include <yaal/hcore/hpointer.h>
+#include <yaal/hcore/hpointer.hxx>
 
-#include "events.h"
+#include "events.hxx"
 
 namespace funlab
 {

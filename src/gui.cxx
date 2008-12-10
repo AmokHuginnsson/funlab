@@ -30,16 +30,16 @@ Copyright:
 #include <iostream>
 #include <libintl.h>
 
-#include <yaal/yaal.h>
+#include <yaal/yaal.hxx>
 M_VCSID( "$Id: "__ID__" $" )
-#include "gui.h"
+#include "gui.hxx"
 
-#include "version.h"
-#include "setup.h"
-#include "hdetachedrenderer.h"
-#include "hembeddedrenderer.h"
-#include "events.h"
-#include "hfunlab.h"
+#include "version.hxx"
+#include "setup.hxx"
+#include "hdetachedrenderer.hxx"
+#include "hembeddedrenderer.hxx"
+#include "events.hxx"
+#include "hfunlab.hxx"
 
 using namespace std;
 using namespace yaal::hcore;

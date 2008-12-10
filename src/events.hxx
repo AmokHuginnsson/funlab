@@ -27,7 +27,7 @@ Copyright:
 #ifndef __FUNLAB_EVENTS_H
 #define __FUNLAB_EVENTS_H
 
-#include "heventlistener.h"
+#include "heventlistener.hxx"
 
 namespace funlab
 {

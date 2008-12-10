@@ -27,11 +27,11 @@ Copyright:
 #include <iostream>
 #include <gtkmm.h>
 
-#include <yaal/yaal.h>
+#include <yaal/yaal.hxx>
 M_VCSID( "$Id: "__ID__" $" )
-#include "hembeddedrenderer.h"
-#include "setup.h"
-#include "hfunlab.h"
+#include "hembeddedrenderer.hxx"
+#include "setup.hxx"
+#include "hfunlab.hxx"
 
 using namespace std;
 using namespace yaal;
