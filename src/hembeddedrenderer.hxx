@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __FUNLAB_HEMBEDDEDRENDERER_H
-#define __FUNLAB_HEMBEDDEDRENDERER_H
+#ifndef FUNLAB_HEMBEDDEDRENDERER_HXX_INCLUDED
+#define FUNLAB_HEMBEDDEDRENDERER_HXX_INCLUDED
 
 #include <gtkmm.h>
 #include <libglademm/xml.h>
@@ -79,5 +79,5 @@ private:
 
 }
 
-#endif /* not __FUNLAB_HEMBEDDEDRENDERER_H */
+#endif /* not FUNLAB_HEMBEDDEDRENDERER_HXX_INCLUDED */
 

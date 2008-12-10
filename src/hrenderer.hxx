@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __FUNLAB_HRENDERER_H
-#define __FUNLAB_HRENDERER_H
+#ifndef FUNLAB_HRENDERER_HXX_INCLUDED
+#define FUNLAB_HRENDERER_HXX_INCLUDED
 
 #include <yaal/hcore/hpointer.hxx>
 
@@ -84,5 +84,5 @@ protected:
 
 }
 
-#endif /* not __FUNLAB_HRENDERER_H */
+#endif /* not FUNLAB_HRENDERER_HXX_INCLUDED */
 

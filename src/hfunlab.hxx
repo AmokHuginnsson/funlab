@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __FUNLAB_HFUNLAB_H
-#define __FUNLAB_HFUNLAB_H
+#ifndef FUNLAB_HFUNLAB_HXX_INCLUDED
+#define FUNLAB_HFUNLAB_HXX_INCLUDED
 
 #include <yaal/tools/hexpression.hxx>
 
@@ -124,5 +124,5 @@ private:
 
 }
 
-#endif /* not __FUNLAB_HFUNLAB_H */
+#endif /* not FUNLAB_HFUNLAB_HXX_INCLUDED */
 

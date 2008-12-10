@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __FUNLAB_HDETACHEDRENDERER_H
-#define __FUNLAB_HDETACHEDRENDERER_H
+#ifndef FUNLAB_HDETACHEDRENDERER_HXX_INCLUDED
+#define FUNLAB_HDETACHEDRENDERER_HXX_INCLUDED
 
 #include <yaal/hcore/hthread.hxx>
 
@@ -83,5 +83,5 @@ private:
 
 }
 
-#endif /* not __FUNLAB_HDETACHEDRENDERER_H */
+#endif /* not FUNLAB_HDETACHEDRENDERER_HXX_INCLUDED */
 

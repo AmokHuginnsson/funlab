@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	heventlistener.h - this file is integral part of `funlab' project.
+	heventlistener.hxx - this file is integral part of `funlab' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef __FUNLAB_HEVENTLISTENER_H
-#define __FUNLAB_HEVENTLISTENER_H
+#ifndef FUNLAB_HEVENTLISTENER_HXX_INCLUDED
+#define FUNLAB_HEVENTLISTENER_HXX_INCLUDED
 
 namespace funlab
 {
@@ -43,5 +43,5 @@ protected:
 
 }
 
-#endif /* not __FUNLAB_HEVENTLISTENER_H */
+#endif /* not FUNLAB_HEVENTLISTENER_HXX_INCLUDED */
 
