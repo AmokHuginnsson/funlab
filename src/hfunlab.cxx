@@ -231,7 +231,7 @@ void HFunlab::do_draw_frame( void )
 			{
 			if ( ! setup.f_bStereo && setup.f_bShowAxis )
 				draw_axis();
-			int sfSize = f_oExpressions.size();
+			int sfSize = static_cast<int>( f_oExpressions.size() );
 			for ( int sf = 0; sf < sfSize; ++ sf )
 				{
 				bool valid = false, oldvalid = false;
@@ -288,7 +288,7 @@ void HFunlab::do_draw_frame( void )
 					{
 					double long val = static_cast<double long>( it->evaluate() ) * setup.f_iResolutionY;
 					if ( x )
-						f_poRenderer->line( x, - val + setup.f_iResolutionY / 2, x - 1, - oldVal + setup.f_iResolutionY / 2, f_ulColor );
+						f_poRenderer->line( x, - static_cast<double>( val ) + setup.f_iResolutionY / 2, x - 1, - static_cast<double>( oldVal ) + setup.f_iResolutionY / 2, f_ulColor );
 					oldVal = val;
 					}
 				catch ( HExpressionException& )
@@ -492,7 +492,7 @@ void HFunlab::regen_cache( int size )
 	{
 	M_PROLOG
 	f_oNode.pool_realloc( size );
-	f_oMesh.set_size( size, f_oExpressions.size() );
+	f_oMesh.set_size( size, static_cast<int>( f_oExpressions.size() ) );
 	if ( ! f_oExpressions.empty() )
 		generate_surface();
 	M_EPILOG
