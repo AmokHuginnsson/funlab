@@ -41,7 +41,6 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "events.hxx"
 #include "hfunlab.hxx"
 
-using namespace std;
 using namespace yaal::hcore;
 
 namespace funlab
@@ -683,12 +682,12 @@ int gui_start( int a_iArgc, char* a_ppcArgv[] )
 		}
 	catch ( Glib::Exception& e )
 		{
-		cerr << "Glib::Exception: " << e.what() << endl;
+		std::cerr << "Glib::Exception: " << e.what() << std::endl;
 		return ( -1 );
 		}
 	catch ( std::exception& e )
 		{
-		cerr << "std::exception: " << e.what() << endl;
+		std::cerr << "std::exception: " << e.what() << std::endl;
 		return ( -1 );
 		}
 	return ( 0 );
