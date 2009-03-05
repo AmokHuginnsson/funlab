@@ -40,6 +40,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hembeddedrenderer.hxx"
 #include "events.hxx"
 #include "hfunlab.hxx"
+#include "oplotdesc.hxx"
 
 using namespace yaal::hcore;
 
@@ -60,7 +61,7 @@ protected:
 	bool f_bLock;
 	Glib::RefPtr<Gtk::ListStore> f_oFormulasListModel;
 	Gtk::TreeModel::ColumnRecord f_oFormulasListColumns;
-	Gtk::TreeModelColumn<Glib::ustring> f_oFormulasListFormulaColumn;
+	Gtk::TreeModelColumn<OPlotDesc> f_oFormulasListFormulaColumn;
 	Gtk::TreeView* f_poFormulasListView;
 	Gtk::Scale* f_poDensity;
 	Gtk::CheckButton* f_po3D;
@@ -108,6 +109,7 @@ protected:
 	void show_error_message( char const* const, char const* const, int );
 	void set_font_all( Pango::FontDescription const&, Gtk::Widget* );
 	void selected_row_callback( Gtk::TreeModel::iterator const& );
+	static void get_value_for_cell( Gtk::CellRenderer*, Gtk::TreeModel::iterator const&, Gtk::TreeModelColumn<OPlotDesc> const& );
 	HFunlab* funlab( void );
 	void open( HString const& );
 	void save( HString const& );
@@ -128,12 +130,39 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	HRendererEngineInterface::ptr_t ere( new HFunlab( f_poEmbeddedRenderer ) );
 	f_poEmbeddedRenderer->set_engine( ere );
 
-	/* FORMULAS LIST */
+	/* Formulas List */
 	a_roResources->get_widget( "TREE_FORMULAS", f_poFormulasListView );
 	f_oFormulasListColumns.add( f_oFormulasListFormulaColumn );
 	f_oFormulasListModel = Gtk::ListStore::create( f_oFormulasListColumns );
 	f_poFormulasListView->set_model( f_oFormulasListModel );
-	f_poFormulasListView->append_column_editable( _( "Formulas" ), f_oFormulasListFormulaColumn );
+
+	/* Very nontrivial column appending! */
+
+/* 
+ * Use a CellRendererText:
+ * We don't use TreeView::Column::append_column(model_column) to generate an appropriate CellRenderer, 
+ * because that uses set_renderer(), which renders the model value using the automatic glib "transformations"
+ * (number-string conversions). As well as being unnecessary here, those automatic conversions can't handle all numeric types.
+ *
+ * Some compilers don't like us to give the pointer to a template function directly to sigc::ptr_fun():
+ *
+ * Connect a cell_data callback, to show the number's text representation in the specified format:
+ * We use sigc::bind<-1> twice here, instead of sigc::bind() once, because some compilers need the extra hint.  
+*/
+
+	Gtk::TreeViewColumn* const col = Gtk::manage( new Gtk::TreeViewColumn( _( "Formulas" ) ) );
+	Gtk::CellRenderer* pCellRenderer = manage( new Gtk::CellRendererText() );
+  col->pack_start( *pCellRenderer );
+  typedef void ( *get_value_for_cell_t )( Gtk::CellRenderer*, Gtk::TreeModel::iterator const&, Gtk::TreeModelColumn<OPlotDesc> const& );
+  get_value_for_cell_t value_getter = &HWindowMain::get_value_for_cell;
+  Gtk::TreeViewColumn::SlotCellData slot = sigc::bind<-1>(
+			sigc::ptr_fun( value_getter ),
+			f_oFormulasListFormulaColumn );
+	col->set_cell_data_func( *pCellRenderer, slot );
+	f_poFormulasListView->append_column( *col );
+
+	/* Rest of this stuff is plain and simple. */
+
 	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
 	l_oSelection->set_mode( Gtk::SELECTION_SINGLE );
 	l_oSelection->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_sel_changed ) );
@@ -282,7 +311,7 @@ void HWindowMain::open( HString const& a_oPath )
 		while ( l_oFile.read_line( l_oLine, HFile::READ::D_STRIP_NEWLINES ) >= 0 )
 			{
 			l_oRow = *( f_oFormulasListModel->append() );
-			l_oRow[ f_oFormulasListFormulaColumn ] = l_oLine.raw();
+			l_oRow[ f_oFormulasListFormulaColumn ] = OPlotDesc( l_oLine );
 			l_iIndex ++;
 			}
 		l_oFile.close();
@@ -333,7 +362,7 @@ void HWindowMain::save( HString const& a_oPath )
 		{
 		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
 		for ( Gtk::TreeIter l_oIter = l_oRows.begin(); l_oIter != l_oRows.end(); ++ l_oIter )
-			l_oFile << l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str() << endl;
+			l_oFile << l_oIter->get_value( f_oFormulasListFormulaColumn )._formula << endl;
 
 		l_oFile.close();
 		}
@@ -434,7 +463,7 @@ void HWindowMain::selected_row_callback( Gtk::TreeModel::iterator const& iter )
 	HFunlab* f = NULL;
 	if ( iter && ( f = funlab() ) )
 		{
-		f->push_formula( iter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+		f->push_formula( iter->get_value( f_oFormulasListFormulaColumn ) );
 		update_drawing( false );
 		}
 	M_EPILOG
@@ -453,7 +482,7 @@ void HWindowMain::on_sel_changed( void )
 		else
 			{
 			Gtk::TreeIter iter = l_oSelection->get_selected();
-			f->push_formula( iter->get_value( f_oFormulasListFormulaColumn ).c_str() );
+			f->push_formula( iter->get_value( f_oFormulasListFormulaColumn ) );
 			update_drawing( false );
 			}
 		}
@@ -493,14 +522,14 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 			Gtk::TreeIter l_oIter = l_oSelection->get_selected();
 			if ( l_oIter )
 				{
-				HString l_oFormula = l_oIter->get_value( f_oFormulasListFormulaColumn ).c_str();
+				OPlotDesc const& l_oPlot = l_oIter->get_value( f_oFormulasListFormulaColumn );
 				HDetachedRenderer* dr = NULL;
 				f_oDetachedRenderer = HRendererSurfaceInterface::ptr_t( dr = new HDetachedRenderer( this ) );
 				HRendererEngineInterface::ptr_t dre( new HFunlab( &*f_oDetachedRenderer ) );
 				dr->set_engine( dre );
 				HFunlab* f = dynamic_cast<HFunlab*>( &(*dr->get_engine() ) );
-				if ( f && f->push_formula( l_oFormula ) )
-					show_error_message( l_oFormula.raw(), f->error(), f->error_position() );
+				if ( f && f->push_formula( l_oPlot ) )
+					show_error_message( l_oPlot._formula.raw(), f->error(), f->error_position() );
 				else
 					dr->render_surface();
 				f_bDetachedRendererActive = true;
@@ -666,6 +695,15 @@ void HWindowMain::on_range_upper_bound_changed( void )
 	else
 		f_poRangeUpperBound->set_value( static_cast<double>( setup.f_dRangeUpperBound ) );
 	update_drawing();
+	}
+
+void HWindowMain::get_value_for_cell( Gtk::CellRenderer* cell, Gtk::TreeModel::iterator const& iter, Gtk::TreeModelColumn<OPlotDesc> const& col )
+	{
+	Gtk::CellRendererText* pTextRenderer = dynamic_cast<Gtk::CellRendererText*>(cell);
+	if( ! ( pTextRenderer && ( !! iter ) ) )
+		g_warning( "gtkmm: TextView: bad usage of value_getter." );
+	else
+		pTextRenderer->property_text() = iter->get_value( col )._formula.raw();
 	}
 
 int gui_start( int a_iArgc, char* a_ppcArgv[] )

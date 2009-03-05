@@ -85,7 +85,7 @@ HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	f_dCosBeta( 0 ), f_dSinBeta( 0 ),
 	f_dCosGamma( 0 ), f_dSinGamma( 0 ),
 	f_oCache( 0, 0, 0 ), f_pdTrygo( NULL ),
-	f_oExpressions(), f_poRenderer( a_poRenderer ),
+	f_oPlots(), f_poRenderer( a_poRenderer ),
 	f_oError(), f_iErrorIndex( 0 )
 	{
 	int i = 0;
@@ -108,21 +108,21 @@ void HFunlab::generate_surface( void )
 	if ( size && setup.f_b3D )
 		{
 		int formula = 0;
-		for ( expressions_t::iterator it = f_oExpressions.begin(); it != f_oExpressions.end(); ++ it, ++ formula )
+		for ( plots_t::iterator it = f_oPlots.begin(); it != f_oPlots.end(); ++ it, ++ formula )
 			{
-			double long* l_pdVariables = it->variables();
+			double long* l_pdVariables = it->_expression.variables();
 			f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
 			f_pdYVariable = ( l_pdVariables + 'Y' ) - 'A';
-			( *f_pdYVariable ) = setup.f_dDomainLowerBound;
+			( *f_pdYVariable ) = it->_domainLowerBound;
 			HMesh::OValue** values = f_oMesh.fast( formula );
 			for ( int j = 0; j < size; ++ j )
 				{
-				( *f_pdXVariable ) = setup.f_dDomainLowerBound;
+				( *f_pdXVariable ) = it->_domainLowerBound;
 				for ( int i = 0; i < size; ++ i )
 					{
 					try
 						{
-						values[ i ][ j ]._value = static_cast<double>( it->evaluate() );
+						values[ i ][ j ]._value = static_cast<double>( it->_expression.evaluate() );
 						values[ i ][ j ]._valid = true;
 						}
 					catch ( HExpressionException& )
@@ -231,7 +231,7 @@ void HFunlab::do_draw_frame( void )
 			{
 			if ( ! setup.f_bStereo && setup.f_bShowAxis )
 				draw_axis();
-			int sfSize = static_cast<int>( f_oExpressions.size() );
+			int sfSize = static_cast<int>( f_oPlots.size() );
 			for ( int sf = 0; sf < sfSize; ++ sf )
 				{
 				bool valid = false, oldvalid = false;
@@ -275,18 +275,18 @@ void HFunlab::do_draw_frame( void )
 		}
 	else
 		{
-		for ( expressions_t::iterator it = f_oExpressions.begin(); it != f_oExpressions.end(); ++ it )
+		for ( plots_t::iterator it = f_oPlots.begin(); it != f_oPlots.end(); ++ it )
 			{
-			double long* l_pdVariables = it->variables();
+			double long* l_pdVariables = it->_expression.variables();
 			f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
-			( *f_pdXVariable ) = setup.f_dDomainLowerBound;
-			double long gridSize = ( setup.f_dDomainUpperBound - setup.f_dDomainLowerBound ) / static_cast<double long>( setup.f_iResolutionX );
+			( *f_pdXVariable ) = it->_domainLowerBound;
+			double long gridSize = ( it->_domainUpperBound - it->_domainLowerBound ) / static_cast<double long>( setup.f_iResolutionX );
 			double long oldVal = 0;
 			for ( int x = 0; x < setup.f_iResolutionX; ++ x )
 				{
 				try
 					{
-					double long val = static_cast<double long>( it->evaluate() ) * setup.f_iResolutionY;
+					double long val = static_cast<double long>( it->_expression.evaluate() ) * setup.f_iResolutionY;
 					if ( x )
 						f_poRenderer->line( x, - static_cast<double>( val ) + setup.f_iResolutionY / 2, x - 1, - static_cast<double>( oldVal ) + setup.f_iResolutionY / 2, f_ulColor );
 					oldVal = val;
@@ -462,16 +462,15 @@ void HFunlab::do_on_event( HKeyboardEvent const* e )
 		}
 	}
 
-bool HFunlab::push_formula( HString const& a_oFormula )
+bool HFunlab::push_formula( OPlotDesc a_oFormula )
 	{
 	M_PROLOG
-	if ( ! a_oFormula )
+	if ( ! a_oFormula._formula )
 		return ( true );
-	HExpression ex;
 	try
 		{
-		ex.compile( a_oFormula );
-		f_oExpressions.push_back( ex );
+		a_oFormula._expression.compile( a_oFormula._formula );
+		f_oPlots.push_back( a_oFormula );
 		f_dDY = - 15.0;
 		f_iRed = 8;
 		f_iGreen = 8;
@@ -481,8 +480,8 @@ bool HFunlab::push_formula( HString const& a_oFormula )
 		}
 	catch ( HExpressionException& e )
 		{
-		f_oError = ex.get_error();
-		f_iErrorIndex = ex.get_error_token();
+		f_oError = a_oFormula._expression.get_error();
+		f_iErrorIndex = a_oFormula._expression.get_error_token();
 		}
 	return ( f_iErrorIndex ? true : false );
 	M_EPILOG
@@ -492,8 +491,8 @@ void HFunlab::regen_cache( int size )
 	{
 	M_PROLOG
 	f_oNode.pool_realloc( size );
-	f_oMesh.set_size( size, static_cast<int>( f_oExpressions.size() ) );
-	if ( ! f_oExpressions.empty() )
+	f_oMesh.set_size( size, static_cast<int>( f_oPlots.size() ) );
+	if ( ! f_oPlots.empty() )
 		generate_surface();
 	M_EPILOG
 	}
@@ -515,7 +514,7 @@ int HFunlab::error_position( void ) const
 void HFunlab::clear( void )
 	{
 	M_PROLOG
-	f_oExpressions.clear();
+	f_oPlots.clear();
 	return;
 	M_EPILOG
 	}

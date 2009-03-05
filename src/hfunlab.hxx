@@ -30,6 +30,7 @@ Copyright:
 #include <yaal/tools/hexpression.hxx>
 
 #include "hrenderer.hxx"
+#include "oplotdesc.hxx"
 
 namespace funlab
 {
@@ -96,15 +97,15 @@ class HFunlab : public HRendererEngineInterface
 		double f_dPreCalcC;
 		} f_oCache;
 	double* f_pdTrygo;
-	typedef yaal::hcore::HList<yaal::tools::HExpression> expressions_t;
-	expressions_t f_oExpressions;
+	typedef yaal::hcore::HList<OPlotDesc> plots_t;
+	plots_t f_oPlots;
 	HRendererSurfaceInterface* f_poRenderer;
 	yaal::hcore::HString f_oError;
 	int f_iErrorIndex;
 public:
 	HFunlab( HRendererSurfaceInterface* );
 	virtual ~HFunlab( void );
-	bool push_formula( yaal::hcore::HString const& );
+	bool push_formula( OPlotDesc );
 	char const* error( void ) const;
 	int error_position( void ) const;
 	void regen_cache( int );
