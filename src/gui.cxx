@@ -356,7 +356,7 @@ void HWindowMain::save( HString const& a_oPath )
 	if ( a_oPath.is_empty() )
 		M_THROW( _( "Empty path." ), errno );
 
-	HFile l_oFile( HFile::OPEN::D_WRITING );
+	HFile l_oFile( HFile::open_t( HFile::OPEN::D_WRITING ) );
 	l_oFile.open( a_oPath );
 	if ( !!l_oFile )
 		{
