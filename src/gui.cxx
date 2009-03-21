@@ -72,6 +72,7 @@ protected:
 	Gtk::SpinButton* f_poDomainUpperBound;
 	Gtk::SpinButton* f_poRangeLowerBound;
 	Gtk::SpinButton* f_poRangeUpperBound;
+	Gtk::Entry* f_poFormula;
 	Glib::Dispatcher f_oDispatcher;
 	bool f_bDetachedRendererActive;
 	HEmbeddedRenderer* f_poEmbeddedRenderer;
@@ -120,6 +121,9 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	Glib::RefPtr<Gnome::Glade::Xml> const& a_roResources ) : Gtk::Window( a_poBaseObject ),
 	f_bLock( false ), f_poFormulasListView( NULL ), f_poDensity( NULL ),
 	f_po3D( NULL ), f_poMultiFormula( NULL ), f_poShowAxis( NULL ),
+	f_poDomainLowerBound( NULL ), f_poDomainUpperBound( NULL ),
+	f_poRangeLowerBound( NULL ), f_poRangeUpperBound( NULL ),
+	f_poFormula( NULL ),
 	f_bDetachedRendererActive( false ), f_oDetachedRenderer()
 	{
 	M_PROLOG
@@ -200,6 +204,8 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	a_roResources->get_widget( "RANGE_UPPER_BOUND", f_poRangeUpperBound );
 	f_poRangeUpperBound->set_value( static_cast<double>( setup.f_dRangeUpperBound ) );
 	f_poRangeUpperBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_range_upper_bound_changed ) );
+
+	a_roResources->get_widget( "FORMULA", f_poFormula );
 
 	a_roResources->get_widget( "MODE_3D", f_po3D );
 	f_po3D->set_active( setup.f_b3D );
@@ -304,22 +310,33 @@ void HWindowMain::open( HString const& a_oPath )
 	HString l_oLine;
 	HFile l_oFile;
 	Gtk::TreeModel::Row l_oRow;
-	l_oFile.open( a_oPath );
-	if ( !!l_oFile )
+	try
 		{
-		f_oFormulasListModel->clear();
-		while ( l_oFile.read_line( l_oLine, HFile::READ::D_STRIP_NEWLINES ) >= 0 )
+		l_oFile.open( a_oPath );
+		if ( !!l_oFile )
 			{
-			l_oRow = *( f_oFormulasListModel->append() );
-			l_oRow[ f_oFormulasListFormulaColumn ] = OPlotDesc( l_oLine );
-			l_iIndex ++;
+			f_oFormulasListModel->clear();
+			while ( l_oFile.read_line( l_oLine, HFile::READ::D_STRIP_NEWLINES ) >= 0 )
+				{
+				l_oRow = *( f_oFormulasListModel->append() );
+				l_oRow[ f_oFormulasListFormulaColumn ] = plot_desc_from_string( l_oLine );
+				l_iIndex ++;
+				}
+			l_oFile.close();
 			}
-		l_oFile.close();
 		}
-	f_poFormulasListView->grab_focus();
-	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
+	catch ( HException const& e )
+		{
+		Gtk::MessageDialog l_oInfo( *this, e.what(), true );
+		l_oInfo.set_title( _( "Error loading file ..." ) );
+		Pango::FontDescription l_oFontDesc( "Sans Bold 14" );
+		set_font_all( l_oFontDesc, &l_oInfo );
+		l_oInfo.run();
+		}
 	if ( l_iIndex )
 		{
+		f_poFormulasListView->grab_focus();
+		Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
 		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
 		Gtk::TreeIter l_oIter = l_oRows.begin();
 		f_poFormulasListView->set_cursor ( f_oFormulasListModel->get_path ( l_oIter ) );
@@ -362,7 +379,7 @@ void HWindowMain::save( HString const& a_oPath )
 		{
 		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
 		for ( Gtk::TreeIter l_oIter = l_oRows.begin(); l_oIter != l_oRows.end(); ++ l_oIter )
-			l_oFile << l_oIter->get_value( f_oFormulasListFormulaColumn )._formula << endl;
+			l_oFile << l_oIter->get_value( f_oFormulasListFormulaColumn ) << endl;
 
 		l_oFile.close();
 		}
@@ -482,7 +499,14 @@ void HWindowMain::on_sel_changed( void )
 		else
 			{
 			Gtk::TreeIter iter = l_oSelection->get_selected();
-			f->push_formula( iter->get_value( f_oFormulasListFormulaColumn ) );
+			OPlotDesc plot = iter->get_value( f_oFormulasListFormulaColumn );
+			f_poFormula->set_text( plot._formula.raw() );
+			f_po3D->set_active( plot._3d );
+			f_poDomainLowerBound->set_value( static_cast<double>( plot._domainLowerBound ) );
+			f_poDomainUpperBound->set_value( static_cast<double>( plot._domainUpperBound ) );
+			f_poRangeLowerBound->set_value( static_cast<double>( plot._rangeLowerBound ) );
+			f_poRangeUpperBound->set_value( static_cast<double>( plot._rangeUpperBound ) );
+			f->push_formula( plot );
 			update_drawing( false );
 			}
 		}

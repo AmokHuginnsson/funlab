@@ -30,6 +30,8 @@ M_VCSID( "$Id: "__ID__" $" )
 
 #include "setup.hxx"
 
+using namespace yaal;
+
 namespace funlab
 {
 
@@ -41,6 +43,33 @@ OPlotDesc::OPlotDesc( yaal::hcore::HString const& formula )
 	_rangeUpperBound( setup.f_dDomainUpperBound ),
 	_formula( formula )
 	{
+	}
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream, OPlotDesc const& plot )
+	{
+	M_PROLOG
+	stream << ( plot._3d ? "true" : "false" ) << ";"
+		<< plot._domainLowerBound << ";"
+		<< plot._domainUpperBound << ";"
+		<< plot._rangeLowerBound << ";"
+		<< plot._rangeUpperBound << ";"
+		<< plot._formula;
+	return ( stream );
+	M_EPILOG
+	}
+
+OPlotDesc plot_desc_from_string( yaal::hcore::HString const& line )
+	{
+	M_PROLOG
+	OPlotDesc plot;
+	plot._3d = lexical_cast<bool>( line.split( ";", 0 ) );
+	plot._domainLowerBound = lexical_cast<double long>( line.split( ";", 1 ) );
+	plot._domainUpperBound = lexical_cast<double long>( line.split( ";", 2 ) );
+	plot._rangeLowerBound = lexical_cast<double long>( line.split( ";", 3 ) );
+	plot._rangeUpperBound = lexical_cast<double long>( line.split( ";", 4 ) );
+	plot._formula = line.split( ";", 5 );
+	return ( plot );
+	M_EPILOG
 	}
 
 }

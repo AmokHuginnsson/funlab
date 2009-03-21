@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--*- mode: xml -*-->
+<?xml version="1.0"?>
 <glade-interface>
+  <!-- interface-requires gtk+ 2.16 -->
+  <!-- interface-naming-policy toplevel-contextual -->
   <widget class="GtkWindow" id="WINDOW_MAIN">
     <property name="visible">True</property>
     <property name="title" translatable="yes">funlab 0.0.0</property>
-    <property name="default_width">640</property>
+    <property name="default_width">800</property>
     <property name="default_height">360</property>
     <property name="icon">funlab.xpm</property>
     <child>
@@ -17,7 +17,7 @@
           <widget class="GtkAspectFrame" id="ASPECT_KEEPER">
             <property name="visible">True</property>
             <property name="label_xalign">0</property>
-            <property name="shadow_type">GTK_SHADOW_NONE</property>
+            <property name="shadow_type">none</property>
             <child>
               <widget class="GtkDrawingArea" id="RENDERER">
                 <property name="visible">True</property>
@@ -56,32 +56,32 @@
                                   <widget class="GtkMenu" id="MENU_FILE">
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_NEW">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-new</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
                                     </child>
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_OPEN">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-open</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
                                     </child>
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_SAVE">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-save</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
                                     </child>
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_SAVE_AS">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-save-as</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
@@ -93,8 +93,8 @@
                                     </child>
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_QUIT">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-quit</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
@@ -112,32 +112,32 @@
                                   <widget class="GtkMenu" id="MENU_EDIT">
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_CUT">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-cut</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
                                     </child>
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_COPY">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-copy</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
                                     </child>
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_PASTE">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-paste</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
                                     </child>
                                     <child>
                                       <widget class="GtkImageMenuItem" id="ID_MENU_DELETE">
-                                        <property name="visible">True</property>
                                         <property name="label">gtk-delete</property>
+                                        <property name="visible">True</property>
                                         <property name="use_underline">True</property>
                                         <property name="use_stock">True</property>
                                       </widget>
@@ -172,20 +172,22 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkToolbar" id="TOOLBAR">
                     <property name="visible">True</property>
-                    <property name="toolbar_style">GTK_TOOLBAR_BOTH_HORIZ</property>
+                    <property name="toolbar_style">both-horiz</property>
                     <property name="show_arrow">False</property>
-                    <property name="icon_size">GTK_ICON_SIZE_SMALL_TOOLBAR</property>
+                    <property name="icon_size">0</property>
                     <child>
                       <widget class="GtkToolButton" id="ID_TOOLBAR_NEW">
                         <property name="visible">True</property>
                         <property name="stock_id">gtk-new</property>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="homogeneous">True</property>
                       </packing>
                     </child>
@@ -195,6 +197,7 @@
                         <property name="stock_id">gtk-open</property>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="homogeneous">True</property>
                       </packing>
                     </child>
@@ -204,6 +207,7 @@
                         <property name="stock_id">gtk-save-as</property>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="homogeneous">True</property>
                       </packing>
                     </child>
@@ -213,6 +217,7 @@
                         <property name="stock_id">gtk-add</property>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="homogeneous">True</property>
                       </packing>
                     </child>
@@ -222,6 +227,7 @@
                         <property name="stock_id">gtk-remove</property>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="homogeneous">True</property>
                       </packing>
                     </child>
@@ -231,6 +237,7 @@
                         <property name="stock_id">gtk-quit</property>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="homogeneous">True</property>
                       </packing>
                     </child>
@@ -240,6 +247,7 @@
                         <property name="stock_id">gtk-about</property>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="homogeneous">True</property>
                       </packing>
                     </child>
@@ -252,62 +260,19 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
               <widget class="GtkTable" id="SETUP">
                 <property name="visible">True</property>
-                <property name="n_rows">4</property>
                 <property name="n_columns">3</property>
                 <child>
-                  <widget class="GtkVBox" id="SETUP_3D">
-                    <property name="visible">True</property>
-                    <child>
-                      <widget class="GtkCheckButton" id="MODE_3D">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">3D mode</property>
-                        <property name="response_id">0</property>
-                        <property name="draw_indicator">True</property>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkCheckButton" id="STEREO">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">Stereo</property>
-                        <property name="response_id">0</property>
-                        <property name="draw_indicator">True</property>
-                      </widget>
-                      <packing>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                  </widget>
-                  <packing>
-                    <property name="y_options"></property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label1">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Interval
-bound</property>
-                    <property name="justify">GTK_JUSTIFY_CENTER</property>
-                    <property name="wrap_mode">PANGO_WRAP_WORD_CHAR</property>
-                  </widget>
-                  <packing>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                  </packing>
-                </child>
-                <child>
                   <widget class="GtkCheckButton" id="AXIS">
+                    <property name="label" translatable="yes">Display Axis</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">Display
-Axis</property>
-                    <property name="response_id">0</property>
+                    <property name="receives_default">False</property>
                     <property name="draw_indicator">True</property>
                   </widget>
                   <packing>
@@ -317,62 +282,101 @@ Axis</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label2">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">domain</property>
-                  </widget>
-                  <packing>
-                    <property name="top_attach">2</property>
-                    <property name="bottom_attach">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label3">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">range</property>
-                  </widget>
-                  <packing>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkLabel" id="label4">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">lower</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                  </packing>
-                </child>
-                <child>
                   <widget class="GtkCheckButton" id="MULTI">
+                    <property name="label" translatable="yes">Multi formula</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">Multi
-formula</property>
-                    <property name="response_id">0</property>
+                    <property name="receives_default">False</property>
                     <property name="draw_indicator">True</property>
                   </widget>
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
                     <property name="y_options"></property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkCheckButton" id="STEREO">
+                    <property name="label" translatable="yes">Stereo</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="draw_indicator">True</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkHScale" id="DENSITY">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="update_policy">delayed</property>
+                <property name="adjustment">20 20 110 1 10 10</property>
+                <property name="digits">0</property>
+                <property name="value_pos">left</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkTable" id="PLOT_DESC">
+                <property name="visible">True</property>
+                <property name="n_rows">4</property>
+                <property name="n_columns">4</property>
+                <child>
+                  <widget class="GtkLabel" id="label9">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">lower</property>
+                  </widget>
+                  <packing>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label10">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">upper</property>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
                   </packing>
                 </child>
                 <child>
                   <widget class="GtkSpinButton" id="DOMAIN_LOWER_BOUND">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="tooltip_text">Domain interval lower bound.</property>
+                    <property name="invisible_char">&#x25CF;</property>
                     <property name="adjustment">0 -10 10 0.10000000000000001 1 0</property>
                     <property name="climb_rate">0.10000000000000001</property>
                     <property name="digits">2</property>
                     <property name="numeric">True</property>
-                    <property name="update_policy">GTK_UPDATE_IF_VALID</property>
+                    <property name="update_policy">if-valid</property>
+                  </widget>
+                  <packing>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkSpinButton" id="DOMAIN_UPPER_BOUND">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="adjustment">0 -10 10 0.10000000000000001 1 0</property>
+                    <property name="climb_rate">0.10000000000000001</property>
+                    <property name="digits">2</property>
+                    <property name="numeric">True</property>
+                    <property name="update_policy">if-valid</property>
                   </widget>
                   <packing>
                     <property name="left_attach">1</property>
@@ -382,45 +386,15 @@ formula</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label5">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">upper</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">3</property>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                  </packing>
-                </child>
-                <child>
                   <widget class="GtkSpinButton" id="RANGE_LOWER_BOUND">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="tooltip_text">Range interval lower bound.</property>
+                    <property name="invisible_char">&#x25CF;</property>
                     <property name="adjustment">0 -10 10 0.10000000000000001 1 0</property>
                     <property name="climb_rate">0.10000000000000001</property>
                     <property name="digits">2</property>
                     <property name="numeric">True</property>
-                    <property name="update_policy">GTK_UPDATE_IF_VALID</property>
-                  </widget>
-                  <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
-                    <property name="top_attach">3</property>
-                    <property name="bottom_attach">4</property>
-                  </packing>
-                </child>
-                <child>
-                  <widget class="GtkSpinButton" id="DOMAIN_UPPER_BOUND">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="tooltip_text">Domain interval upper bound.</property>
-                    <property name="adjustment">0 -10 10 0.10000000000000001 1 0</property>
-                    <property name="climb_rate">0.10000000000000001</property>
-                    <property name="digits">2</property>
-                    <property name="numeric">True</property>
-                    <property name="update_policy">GTK_UPDATE_IF_VALID</property>
+                    <property name="update_policy">if-valid</property>
                   </widget>
                   <packing>
                     <property name="left_attach">2</property>
@@ -433,16 +407,106 @@ formula</property>
                   <widget class="GtkSpinButton" id="RANGE_UPPER_BOUND">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="tooltip_text">Range interval upper bound.</property>
+                    <property name="invisible_char">&#x25CF;</property>
                     <property name="adjustment">0 -10 10 0.10000000000000001 1 0</property>
                     <property name="climb_rate">0.10000000000000001</property>
                     <property name="digits">2</property>
                     <property name="numeric">True</property>
-                    <property name="update_policy">GTK_UPDATE_IF_VALID</property>
+                    <property name="update_policy">if-valid</property>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">3</property>
+                    <property name="right_attach">4</property>
+                    <property name="top_attach">2</property>
+                    <property name="bottom_attach">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label2">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">lower</property>
                   </widget>
                   <packing>
                     <property name="left_attach">2</property>
                     <property name="right_attach">3</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label3">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">upper	</property>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">3</property>
+                    <property name="right_attach">4</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label4">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">Domain bound</property>
+                  </widget>
+                  <packing>
+                    <property name="right_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label5">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">Range bound</property>
+                  </widget>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="right_attach">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="GtkHBox" id="PLOT_DESC_HBOX">
+                    <property name="visible">True</property>
+                    <child>
+                      <widget class="GtkLabel" id="label1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Formula</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="padding">8</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkEntry" id="FORMULA">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">&#x25CF;</property>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkCheckButton" id="MODE_3D">
+                        <property name="label" translatable="yes">3D mode</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="padding">8</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="right_attach">4</property>
                     <property name="top_attach">3</property>
                     <property name="bottom_attach">4</property>
                   </packing>
@@ -450,29 +514,15 @@ formula</property>
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <widget class="GtkHScale" id="DENSITY">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="update_policy">GTK_UPDATE_DELAYED</property>
-                <property name="adjustment">20 20 110 1 10 10</property>
-                <property name="digits">0</property>
-                <property name="value_pos">GTK_POS_LEFT</property>
-              </widget>
-              <packing>
-                <property name="expand">False</property>
-                <property name="position">2</property>
+                <property name="position">3</property>
               </packing>
             </child>
             <child>
               <widget class="GtkScrolledWindow" id="FORMULAS_SCROLLED_WINDOW">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                <property name="hscrollbar_policy">automatic</property>
+                <property name="vscrollbar_policy">automatic</property>
                 <child>
                   <widget class="GtkTreeView" id="TREE_FORMULAS">
                     <property name="visible">True</property>
@@ -481,7 +531,7 @@ formula</property>
                 </child>
               </widget>
               <packing>
-                <property name="position">3</property>
+                <property name="position">4</property>
               </packing>
             </child>
           </widget>
