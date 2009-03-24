@@ -43,6 +43,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "oplotdesc.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace funlab
 {
@@ -57,7 +58,6 @@ class HWindowMain : public Gtk::Window, public HKeyboardEventListener
 		friend class HWindowMain;
 		};
 protected:
-	/*{*/
 	bool f_bLock;
 	Glib::RefPtr<Gtk::ListStore> f_oFormulasListModel;
 	Gtk::TreeModel::ColumnRecord f_oFormulasListColumns;
@@ -77,15 +77,10 @@ protected:
 	bool f_bDetachedRendererActive;
 	HEmbeddedRenderer* f_poEmbeddedRenderer;
 	HDetachedRenderer::ptr_t f_oDetachedRenderer;
-	/*}*/
 public:
-	/*{*/
 	HWindowMain( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
 	virtual ~HWindowMain( void );
-
-	/*}*/
 protected:
-	/*{*/
 	void shutdown_renderer( void );
 	void on_new( void );
 	void on_open( void );
@@ -104,6 +99,8 @@ protected:
 	void on_domain_upper_bound_changed( void );
 	void on_range_lower_bound_changed( void );
 	void on_range_upper_bound_changed( void );
+	void on_formula_changed( void );
+	void on_plot_data_changed( void );
 	void update_drawing( bool = true );
 	bool on_key_press( GdkEventKey* );
 	virtual void do_on_event( HKeyboardEvent const* );
@@ -114,7 +111,6 @@ protected:
 	HFunlab* funlab( void );
 	void open( HString const& );
 	void save( HString const& );
-	/*}*/
 	};
 
 HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
@@ -206,6 +202,7 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
 	f_poRangeUpperBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_range_upper_bound_changed ) );
 
 	a_roResources->get_widget( "FORMULA", f_poFormula );
+	f_poFormula->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_formula_changed ) );
 
 	a_roResources->get_widget( "MODE_3D", f_po3D );
 	f_po3D->set_active( setup.f_b3D );
@@ -440,7 +437,7 @@ void HWindowMain::on_remove( void )
 			if ( l_oIter != l_oRows.begin() )
 				{
 				l_oIterNew = l_oIter;
-				-- l_oIter;
+				-- l_oIterNew;
 				}
 			}
 
@@ -499,15 +496,18 @@ void HWindowMain::on_sel_changed( void )
 		else
 			{
 			Gtk::TreeIter iter = l_oSelection->get_selected();
-			OPlotDesc plot = iter->get_value( f_oFormulasListFormulaColumn );
-			f_poFormula->set_text( plot._formula.raw() );
-			f_po3D->set_active( plot._3d );
-			f_poDomainLowerBound->set_value( static_cast<double>( plot._domainLowerBound ) );
-			f_poDomainUpperBound->set_value( static_cast<double>( plot._domainUpperBound ) );
-			f_poRangeLowerBound->set_value( static_cast<double>( plot._rangeLowerBound ) );
-			f_poRangeUpperBound->set_value( static_cast<double>( plot._rangeUpperBound ) );
-			f->push_formula( plot );
-			update_drawing( false );
+			if ( iter )
+				{
+				OPlotDesc plot = iter->get_value( f_oFormulasListFormulaColumn );
+				f_poFormula->set_text( plot._formula.raw() );
+				f_po3D->set_active( plot._3d );
+				f_poDomainLowerBound->set_value( static_cast<double>( plot._domainLowerBound ) );
+				f_poDomainUpperBound->set_value( static_cast<double>( plot._domainUpperBound ) );
+				f_poRangeLowerBound->set_value( static_cast<double>( plot._rangeLowerBound ) );
+				f_poRangeUpperBound->set_value( static_cast<double>( plot._rangeUpperBound ) );
+				f->push_formula( plot );
+				update_drawing( false );
+				}
 			}
 		}
 	return;
@@ -669,8 +669,7 @@ void HWindowMain::on_stereo_changed( void )
 
 void HWindowMain::on_3d_changed( void )
 	{
-	setup.f_b3D = f_po3D->get_active();
-	update_drawing();
+	on_plot_data_changed();
 	}
 
 void HWindowMain::on_multi_changed( void )
@@ -681,6 +680,48 @@ void HWindowMain::on_multi_changed( void )
 	update_drawing();
 	}
 
+void HWindowMain::on_plot_data_changed( void )
+	{
+	OPlotDesc plot;
+	plot._3d = f_po3D->get_active();
+	plot._domainLowerBound = f_poDomainLowerBound->get_value();
+	plot._domainUpperBound = f_poDomainUpperBound->get_value();
+	plot._rangeLowerBound = f_poRangeLowerBound->get_value();
+	plot._rangeUpperBound = f_poRangeUpperBound->get_value();
+	plot._formula = f_poFormula->get_text().c_str();
+	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
+	if ( l_oSelection->get_mode() != Gtk::SELECTION_MULTIPLE )
+		{
+		Gtk::TreeIter iter = l_oSelection->get_selected();
+		if ( iter )
+			iter->set_value( f_oFormulasListFormulaColumn, plot );
+		}
+	HFunlab* f = funlab();
+	if ( f )
+		{
+		f->clear();
+		f->push_formula( plot );
+		update_drawing();
+		}
+	return;
+	}
+
+void HWindowMain::on_formula_changed( void )
+	{
+	HExpression e;
+	Glib::ustring s( f_poFormula->get_text() );
+	try
+		{
+		e.compile( s.c_str() );
+		on_plot_data_changed();
+		}
+	catch ( HExpressionException const& ex )
+		{
+/*		f_poFormula->select_region( e.get_error_token(), static_cast<int>( s.length() - 1 ) ); */
+		}
+	return;
+	}
+
 void HWindowMain::on_domain_lower_bound_changed( void )
 	{
 	double nval = f_poDomainLowerBound->get_value();
@@ -688,7 +729,7 @@ void HWindowMain::on_domain_lower_bound_changed( void )
 		setup.f_dDomainLowerBound = nval;
 	else
 		f_poDomainLowerBound->set_value( static_cast<double>( setup.f_dDomainLowerBound ) );
-	update_drawing();
+	on_plot_data_changed();
 	}
 
 void HWindowMain::on_domain_upper_bound_changed( void )
@@ -698,7 +739,7 @@ void HWindowMain::on_domain_upper_bound_changed( void )
 		setup.f_dDomainUpperBound = nval;
 	else
 		f_poDomainUpperBound->set_value( static_cast<double>( setup.f_dDomainUpperBound ) );
-	update_drawing();
+	on_plot_data_changed();
 	}
 
 void HWindowMain::on_range_lower_bound_changed( void )
@@ -708,7 +749,7 @@ void HWindowMain::on_range_lower_bound_changed( void )
 		setup.f_dRangeLowerBound = nval;
 	else
 		f_poRangeLowerBound->set_value( static_cast<double>( setup.f_dRangeLowerBound ) );
-	update_drawing();
+	on_plot_data_changed();
 	}
 
 void HWindowMain::on_range_upper_bound_changed( void )
@@ -718,7 +759,7 @@ void HWindowMain::on_range_upper_bound_changed( void )
 		setup.f_dRangeUpperBound = nval;
 	else
 		f_poRangeUpperBound->set_value( static_cast<double>( setup.f_dRangeUpperBound ) );
-	update_drawing();
+	on_plot_data_changed();
 	}
 
 void HWindowMain::get_value_for_cell( Gtk::CellRenderer* cell, Gtk::TreeModel::iterator const& iter, Gtk::TreeModelColumn<OPlotDesc> const& col )
