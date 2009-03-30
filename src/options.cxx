@@ -57,7 +57,7 @@ void usage( void* ) __attribute__((__noreturn__));
 void usage( void* arg )
 	{
 	OOptionInfo* info = static_cast<OOptionInfo*>( arg );
-	info->PROC( info->_opt, info->_size, setup.f_pcProgramName, "renders three dimensional function surfaces", NULL );
+	info->PROC( info->_opt, setup.f_pcProgramName, "renders three dimensional function surfaces", NULL );
 	throw ( setup.f_bHelp ? 0 : 1 );
 	}
 
@@ -71,57 +71,47 @@ void version( void* )
 namespace
 {
 
-simple_callback_t help( usage, NULL );
-simple_callback_t dump( usage, NULL );
-simple_callback_t version_call( version, NULL );
-
-OOption n_psOptions[] =
-	{
-		{ "log_path", TYPE::D_HSTRING, &setup.f_oLogPath, NULL, OOption::D_REQUIRED, "path", "path pointing to file for application logs", NULL },
-		{ "resource_path", TYPE::D_HSTRING, &setup.f_oResourcePath, NULL, OOption::D_REQUIRED, "path", "path to XUL resources", NULL },
-		{ "icon_path", TYPE::D_HSTRING, &setup.f_oIconPath, NULL, OOption::D_REQUIRED, "path", "path to icon resources", NULL },
-		{ "resolution-x", TYPE::D_INT, &setup.f_iResolutionX, "X", OOption::D_REQUIRED, "val", "set x resolution to val value", NULL },
-		{ "resolution-y", TYPE::D_INT, &setup.f_iResolutionY, "Y", OOption::D_REQUIRED, "val", "set y resolution to val value", NULL },
-		{ "aspect", TYPE::D_DOUBLE, &setup.f_dAspect, "a", OOption::D_REQUIRED, "expr", "set aspect of drawing to value of expr", NULL },
-		{ "domain-lower-bound", TYPE::D_DOUBLE_LONG, &setup.f_dDomainLowerBound, "[", OOption::D_REQUIRED, "val", "set lower bound for domain interval to val", NULL },
-		{ "domain-upper-bound", TYPE::D_DOUBLE_LONG, &setup.f_dDomainUpperBound, "]", OOption::D_REQUIRED, "val", "set upper bound for domain interval to val", NULL },
-		{ "range-lower-bound", TYPE::D_DOUBLE_LONG, &setup.f_dRangeLowerBound, "{", OOption::D_REQUIRED, "val", "set lower bound for range interval to val", NULL },
-		{ "range-upper-bound", TYPE::D_DOUBLE_LONG, &setup.f_dRangeUpperBound, "}", OOption::D_REQUIRED, "val", "set upper bound for range interval to val", NULL },
-		{ "density", TYPE::D_INT, &setup.f_iDensity, "D", OOption::D_REQUIRED, "val", "set graph density to val", NULL },
-		{ "stereo", TYPE::D_BOOL, &setup.f_bStereo, "S", OOption::D_NONE, NULL, "generate stereo picture", NULL },
-		{ "3D", TYPE::D_BOOL, &setup.f_b3D, "3", OOption::D_NONE, NULL, "draw 3D function surfaces", NULL },
-		{ "show-axis", TYPE::D_BOOL, &setup.f_bShowAxis, "A", OOption::D_NONE, NULL, "draw multiple functions at once", NULL },
-		{ "multi-formula", TYPE::D_BOOL, &setup.f_bMultiFormula, "M", OOption::D_NONE, NULL, "draw axes", NULL },
-		{ "formula", TYPE::D_HSTRING, &setup.f_oFormula, "F", OOption::D_REQUIRED, "eq", "render specified formula", NULL },
-		{ "quiet", TYPE::D_BOOL, &setup.f_bQuiet, "q", OOption::D_NONE, NULL, "inhibit usual output", NULL },
-		{ "silent", TYPE::D_BOOL, &setup.f_bQuiet, "q", OOption::D_NONE, NULL, "inhibit usual output", NULL },
-		{ "verbose", TYPE::D_BOOL, &setup.f_bVerbose, "v", OOption::D_NONE, NULL, "print more information", NULL },
-		{ "help", TYPE::D_BOOL, &setup.f_bHelp, "h", OOption::D_NONE, NULL, "display this help and exit", &help },
-		{ "dump-configuration", TYPE::D_VOID, NULL, "W", OOption::D_NONE, NULL, "dump current configuration", &dump },
-		{ "version", TYPE::D_VOID, NULL, "V", OOption::D_NONE, NULL, "output version information and exit", &version_call },
-		{ NULL, TYPE::D_VOID, NULL, NULL, OOption::D_NONE, NULL, NULL, NULL }
-	};
+HProgramOptionsHandler::simple_callback_t help( usage, NULL );
+HProgramOptionsHandler::simple_callback_t dump( usage, NULL );
+HProgramOptionsHandler::simple_callback_t version_call( version, NULL );
 
 }
 
-int process_funlabrc_file( void )
-	{
-	rc_file::process_rc_file( "funlab", HString(), n_psOptions, NULL );
-	if ( ! setup.f_oLogPath )
-		setup.f_oLogPath = "funlab.log";
-	return ( 0 );
-	}
-
-int decode_switches( int a_iArgc, char** a_ppcArgv )
+int handle_program_options( int a_iArgc, char** a_ppcArgv )
 	{
 	M_PROLOG
+	HProgramOptionsHandler po;
+	po( "log_path", program_options_helper::option_value( setup.f_oLogPath ), NULL, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "path", "path pointing to file for application logs", NULL )
+		( "resource_path", program_options_helper::option_value( setup.f_oResourcePath ), NULL, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "path", "path to XUL resources", NULL )
+		( "icon_path", program_options_helper::option_value( setup.f_oIconPath ), NULL, HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "path", "path to icon resources", NULL )
+		( "resolution-x", program_options_helper::option_value( setup.f_iResolutionX ), "X", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "val", "set x resolution to val value", NULL )
+		( "resolution-y", program_options_helper::option_value( setup.f_iResolutionY ), "Y", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "val", "set y resolution to val value", NULL )
+		( "aspect", program_options_helper::option_value( setup.f_dAspect ), "a", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "expr", "set aspect of drawing to value of expr", NULL )
+		( "domain-lower-bound", program_options_helper::option_value( setup.f_dDomainLowerBound ), "[", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "val", "set lower bound for domain interval to val", NULL )
+		( "domain-upper-bound", program_options_helper::option_value( setup.f_dDomainUpperBound ), "]", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "val", "set upper bound for domain interval to val", NULL )
+		( "range-lower-bound", program_options_helper::option_value( setup.f_dRangeLowerBound ), "{", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "val", "set lower bound for range interval to val", NULL )
+		( "range-upper-bound", program_options_helper::option_value( setup.f_dRangeUpperBound ), "}", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "val", "set upper bound for range interval to val", NULL )
+		( "density", program_options_helper::option_value( setup.f_iDensity ), "D", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "val", "set graph density to val", NULL )
+		( "stereo", program_options_helper::option_value( setup.f_bStereo ), "S", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "generate stereo picture", NULL )
+		( "3D", program_options_helper::option_value( setup.f_b3D ), "3", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "draw 3D function surfaces", NULL )
+		( "show-axis", program_options_helper::option_value( setup.f_bShowAxis ), "A", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "draw multiple functions at once", NULL )
+		( "multi-formula", program_options_helper::option_value( setup.f_bMultiFormula ), "M", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "draw axes", NULL )
+		( "formula", program_options_helper::option_value( setup.f_oFormula ), "F", HProgramOptionsHandler::OOption::TYPE::D_REQUIRED, "eq", "render specified formula", NULL )
+		( "quiet", program_options_helper::option_value( setup.f_bQuiet ), "q", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "inhibit usual output", NULL )
+		( "silent", program_options_helper::option_value( setup.f_bQuiet ), "q", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "inhibit usual output", NULL )
+		( "verbose", program_options_helper::option_value( setup.f_bVerbose ), "v", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "print more information", NULL )
+		( "help", program_options_helper::option_value( setup.f_bHelp ), "h", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "display this help and exit", &help )
+		( "dump-configuration", program_options_helper::no_value, "W", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "dump current configuration", &dump )
+		( "version", program_options_helper::no_value, "V", HProgramOptionsHandler::OOption::TYPE::D_NONE, NULL, "output version information and exit", &version_call );
+	po.process_rc_file( "funlab", "", NULL );
+	if ( setup.f_oLogPath.is_empty() )
+		setup.f_oLogPath = "funlab.log";
 	int l_iUnknown = 0, l_iNonOption = 0;
-	OOptionInfo info( n_psOptions, sizeof ( n_psOptions ) / sizeof ( OOption ), util::show_help );
-	OOptionInfo infoConf( n_psOptions, sizeof ( n_psOptions ) / sizeof ( OOption ), util::dump_configuration );
+	OOptionInfo info( po.get_options(), util::show_help );
+	OOptionInfo infoConf( po.get_options(), util::dump_configuration );
 	help.second = &info;
 	dump.second = &infoConf;
-	l_iNonOption = cl_switch::decode_switches( a_iArgc, a_ppcArgv, n_psOptions,
-			info._size, &l_iUnknown );
+	l_iNonOption = po.process_command_line( a_iArgc, a_ppcArgv, &l_iUnknown );
 	if ( l_iUnknown > 0 )
 		usage( &info );
 	return ( l_iNonOption );
