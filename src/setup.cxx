@@ -37,7 +37,7 @@ namespace funlab
 {
 OSetup::OSetup( void )
 	: f_bQuiet( false ), f_bVerbose( false ),
-		f_bHelp( false ), f_bStereo( false ),
+		f_bStereo( false ),
 		f_b3D( true ), f_bShowAxis( false ),
 		f_bMultiFormula( false ),
 		f_iDensity( 32 ), f_iResolutionX( 640 ),

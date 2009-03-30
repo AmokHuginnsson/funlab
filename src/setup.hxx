@@ -42,7 +42,6 @@ struct OSetup
 	{
 	bool f_bQuiet;			/* --quiet, --silent */
 	bool f_bVerbose;		/* --verbose */
-	bool f_bHelp;
 	bool f_bStereo;
 	bool f_b3D;
 	bool f_bShowAxis;
