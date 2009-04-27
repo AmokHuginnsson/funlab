@@ -31,6 +31,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "setup.hxx"
 
 using namespace yaal;
+using namespace yaal::hcore;
 
 namespace funlab
 {
@@ -62,12 +63,13 @@ OPlotDesc plot_desc_from_string( yaal::hcore::HString const& line )
 	{
 	M_PROLOG
 	OPlotDesc plot;
-	plot._3d = lexical_cast<bool>( line.split( ";", 0 ) );
-	plot._domainLowerBound = lexical_cast<double long>( line.split( ";", 1 ) );
-	plot._domainUpperBound = lexical_cast<double long>( line.split( ";", 2 ) );
-	plot._rangeLowerBound = lexical_cast<double long>( line.split( ";", 3 ) );
-	plot._rangeUpperBound = lexical_cast<double long>( line.split( ";", 4 ) );
-	plot._formula = line.split( ";", 5 );
+	HTokenizer t( line, ";" );
+	plot._3d = lexical_cast<bool>( t[ 0 ] );
+	plot._domainLowerBound = lexical_cast<double long>( t[ 1 ] );
+	plot._domainUpperBound = lexical_cast<double long>( t[ 2 ] );
+	plot._rangeLowerBound = lexical_cast<double long>( t[ 3 ] );
+	plot._rangeUpperBound = lexical_cast<double long>( t[ 4 ] );
+	plot._formula = t[ 5 ];
 	return ( plot );
 	M_EPILOG
 	}
