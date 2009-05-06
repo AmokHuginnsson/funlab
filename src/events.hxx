@@ -39,23 +39,23 @@ public:
 		{
 		typedef enum
 			{
-			D_NONE = 0x0000,
-			D_LSHIFT = 0x0001,
-			D_RSHIFT = 0x0002,
-			D_SHIFT = D_LSHIFT | D_RSHIFT,
-			D_LCONTROL = 0x0004,
-			D_RCONTROL = 0x0008,
-			D_CONTROL = D_LCONTROL | D_RCONTROL,
-			D_LALT = 0x0010,
-			D_RALT = 0x0020,
-			D_ALT = D_LALT | D_RALT
+			NONE = 0x0000,
+			LSHIFT = 0x0001,
+			RSHIFT = 0x0002,
+			SHIFT = LSHIFT | RSHIFT,
+			LCONTROL = 0x0004,
+			RCONTROL = 0x0008,
+			CONTROL = LCONTROL | RCONTROL,
+			LALT = 0x0010,
+			RALT = 0x0020,
+			ALT = LALT | RALT
 			} mod_t;
 		};
 private:
 	int f_iCode;
 	MOD::mod_t f_eMod;
 public:
-	HKeyboardEvent( int const& code, MOD::mod_t const& a_eMod = MOD::D_NONE ) : f_iCode( code ), f_eMod( a_eMod ) { }
+	HKeyboardEvent( int const& code, MOD::mod_t const& a_eMod = MOD::NONE ) : f_iCode( code ), f_eMod( a_eMod ) { }
 	int get_code( void ) const { return ( f_iCode ); }
 	MOD::mod_t get_mod( void ) const { return ( f_eMod ); }
 	};
@@ -67,25 +67,25 @@ public:
 		{
 		typedef enum
 			{
-			D_CLICK,
-			D_PRESS,
-			D_RELEASE,
-			D_MOVE
+			CLICK,
+			PRESS,
+			RELEASE,
+			MOVE
 			} type_t;
 		};
 	struct BUTTON
 		{
 		typedef enum
 			{
-			D_NONE = 0x00,
-			D_1 = 0x01,
-			D_2 = 0x02,
-			D_3 = 0x04,
-			D_4 = 0x08,
-			D_5 = 0x10,
-			D_6 = 0x20,
-			D_7 = 0x40,
-			D_8 = 0x80
+			NONE = 0x00,
+			B_1 = 0x01,
+			B_2 = 0x02,
+			B_3 = 0x04,
+			B_4 = 0x08,
+			B_5 = 0x10,
+			B_6 = 0x20,
+			B_7 = 0x40,
+			B_8 = 0x80
 			} button_t;
 		};
 private:

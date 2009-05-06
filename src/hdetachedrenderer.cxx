@@ -155,19 +155,19 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 					int dy = yaal::abs( l_uEvent.motion.yrel );
 					if ( ( dx < ( setup.f_iResolutionX >> 1 ) ) && ( dy < ( setup.f_iResolutionY >> 1 ) ) )
 						{
-						HMouseEvent e( HMouseEvent::TYPE::D_MOVE );
+						HMouseEvent e( HMouseEvent::TYPE::MOVE );
 						e.set_pos( l_uEvent.motion.xrel, l_uEvent.motion.yrel );
 						bool skip = false;
 						switch ( l_uEvent.motion.state )
 							{
 							case ( SDL_BUTTON( 1 ) ):
-								e.set_button( HMouseEvent::BUTTON::D_1 );
+								e.set_button( HMouseEvent::BUTTON::B_1 );
 							break;
 							case ( SDL_BUTTON( 2 ) ):
-								e.set_button( HMouseEvent::BUTTON::D_2 );
+								e.set_button( HMouseEvent::BUTTON::B_2 );
 							break;
 							case ( SDL_BUTTON( 3 ) ):
-								e.set_button( HMouseEvent::BUTTON::D_3 );
+								e.set_button( HMouseEvent::BUTTON::B_3 );
 							break;
 							default:
 								skip = true;
@@ -181,14 +181,14 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 				case ( SDL_MOUSEBUTTONDOWN ):
 					{
 					bool skip = false;
-					HMouseEvent e( HMouseEvent::TYPE::D_PRESS );
+					HMouseEvent e( HMouseEvent::TYPE::PRESS );
 					switch ( l_uEvent.button.button )
 						{
 						case ( 4 ):
-							e.set_button( HMouseEvent::BUTTON::D_4 );
+							e.set_button( HMouseEvent::BUTTON::B_4 );
 						break;
 						case ( 5 ):
-							e.set_button( HMouseEvent::BUTTON::D_5 );
+							e.set_button( HMouseEvent::BUTTON::B_5 );
 						break;
 						default:
 							skip = true;
@@ -223,7 +223,7 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 						default:
 							HKeyboardEvent e( static_cast<int>( l_uEvent.key.keysym.sym ),
 									( l_uEvent.key.keysym.mod & ( KMOD_RSHIFT | KMOD_LSHIFT ) )
-										? HKeyboardEvent::MOD::D_SHIFT : HKeyboardEvent::MOD::D_NONE );
+										? HKeyboardEvent::MOD::SHIFT : HKeyboardEvent::MOD::NONE );
 							f_oEngine->on_event( &e );
 						break;
 						}
@@ -291,7 +291,7 @@ void HDetachedRenderer::do_commit( void )
 	if ( SDL_MUSTLOCK( l_psSurface ) )
 		{
 		if ( SDL_LockSurface( l_psSurface ) < 0 )
-			hcore::log( LOG_TYPE::D_ERROR ) << "Can't lock screen: " << SDL_GetError() << endl;
+			hcore::log( LOG_TYPE::ERROR ) << "Can't lock screen: " << SDL_GetError() << endl;
 		}
 	return;
 	M_EPILOG
@@ -413,10 +413,10 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
  *
  */
 	
-#define D_EDGE_LEFT		1
-#define D_EDGE_TOP		8
-#define D_EDGE_RIGHT	2
-#define D_EDGE_BOTTOM	4
+#define EDGE_LEFT		1
+#define EDGE_TOP		8
+#define EDGE_RIGHT	2
+#define EDGE_BOTTOM	4
 
 	double dx = 0, dy = 0, stepx = 0, stepy = 0, fraction = 0, cx = 0, cy = 0;
 
@@ -425,14 +425,14 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 	do
 		{
 		l_iEdges0 = l_iEdges1 = l_iEdges = 0;
-		l_iEdges0 |= ( x0 < 0 ) ? D_EDGE_LEFT : 0;
-		l_iEdges0 |= ( y0 < 0 ) ? D_EDGE_TOP : 0;
-		l_iEdges0 |= ( x0 >= f_iWidth ) ? D_EDGE_RIGHT : 0;
-		l_iEdges0 |= ( y0 >= f_iHeight ) ? D_EDGE_BOTTOM : 0;
-		l_iEdges1 |= ( x1 < 0 ) ? D_EDGE_LEFT : 0;
-		l_iEdges1 |= ( y1 < 0 ) ? D_EDGE_TOP : 0;
-		l_iEdges1 |= ( x1 >= f_iWidth ) ? D_EDGE_RIGHT : 0;
-		l_iEdges1 |= ( y1 >= f_iHeight ) ? D_EDGE_BOTTOM : 0;
+		l_iEdges0 |= ( x0 < 0 ) ? EDGE_LEFT : 0;
+		l_iEdges0 |= ( y0 < 0 ) ? EDGE_TOP : 0;
+		l_iEdges0 |= ( x0 >= f_iWidth ) ? EDGE_RIGHT : 0;
+		l_iEdges0 |= ( y0 >= f_iHeight ) ? EDGE_BOTTOM : 0;
+		l_iEdges1 |= ( x1 < 0 ) ? EDGE_LEFT : 0;
+		l_iEdges1 |= ( y1 < 0 ) ? EDGE_TOP : 0;
+		l_iEdges1 |= ( x1 >= f_iWidth ) ? EDGE_RIGHT : 0;
+		l_iEdges1 |= ( y1 >= f_iHeight ) ? EDGE_BOTTOM : 0;
 		if ( l_iEdges0 & l_iEdges1 )
 			return;
 		if ( l_iEdges0 )
@@ -442,22 +442,22 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 		else
 			break;
 
-		if ( l_iEdges & D_EDGE_LEFT )
+		if ( l_iEdges & EDGE_LEFT )
 			{
 			cx = 0;
 			cy = y0 + ( y1 - y0 ) * ( 0 - x0 ) / ( x1 - x0 );
 			}
-		else if ( l_iEdges & D_EDGE_TOP )
+		else if ( l_iEdges & EDGE_TOP )
 			{
 			cx = x0 + ( x1 - x0 ) * ( 0 - y0 ) / ( y1 - y0 );
 			cy = 0;
 			}
-		else if ( l_iEdges & D_EDGE_RIGHT )
+		else if ( l_iEdges & EDGE_RIGHT )
 			{
 			cx = f_iWidth - 1;
 			cy = y0 + ( y1 - y0 ) * ( cx - x0 ) / ( x1 - x0 );
 			}
-		else if ( l_iEdges & D_EDGE_BOTTOM )
+		else if ( l_iEdges & EDGE_BOTTOM )
 			{
 			cy = f_iHeight - 1;
 			cx = x0 + ( x1 - x0 ) * ( cy - y0 ) / ( y1 - y0 );

@@ -313,7 +313,7 @@ void HWindowMain::open( HString const& a_oPath )
 		if ( !!l_oFile )
 			{
 			f_oFormulasListModel->clear();
-			while ( l_oFile.read_line( l_oLine, HFile::READ::D_STRIP_NEWLINES ) >= 0 )
+			while ( l_oFile.read_line( l_oLine, HFile::READ::STRIP_NEWLINES ) >= 0 )
 				{
 				l_oRow = *( f_oFormulasListModel->append() );
 				l_oRow[ f_oFormulasListFormulaColumn ] = plot_desc_from_string( l_oLine );
@@ -370,7 +370,7 @@ void HWindowMain::save( HString const& a_oPath )
 	if ( a_oPath.is_empty() )
 		M_THROW( _( "Empty path." ), errno );
 
-	HFile l_oFile( HFile::open_t( HFile::OPEN::D_WRITING ) );
+	HFile l_oFile( HFile::open_t( HFile::OPEN::WRITING ) );
 	l_oFile.open( a_oPath );
 	if ( !!l_oFile )
 		{

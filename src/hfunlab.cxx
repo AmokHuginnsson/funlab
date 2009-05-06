@@ -40,12 +40,12 @@ using namespace yaal::tools;
 namespace funlab
 {
 
-#define D_TRYGO_BASE 8192
+#define TRYGO_BASE 8192
 
 HFunlab::HMesh::HMesh( void )
 	: f_iSize( 0 ), f_iSurfaces( 0 ),
-	f_oValues( f_iSize, values_t::D_AUTO_GROW ),
-	f_oValuesBackbone( f_iSize, values_backbone_t::D_AUTO_GROW )
+	f_oValues( f_iSize, values_t::AUTO_GROW ),
+	f_oValuesBackbone( f_iSize, values_backbone_t::AUTO_GROW )
 	{
 	}
 
@@ -80,7 +80,7 @@ HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	f_dAngleX( 0 ), f_dAngleY( 0 ), f_dAngleZ( 0 ),
 	f_dDX( 0 ), f_dDY( 0 ), f_dDZ( 0 ), f_dFOV( 0 ),
 	f_pdXVariable( NULL ), f_pdYVariable( NULL ),
-	f_oMesh(), f_oNode( 0, node_t::D_AUTO_GROW ),
+	f_oMesh(), f_oNode( 0, node_t::AUTO_GROW ),
 	f_ulColor( 0 ), f_dCosAlpha( 0 ), f_dSinAlpha( 0 ),
 	f_dCosBeta( 0 ), f_dSinBeta( 0 ),
 	f_dCosGamma( 0 ), f_dSinGamma( 0 ),
@@ -89,9 +89,9 @@ HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	f_oError(), f_iErrorIndex( 0 )
 	{
 	int i = 0;
-	f_pdTrygo = xcalloc<double>( D_TRYGO_BASE );
-	for ( i = 0; i < D_TRYGO_BASE; i ++ )
-		f_pdTrygo[ i ] = sin( ( ( double ) i * M_PI ) / static_cast<double>( 2 * D_TRYGO_BASE ) );
+	f_pdTrygo = xcalloc<double>( TRYGO_BASE );
+	for ( i = 0; i < TRYGO_BASE; i ++ )
+		f_pdTrygo[ i ] = sin( ( ( double ) i * M_PI ) / static_cast<double>( 2 * TRYGO_BASE ) );
 	}
 
 HFunlab::~HFunlab( void )
@@ -156,22 +156,22 @@ void HFunlab::precalculate( void )
 
 double HFunlab::sinq( int unsigned a_iAngle )
 	{
-	a_iAngle &= ( ( 4 * D_TRYGO_BASE ) - 1 );
-	if ( a_iAngle > ( ( 2 * D_TRYGO_BASE ) - 1 ) )
+	a_iAngle &= ( ( 4 * TRYGO_BASE ) - 1 );
+	if ( a_iAngle > ( ( 2 * TRYGO_BASE ) - 1 ) )
 		{
-		a_iAngle -= ( 2 * D_TRYGO_BASE );
-		if ( a_iAngle > ( D_TRYGO_BASE - 1 ) )
-			a_iAngle = ( ( 2 * D_TRYGO_BASE ) - 1 ) - a_iAngle;
+		a_iAngle -= ( 2 * TRYGO_BASE );
+		if ( a_iAngle > ( TRYGO_BASE - 1 ) )
+			a_iAngle = ( ( 2 * TRYGO_BASE ) - 1 ) - a_iAngle;
 		return ( - f_pdTrygo[ a_iAngle ] );
 		}
-	if ( a_iAngle > ( D_TRYGO_BASE - 1 ) )
-		a_iAngle = ( ( 2 * D_TRYGO_BASE ) - 1 ) - a_iAngle;
+	if ( a_iAngle > ( TRYGO_BASE - 1 ) )
+		a_iAngle = ( ( 2 * TRYGO_BASE ) - 1 ) - a_iAngle;
 	return ( f_pdTrygo [ a_iAngle ] );
 	}
 
 double HFunlab::cosq( int unsigned a_iAngle )
 	{
-	return ( sinq( a_iAngle + D_TRYGO_BASE ) );
+	return ( sinq( a_iAngle + TRYGO_BASE ) );
 	}
 
 bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _r )
@@ -306,16 +306,16 @@ void HFunlab::do_draw_frame( void )
 
 void HFunlab::draw_axis( void )
 	{
-	u32_t D_WHITE = 0xffffffff;
+	u32_t WHITE = 0xffffffff;
 	double long frac = 4.;
 	int x1, x2, y1, y2;
 	x1 = x2 = y1 = y2 = 0;
 	if ( T( 0, 0, 0, x1, y1 ) && T( 0, 0, setup.f_dDomainUpperBound, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, 0, 0, x1, y1 ) && T( 0, setup.f_dDomainUpperBound, 0, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, 0, 0, x1, y1 ) && T( setup.f_dDomainUpperBound, 0, 0, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	int size = f_oMesh.get_size();
 	double long gridSize = ( setup.f_dDomainUpperBound - setup.f_dDomainLowerBound ) / static_cast<double long>( size );
 	double long x = setup.f_dDomainLowerBound;
@@ -323,61 +323,61 @@ void HFunlab::draw_axis( void )
 	for ( int i = 0; i < size; ++ i )
 		{
 		if ( T( x, - a, 0, x1, y1 ) && T( x, a, 0, x2, y2 ) )
-			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+			f_poRenderer->line( x1, y1, x2, y2, WHITE );
 		if ( T( x, 0, - a, x1, y1 ) && T( x, 0, a, x2, y2 ) )
-			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+			f_poRenderer->line( x1, y1, x2, y2, WHITE );
 		if ( T( - a, x, 0, x1, y1 ) && T( a, x, 0, x2, y2 ) )
-			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+			f_poRenderer->line( x1, y1, x2, y2, WHITE );
 		if ( T( 0, x, - a, x1, y1 ) && T( 0, x, a, x2, y2 ) )
-			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+			f_poRenderer->line( x1, y1, x2, y2, WHITE );
 		if ( T( - a, 0, x, x1, y1 ) && T( a, 0, x, x2, y2 ) )
-			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+			f_poRenderer->line( x1, y1, x2, y2, WHITE );
 		if ( T( 0, - a, x, x1, y1 ) && T( 0, a, x, x2, y2 ) )
-			f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+			f_poRenderer->line( x1, y1, x2, y2, WHITE );
 		x += gridSize;
 		}
 	double long t = setup.f_dDomainUpperBound + a;
 	double long d = setup.f_dDomainUpperBound - a;
 	if ( T( t, 0, 0, x1, y1 ) && T( d, a, 0, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( t, 0, 0, x1, y1 ) && T( d, - a, 0, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( t, 0, 0, x1, y1 ) && T( d, 0, a, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( t, 0, 0, x1, y1 ) && T( d, 0, - a, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 
 	if ( T( 0, t, 0, x1, y1 ) && T( a, d, 0, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, t, 0, x1, y1 ) && T( - a, d, 0, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, t, 0, x1, y1 ) && T( 0, d, a, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, t, 0, x1, y1 ) && T( 0, d, - a, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 
 	if ( T( 0, 0, t, x1, y1 ) && T( a, 0, d, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, 0, t, x1, y1 ) && T( - a, 0, d, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, 0, t, x1, y1 ) && T( 0, a, d, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, 0, t, x1, y1 ) && T( 0, - a, d, x2, y2 ) )
-		f_poRenderer->line( x1, y1, x2, y2, D_WHITE );
+		f_poRenderer->line( x1, y1, x2, y2, WHITE );
 	}
 
 void HFunlab::do_on_event( HMouseEvent const* e )
 	{
 	switch ( e->get_type() )
 		{
-		case ( HMouseEvent::TYPE::D_PRESS ):
+		case ( HMouseEvent::TYPE::PRESS ):
 			{
 			switch ( e->get_button() )
 				{
-				case ( HMouseEvent::BUTTON::D_4 ):
+				case ( HMouseEvent::BUTTON::B_4 ):
 					f_dDY ++;
 				break;
-				case ( HMouseEvent::BUTTON::D_5 ):
+				case ( HMouseEvent::BUTTON::B_5 ):
 					f_dDY --;
 				break;
 				default:
@@ -385,20 +385,20 @@ void HFunlab::do_on_event( HMouseEvent const* e )
 				}
 			}
 		break;
-		case ( HMouseEvent::TYPE::D_MOVE ):
+		case ( HMouseEvent::TYPE::MOVE ):
 			{
 			switch ( e->get_button() )
 				{
-				case ( HMouseEvent::BUTTON::D_1 ):
+				case ( HMouseEvent::BUTTON::B_1 ):
 					f_dAngleZ += e->get_x() << 2;
 					f_dAngleX -= e->get_y() << 2;
 				break;
-				case ( HMouseEvent::BUTTON::D_2 ):
+				case ( HMouseEvent::BUTTON::B_2 ):
 					setup.f_dDomainLowerBound -= e->get_x();
 					setup.f_dDomainUpperBound += e->get_x();
 					generate_surface();
 				break;
-				case ( HMouseEvent::BUTTON::D_3 ):
+				case ( HMouseEvent::BUTTON::B_3 ):
 					f_dAngleY += e->get_x() << 2;
 				break;
 				default:
@@ -417,7 +417,7 @@ void HFunlab::do_on_event( HKeyboardEvent const* e )
 		{
 		case ( 'r' ):
 			{
-			if ( e->get_mod() & HKeyboardEvent::MOD::D_SHIFT )
+			if ( e->get_mod() & HKeyboardEvent::MOD::SHIFT )
 				{
 				f_iRed += 240;
 				f_iRed %= 256;
@@ -431,7 +431,7 @@ void HFunlab::do_on_event( HKeyboardEvent const* e )
 		break;
 		case ( 'g' ):
 			{
-			if ( e->get_mod() & ( HKeyboardEvent::MOD::D_SHIFT ) )
+			if ( e->get_mod() & ( HKeyboardEvent::MOD::SHIFT ) )
 				{
 				f_iGreen += 240;
 				f_iGreen %= 256;
@@ -445,7 +445,7 @@ void HFunlab::do_on_event( HKeyboardEvent const* e )
 		break;
 		case ( 'b' ):
 			{
-			if ( e->get_mod() & ( HKeyboardEvent::MOD::D_SHIFT ) )
+			if ( e->get_mod() & ( HKeyboardEvent::MOD::SHIFT ) )
 				{
 				f_iBlue += 240;
 				f_iBlue %= 256;

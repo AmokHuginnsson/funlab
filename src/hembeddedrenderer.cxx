@@ -156,14 +156,14 @@ double HEmbeddedRenderer::alpha( yaal::u32_t color )
 bool HEmbeddedRenderer::on_scroll_event( GdkEventScroll* ev )
 	{
 	bool skip = false;
-	HMouseEvent e( HMouseEvent::TYPE::D_PRESS );
+	HMouseEvent e( HMouseEvent::TYPE::PRESS );
 	switch ( ev->direction )
 		{
 		case ( GDK_SCROLL_UP ):
-			e.set_button( HMouseEvent::BUTTON::D_4 );
+			e.set_button( HMouseEvent::BUTTON::B_4 );
 		break;
 		case ( GDK_SCROLL_DOWN ):
-			e.set_button( HMouseEvent::BUTTON::D_5 );
+			e.set_button( HMouseEvent::BUTTON::B_5 );
 		break;
 		default:
 			skip = true;
@@ -186,19 +186,19 @@ bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev )
 
 	if ( ( dx < ( setup.f_iResolutionX >> 1 ) ) && ( dy < ( setup.f_iResolutionY >> 1 ) ) )
 		{
-		HMouseEvent e( HMouseEvent::TYPE::D_MOVE );
+		HMouseEvent e( HMouseEvent::TYPE::MOVE );
 		e.set_pos( nx - _move._x, ny - _move._y );
 		bool skip = false;
 		switch ( ev->state )
 			{
 			case ( GDK_BUTTON1_MASK ):
-				e.set_button( HMouseEvent::BUTTON::D_1 );
+				e.set_button( HMouseEvent::BUTTON::B_1 );
 			break;
 			case ( GDK_BUTTON2_MASK ):
-				e.set_button( HMouseEvent::BUTTON::D_2 );
+				e.set_button( HMouseEvent::BUTTON::B_2 );
 			break;
 			case ( GDK_BUTTON3_MASK ):
-				e.set_button( HMouseEvent::BUTTON::D_3 );
+				e.set_button( HMouseEvent::BUTTON::B_3 );
 			break;
 			default:
 				skip = true;
