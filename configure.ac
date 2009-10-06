@@ -1,7 +1,8 @@
 dnl configure.ac is integral part of funlab project.
 
 dnl Initialization data.
-AC_INIT([[funlab]],[[0.0.0]],[[amok@codestation.org]])
+pushdef([MY_PACKAGE_VERSION],[0.0.0-esyscmd(date +%Y%m%d|tr -d '\n')])
+AC_INIT([[funlab]],[MY_PACKAGE_VERSION],[[amok@codestation.org]])
 
 AC_MSG_RESULT([--- Welcome to funlab configurator ---                   [[0%]]])
 AC_MSG_RESULT([--- Initialization ... ---                               [[6%]]])

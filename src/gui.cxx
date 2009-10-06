@@ -34,7 +34,6 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "gui.hxx"
 
-#include "version.hxx"
 #include "setup.hxx"
 #include "hdetachedrenderer.hxx"
 #include "hembeddedrenderer.hxx"
@@ -401,7 +400,7 @@ void HWindowMain::on_about( void )
 	HString l_oMsg;
 	l_oMsg.format( _( "The funlab program, very fancy GUI application that\n"
 			"can be used for rendering function surfaces.\n"
-			"Welcome to funlab %s" ), VER );
+			"Welcome to funlab %s" ), PACKAGE_STRING );
 	Gtk::MessageDialog l_oMessageAbout( *this, l_oMsg.raw() );
 	l_oMessageAbout.set_title( _( "About funlab" ) );
 	l_oMessageAbout.run();
