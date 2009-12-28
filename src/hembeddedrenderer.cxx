@@ -48,16 +48,16 @@ HEmbeddedRenderer::~HEmbeddedRenderer( void )
 	{
 	}
 
-bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event )
+bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event_ )
 	{
 	Glib::RefPtr<Gdk::Window> window = get_window();
 	if ( window )
 		{
 		_context = window->create_cairo_context();
-		if ( event )
+		if ( event_ )
 			{
-			_context->rectangle( event->area.x, event->area.y,
-					event->area.width, event->area.height );
+			_context->rectangle( event_->area.x, event_->area.y,
+					event_->area.width, event_->area.height );
 			_context->clip();
 			}
 		Gtk::Allocation allocation = get_allocation();
@@ -119,9 +119,9 @@ void HEmbeddedRenderer::do_commit( void )
 		stroke_line_buffer();
 	}
 
-yaal::u32_t HEmbeddedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue )
+yaal::u32_t HEmbeddedRenderer::do_RGB( u8_t red_, u8_t green_, u8_t blue_ )
 	{
-	yaal::u8_t c[] = { 255, blue, green, red };
+	yaal::u8_t c[] = { 255, blue_, green_, red_ };
 	return ( *reinterpret_cast<yaal::u32_t const*>( c ) );
 	}
 

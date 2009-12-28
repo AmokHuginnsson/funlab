@@ -30,32 +30,19 @@ SUBVERSION		= 0
 EXTRAVERSION	= 0
 include $(DIR_ROOT)/_aux/mk/0_paths.mk
 LIBS					= SDL @GUI_LIBS@ pthread hdata dbwrapper tools hconsole hcore
-TARGET				= funlab
-SRC_TARGET		= src
+$(eval $(call NEW_TARGET,funlab,src))
 EXEC_NAME			= 1exec
-TARGETS				= TARGET
 CTAGS	= @CTAGS@
 GITID = @GITID@
 
 include $(DIR_ROOT)/_aux/inc-helper-pre.mk
 
-CWARNING_FLAGS:=$(filter-out -Wredundant-decls,$(CWARNING_FLAGS))
-CWARNING_FLAGS:=$(filter-out -Werror,$(CWARNING_FLAGS)) # kurwa gtkmm ma problem z TimeVal::as_double()
-CXXWARNING_FLAGS:=$(filter-out -Weffc++,$(CXXWARNING_FLAGS))
-CWARNING_FLAGS								+= @PEDANTIC_ERRORS@ @EXTRA_WARNINGS@
-COMPILER_PRIME_FLAGS					+= @DEFS@
-LINKER_PRIME_FLAGS +=	@SPECIAL_LINKER_FLAGS@
+CXXFLAGS += @EXTRA_CXXFLAGS@ @GUI_COMPILER_FLAGS@ @DEFS@
+LXXFLAGS +=	@EXTRA_LXXFLAGS@ @GUI_LINKER_FLAGS@
+START_GROUP = @START_GROUP@
+END_GROUP = @END_GROUP@
 
-include $(DIR_ROOT)/_aux/mk/7_flags-post.mk
-CXXFLAGS			+= @GUI_COMPILER_FLAGS@
-LINKER_FLAGS	+= @GUI_LINKER_FLAGS@
-include $(DIR_ROOT)/_aux/mk/8_int-libs.mk
-LIBS := $(subst -l-l, -l, $(LIBS))
-include $(DIR_ROOT)/_aux/mk/9_func.mk
-include $(DIR_ROOT)/_aux/mk/a_prepare-target.mk
-include $(DIR_ROOT)/_aux/mk/b_common-targets.mk
-include $(DIR_ROOT)/_aux/mk/c_filenames.mk
-include $(DIR_ROOT)/_aux/mk/e_target-default.mk
-include $(DIR_ROOT)/_aux/mk/f_target-tags.mk
-include $(DIR_ROOT)/_aux/mk/g_deps.mk
+CXXFLAGS:=$(filter-out -Weffc++,$(filter-out -Werror,$(filter-out -Wredundant-decls,$(CXXFLAGS)))) # kurwa gtkmm ma problem z TimeVal::as_double()
+
+include $(DIR_ROOT)/_aux/inc-helper-post.mk
 

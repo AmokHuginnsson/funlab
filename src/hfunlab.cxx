@@ -280,7 +280,7 @@ void HFunlab::do_draw_frame( void )
 			double long* l_pdVariables = it->_expression.variables();
 			f_pdXVariable = ( l_pdVariables + 'X' ) - 'A';
 			( *f_pdXVariable ) = it->_domainLowerBound;
-			double long gridSize = ( it->_domainUpperBound - it->_domainLowerBound ) / static_cast<double long>( setup.f_iResolutionX );
+			gridSize = ( it->_domainUpperBound - it->_domainLowerBound ) / static_cast<double long>( setup.f_iResolutionX );
 			double long oldVal = 0;
 			for ( int x = 0; x < setup.f_iResolutionX; ++ x )
 				{
