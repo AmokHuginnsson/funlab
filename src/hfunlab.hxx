@@ -62,10 +62,8 @@ class HFunlab : public HRendererEngineInterface
 	private:
 		int f_iSize;
 		int f_iSurfaces;
-		typedef yaal::hcore::HPool<OValue> values_t;
-		values_t f_oValues;
-		typedef yaal::hcore::HPool<OValue*> values_backbone_t;
-		values_backbone_t f_oValuesBackbone;
+		yaal::hcore::HChunk f_oValues;
+		yaal::hcore::HChunk f_oValuesBackbone;
 	public:
 		HMesh( void );
 		void set_size( int, int );
@@ -80,8 +78,7 @@ class HFunlab : public HRendererEngineInterface
 		int _valid;
 		ONode( void ) : _col( 0 ), _row( 0 ), _valid( 0 ) {}
 		};
-	typedef yaal::hcore::HPool<ONode> node_t;
-	node_t f_oNode;
+	yaal::hcore::HChunk f_oNode;
 	yaal::u32_t f_ulColor;
 	double f_dCosAlpha;
 	double f_dSinAlpha;

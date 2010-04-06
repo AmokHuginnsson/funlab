@@ -30,6 +30,8 @@ Copyright:
 #include <iostream>
 #include <yaal/yaal.hxx>
 
+#include "config.hxx"
+
 #define out ( cout << __FILE__ + OSetup::PATH_OFFSET << ":" << __LINE__ << ": " )
 
 namespace funlab

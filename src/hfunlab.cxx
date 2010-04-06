@@ -44,8 +44,7 @@ namespace funlab
 
 HFunlab::HMesh::HMesh( void )
 	: f_iSize( 0 ), f_iSurfaces( 0 ),
-	f_oValues( f_iSize, values_t::AUTO_GROW ),
-	f_oValuesBackbone( f_iSize, values_backbone_t::AUTO_GROW )
+	f_oValues(), f_oValuesBackbone()
 	{
 	}
 
@@ -55,10 +54,10 @@ void HFunlab::HMesh::set_size( int size, int surfaces )
 		{
 		f_iSize = size;
 		f_iSurfaces = surfaces;
-		f_oValues.pool_realloc( size * size * surfaces );
-		f_oValuesBackbone.pool_realloc( size * surfaces );
-		OValue* ptr = f_oValues.raw();
-		OValue** bone = f_oValuesBackbone.raw();
+		f_oValues.realloc( chunk_size<OValue>( size * size * surfaces ) );
+		f_oValuesBackbone.realloc( chunk_size<OValue*>( size * surfaces ) );
+		OValue* ptr = f_oValues.get<OValue>();
+		OValue** bone = f_oValuesBackbone.get<OValue*>();
 		for ( int i = 0; i < ( f_iSurfaces * f_iSize ); ++ i, ptr += f_iSize, ++ bone )
 			*bone = ptr;
 		}
@@ -72,7 +71,7 @@ int HFunlab::HMesh::get_size( void ) const
 
 HFunlab::HMesh::OValue** HFunlab::HMesh::fast( int surface )
 	{
-	return ( f_oValuesBackbone.raw() + f_iSize * surface );
+	return ( f_oValuesBackbone.get<OValue*>() + f_iSize * surface );
 	}
 
 HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
@@ -80,7 +79,7 @@ HFunlab::HFunlab( HRendererSurfaceInterface* a_poRenderer )
 	f_dAngleX( 0 ), f_dAngleY( 0 ), f_dAngleZ( 0 ),
 	f_dDX( 0 ), f_dDY( 0 ), f_dDZ( 0 ), f_dFOV( 0 ),
 	f_pdXVariable( NULL ), f_pdYVariable( NULL ),
-	f_oMesh(), f_oNode( 0, node_t::AUTO_GROW ),
+	f_oMesh(), f_oNode(),
 	f_ulColor( 0 ), f_dCosAlpha( 0 ), f_dSinAlpha( 0 ),
 	f_dCosBeta( 0 ), f_dSinBeta( 0 ),
 	f_dCosGamma( 0 ), f_dSinGamma( 0 ),
@@ -238,7 +237,9 @@ void HFunlab::do_draw_frame( void )
 				int f = 0, i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
 				double long x = 0, y = 0;
 				HMesh::OValue** values = f_oMesh.fast( sf );
-				yaal::fill( f_oNode.raw(), f_oNode.raw() + size, ONode() );
+				ONode* nodes = f_oNode.get<ONode>();
+				yaal::fill( nodes, nodes + size, ONode() );
+
 				for ( f = 0; f < ( setup.f_bStereo ? 2 : 1 ); f ++ )
 					{
 					f_dDX = setup.f_bStereo ? ( f ? - 4 : 4 ) : 0;
@@ -249,19 +250,19 @@ void HFunlab::do_draw_frame( void )
 						for ( i = 0; i < size; ++ i )
 							{
 							valid = values[ i ][ j ]._valid && T( x, y, values[ i ][ j ]._value, c, r );
-							if ( valid && oldvalid && f_oNode[ i ]._valid )
+							if ( valid && oldvalid && nodes[ i ]._valid )
 								{
 								if ( i > 0 )
 									f_poRenderer->line( oldc, oldr, c, r,
 											setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 								if ( j > 0 )
-									f_poRenderer->line( c, r, f_oNode[ i ]._col,
-											f_oNode[ i ]._row,
+									f_poRenderer->line( c, r, nodes[ i ]._col,
+											nodes[ i ]._row,
 											setup.f_bStereo ? ( f ? l_iRed : l_iBlue ) : f_ulColor );
 								}
-							f_oNode[ i ]._col = c;
-							f_oNode[ i ]._row = r;
-							f_oNode[ i ]._valid = valid;
+							nodes[ i ]._col = c;
+							nodes[ i ]._row = r;
+							nodes[ i ]._valid = valid;
 							oldc = c;
 							oldr = r;
 							oldvalid = valid;
@@ -490,7 +491,7 @@ bool HFunlab::push_formula( OPlotDesc a_oFormula )
 void HFunlab::regen_cache( int size )
 	{
 	M_PROLOG
-	f_oNode.pool_realloc( size );
+	f_oNode.realloc( chunk_size<ONode>( size ) );
 	f_oMesh.set_size( size, static_cast<int>( f_oPlots.size() ) );
 	if ( ! f_oPlots.empty() )
 		generate_surface();
