@@ -304,11 +304,10 @@ void HWindowMain::open( HString const& a_oPath )
 
 	int l_iIndex = 0;
 	HString l_oLine;
-	HFile l_oFile;
 	Gtk::TreeModel::Row l_oRow;
 	try
 		{
-		l_oFile.open( a_oPath );
+		HFile l_oFile( a_oPath, HFile::OPEN::READING );
 		if ( !!l_oFile )
 			{
 			f_oFormulasListModel->clear();
@@ -318,7 +317,6 @@ void HWindowMain::open( HString const& a_oPath )
 				l_oRow[ f_oFormulasListFormulaColumn ] = plot_desc_from_string( l_oLine );
 				l_iIndex ++;
 				}
-			l_oFile.close();
 			}
 		}
 	catch ( HException const& e )
@@ -369,8 +367,7 @@ void HWindowMain::save( HString const& a_oPath )
 	if ( a_oPath.is_empty() )
 		M_THROW( _( "Empty path." ), errno );
 
-	HFile l_oFile( HFile::open_t( HFile::OPEN::WRITING ) );
-	l_oFile.open( a_oPath );
+	HFile l_oFile( a_oPath, HFile::OPEN::WRITING );
 	if ( !!l_oFile )
 		{
 		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
