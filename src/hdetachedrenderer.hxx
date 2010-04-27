@@ -37,8 +37,6 @@ namespace funlab
 
 class HDetachedRenderer;
 
-typedef yaal::hcore::HThreadT<HDetachedRenderer> renderer_t;
-
 class HDetachedRenderer : public HRendererSurfaceBase
 	{
 protected:
@@ -49,7 +47,7 @@ protected:
 	int f_iHeight;
 	int f_iBPP;
 	yaal::hcore::HSemaphore f_oSemaphore;
-	renderer_t f_oThread;
+	yaal::hcore::HThread _thread;
 	HKeyboardEventListener* f_poKeyboardEventListener;
 	static int f_iActiveSurfaces;
 	/*}*/

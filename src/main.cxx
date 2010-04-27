@@ -36,7 +36,6 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hdetachedrenderer.hxx"
 #include "hfunlab.hxx"
 
-using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::hconsole;
@@ -67,7 +66,7 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 		l_iOpt = handle_program_options( a_iArgc, a_ppcArgv );
 		hcore::log.rehash( setup.f_oLogPath, setup.f_pcProgramName );
 		setup.test_setup();
-/*		if ( ! console::is_enabled ( ) )enter_curses (); / * enabling ncurses ablilities*/
+/*		if ( ! console::is_enabled() )enter_curses (); / * enabling ncurses ablilities*/
 /* *BOOM* */
 		if ( !! setup.f_oFormula )
 			{
@@ -81,8 +80,7 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 				for ( l_iCtr = 0; l_iCtr < l_iPosition; l_iCtr ++ )
 					l_oArrow += '-';
 				l_oArrow += 'v';
-				::fprintf( stderr, _( "Formula syntax error ...\n%s at this place:\n%s\n%s\n" ),
-						pf->error(), l_oArrow.raw(), setup.f_oFormula.raw() );
+				cerr << _( "Formula syntax error ...\n" ) << pf->error() << _( " at this place:\n" ) << l_oArrow << "\n" << setup.f_oFormula << endl;
 				}
 			else
 				{
@@ -93,18 +91,18 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 		else
 			l_iOpt = gui_start ( a_iArgc, a_ppcArgv );
 		HConsole& cons = HCons::get_instance();
-		if ( cons.is_enabled ( ) )
+		if ( cons.is_enabled() )
 			cons.leave_curses (); /* ending ncurses sesion */
 /* ... there is the place main loop ends. :OD-OT */
 		}
 	catch ( ... )
 		{
 		HConsole& cons = HCons::get_instance();
-		if ( cons.is_enabled ( ) )
+		if ( cons.is_enabled() )
 			cons.leave_curses (); /* ending ncurses sesion */
 		throw;
 		}
-	fprintf ( stderr, "Done.\n" );
+	cerr << _( "Done" ) << endl;
 	return ( l_iOpt );
 	M_FINAL
 	}
