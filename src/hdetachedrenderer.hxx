@@ -56,7 +56,7 @@ public:
 	HDetachedRenderer( HKeyboardEventListener* = NULL );
 	virtual ~HDetachedRenderer ( void );
 	bool render_surface( void );
-	int operator() ( yaal::hcore::HThread const* const );
+	void* run( void );
 	void shutdown( void );
 	/*}*/
 private:

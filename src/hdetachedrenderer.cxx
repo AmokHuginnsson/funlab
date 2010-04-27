@@ -47,7 +47,7 @@ int HDetachedRenderer::f_iActiveSurfaces = 0;
 
 HDetachedRenderer::HDetachedRenderer( HKeyboardEventListener* a_poKeyboardEventListener )
 	: f_bLoop( false ), f_pvHandler( NULL ), f_iWidth( 0 ), f_iHeight( 0 ), f_iBPP( 0 ),
-	f_oSemaphore(), f_oThread( *this ), f_poKeyboardEventListener( a_poKeyboardEventListener )
+	f_oSemaphore(), _thread(), f_poKeyboardEventListener( a_poKeyboardEventListener )
 	{
 	M_PROLOG
 	int l_iError = 0;
@@ -134,16 +134,16 @@ int HDetachedRenderer::init( int a_iWidth, int a_iHeight, int a_iBpp )
 	SDL_WarpMouse( static_cast<Uint16>( setup.f_iResolutionX >> 1 ),
 			static_cast<Uint16>( setup.f_iResolutionY >> 1 ) );
 	f_bLoop = true;
-	f_oThread.spawn();
+	_thread.spawn( bound_call( &HDetachedRenderer::run, this ) );
 	return ( 0 );
 	M_EPILOG
 	}
 
-int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
+void* HDetachedRenderer::run( void )
 	{
 	M_PROLOG
 	SDL_Event l_uEvent;
-	while ( f_bLoop && a_poCaller->is_alive() )
+	while ( f_bLoop && _thread.is_alive() )
 		{
 		if ( SDL_WaitEvent( &l_uEvent ) )
 			{
@@ -247,7 +247,7 @@ int HDetachedRenderer::operator() ( HThread const* const a_poCaller )
 
 void HDetachedRenderer::shutdown( void )
 	{
-	f_oThread.finish();
+	_thread.finish();
 	cout << __PRETTY_FUNCTION__ << endl;
 	down();
 	}
