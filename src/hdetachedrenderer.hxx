@@ -41,15 +41,15 @@ class HDetachedRenderer : public HRendererSurfaceBase
 	{
 protected:
 	/*{*/
-	bool f_bLoop;
-	void* f_pvHandler;
-	int	f_iWidth;
-	int f_iHeight;
-	int f_iBPP;
-	yaal::hcore::HSemaphore f_oSemaphore;
+	bool _loop;
+	void* _handler;
+	int	_width;
+	int _height;
+	int _bPP;
+	yaal::hcore::HSemaphore _semaphore;
 	yaal::hcore::HThread _thread;
-	HKeyboardEventListener* f_poKeyboardEventListener;
-	static int f_iActiveSurfaces;
+	HKeyboardEventListener* _keyboardEventListener;
+	static int _activeSurfaces;
 	/*}*/
 public:
 	/*{*/

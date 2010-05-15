@@ -38,10 +38,10 @@ namespace funlab
 
 OPlotDesc::OPlotDesc( yaal::hcore::HString const& formula )
 	: _3d( setup.f_b3D ),
-	_domainLowerBound( setup.f_dDomainLowerBound ),
-	_domainUpperBound( setup.f_dDomainUpperBound ),
-	_rangeLowerBound( setup.f_dRangeLowerBound ),
-	_rangeUpperBound( setup.f_dDomainUpperBound ),
+	_domainLowerBound( setup._domainLowerBound ),
+	_domainUpperBound( setup._domainUpperBound ),
+	_rangeLowerBound( setup._rangeLowerBound ),
+	_rangeUpperBound( setup._domainUpperBound ),
 	_formula( formula )
 	{
 	}

@@ -37,18 +37,18 @@ namespace funlab
 
 class HFunlab : public HRendererEngineInterface
 	{
-	int f_iRed;
-	int f_iGreen;
-	int f_iBlue;
-	double f_dAngleX;
-	double f_dAngleY;
-	double f_dAngleZ;
-	double f_dDX;
-	double f_dDY;
-	double f_dDZ;
-	double f_dFOV;
-	double long* f_pdXVariable;
-	double long* f_pdYVariable;
+	int _red;
+	int _green;
+	int _blue;
+	double _angleX;
+	double _angleY;
+	double _angleZ;
+	double _dX;
+	double _dY;
+	double _dZ;
+	double _fOV;
+	double long* _xVariable;
+	double long* _yVariable;
 
 	class HMesh
 		{
@@ -60,17 +60,17 @@ class HFunlab : public HRendererEngineInterface
 			OValue( void ) : _valid( false ), _value( 0 ) {}
 			};
 	private:
-		int f_iSize;
-		int f_iSurfaces;
-		yaal::hcore::HChunk f_oValues;
-		yaal::hcore::HChunk f_oValuesBackbone;
+		int _size;
+		int _surfaces;
+		yaal::hcore::HChunk _values;
+		yaal::hcore::HChunk _valuesBackbone;
 	public:
 		HMesh( void );
 		void set_size( int, int );
 		int get_size( void ) const;
 		OValue** fast( int );
 		};
-	HMesh f_oMesh;
+	HMesh _mesh;
 	struct ONode
 		{
 		int _col;
@@ -78,27 +78,27 @@ class HFunlab : public HRendererEngineInterface
 		int _valid;
 		ONode( void ) : _col( 0 ), _row( 0 ), _valid( 0 ) {}
 		};
-	yaal::hcore::HChunk f_oNode;
-	yaal::u32_t f_ulColor;
-	double f_dCosAlpha;
-	double f_dSinAlpha;
-	double f_dCosBeta;
-	double f_dSinBeta;
-	double f_dCosGamma;
-	double f_dSinGamma;
+	yaal::hcore::HChunk _node;
+	yaal::u32_t _color;
+	double _cosAlpha;
+	double _sinAlpha;
+	double _cosBeta;
+	double _sinBeta;
+	double _cosGamma;
+	double _sinGamma;
 	struct OCache
 		{
-		OCache( double a, double b, double c ) : f_dPreCalcA( a ), f_dPreCalcB( b ), f_dPreCalcC( c ) {}
-		double f_dPreCalcA;
-		double f_dPreCalcB;
-		double f_dPreCalcC;
-		} f_oCache;
-	double* f_pdTrygo;
+		OCache( double a, double b, double c ) : _preCalcA( a ), _preCalcB( b ), _preCalcC( c ) {}
+		double _preCalcA;
+		double _preCalcB;
+		double _preCalcC;
+		} _cache;
+	double* _trygo;
 	typedef yaal::hcore::HList<OPlotDesc> plots_t;
-	plots_t f_oPlots;
-	HRendererSurfaceInterface* f_poRenderer;
-	yaal::hcore::HString f_oError;
-	int f_iErrorIndex;
+	plots_t _plots;
+	HRendererSurfaceInterface* _renderer;
+	yaal::hcore::HString _error;
+	int _errorIndex;
 public:
 	HFunlab( HRendererSurfaceInterface* );
 	virtual ~HFunlab( void );

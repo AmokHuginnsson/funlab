@@ -36,23 +36,23 @@ using namespace yaal::tools;
 namespace funlab
 {
 OSetup::OSetup( void )
-	: f_bQuiet( false ), f_bVerbose( false ),
-		f_bStereo( false ),
-		f_b3D( true ), f_bShowAxis( false ),
-		f_bMultiFormula( false ),
-		f_iDensity( 32 ), f_iResolutionX( 640 ),
-		f_iResolutionY( 480 ), f_dAspect( 1 ),
-		f_dDomainLowerBound( -1 ), f_dDomainUpperBound( 1 ),
-		f_dRangeLowerBound( -1 ), f_dRangeUpperBound( 1 ),
-		f_pcProgramName( NULL ), f_oLogPath(),
-		f_oFormula(), f_oResourcePath(),
-		f_oIconPath()
+	: _quiet( false ), _verbose( false ),
+		_stereo( false ),
+		f_b3D( true ), _showAxis( false ),
+		_multiFormula( false ),
+		_density( 32 ), _resolutionX( 640 ),
+		_resolutionY( 480 ), _aspect( 1 ),
+		_domainLowerBound( -1 ), _domainUpperBound( 1 ),
+		_rangeLowerBound( -1 ), _rangeUpperBound( 1 ),
+		_programName( NULL ), _logPath(),
+		_formula(), _resourcePath(),
+		_iconPath()
 	{}
 
 void OSetup::test_setup( void )
 	{
 	M_PROLOG
-	if ( f_bQuiet && f_bVerbose )
+	if ( _quiet && _verbose )
 		yaal::tools::util::failure( 1,
 				_( "quiet and verbose options are exclusive\n" ) );
 	return;

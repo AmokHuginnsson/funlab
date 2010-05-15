@@ -51,31 +51,31 @@ class HWindowMain : public Gtk::Window, public HKeyboardEventListener
 	{
 	class HLocker
 		{
-		bool& f_rbLock;
-		explicit HLocker( bool& a_rbLock ) : f_rbLock( a_rbLock ) { f_rbLock = true; }
-		virtual ~HLocker( void ) { f_rbLock = false; }
+		bool& _lock;
+		explicit HLocker( bool& lock_ ) : _lock( lock_ ) { _lock = true; }
+		virtual ~HLocker( void ) { _lock = false; }
 		friend class HWindowMain;
 		};
 protected:
-	bool f_bLock;
-	Glib::RefPtr<Gtk::ListStore> f_oFormulasListModel;
-	Gtk::TreeModel::ColumnRecord f_oFormulasListColumns;
-	Gtk::TreeModelColumn<OPlotDesc> f_oFormulasListFormulaColumn;
-	Gtk::TreeView* f_poFormulasListView;
-	Gtk::Scale* f_poDensity;
+	bool _lock;
+	Glib::RefPtr<Gtk::ListStore> _formulasListModel;
+	Gtk::TreeModel::ColumnRecord _formulasListColumns;
+	Gtk::TreeModelColumn<OPlotDesc> _formulasListFormulaColumn;
+	Gtk::TreeView* _formulasListView;
+	Gtk::Scale* _density;
 	Gtk::CheckButton* f_po3D;
-	Gtk::CheckButton* f_poMultiFormula;
-	Gtk::CheckButton* f_poShowAxis;
-	Gtk::CheckButton* f_poStereo;
-	Gtk::SpinButton* f_poDomainLowerBound;
-	Gtk::SpinButton* f_poDomainUpperBound;
-	Gtk::SpinButton* f_poRangeLowerBound;
-	Gtk::SpinButton* f_poRangeUpperBound;
-	Gtk::Entry* f_poFormula;
-	Glib::Dispatcher f_oDispatcher;
-	bool f_bDetachedRendererActive;
-	HEmbeddedRenderer* f_poEmbeddedRenderer;
-	HDetachedRenderer::ptr_t f_oDetachedRenderer;
+	Gtk::CheckButton* _multiFormula;
+	Gtk::CheckButton* _showAxis;
+	Gtk::CheckButton* _stereo;
+	Gtk::SpinButton* _domainLowerBound;
+	Gtk::SpinButton* _domainUpperBound;
+	Gtk::SpinButton* _rangeLowerBound;
+	Gtk::SpinButton* _rangeUpperBound;
+	Gtk::Entry* _formula;
+	Glib::Dispatcher _dispatcher;
+	bool _detachedRendererActive;
+	HEmbeddedRenderer* _embeddedRenderer;
+	HDetachedRenderer::ptr_t _detachedRenderer;
 public:
 	HWindowMain( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
 	virtual ~HWindowMain( void );
@@ -112,28 +112,28 @@ protected:
 	void save( HString const& );
 	};
 
-HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
-	Glib::RefPtr<Gnome::Glade::Xml> const& a_roResources ) : Gtk::Window( a_poBaseObject ),
-	f_bLock( false ), f_poFormulasListView( NULL ), f_poDensity( NULL ),
-	f_po3D( NULL ), f_poMultiFormula( NULL ), f_poShowAxis( NULL ),
-	f_poDomainLowerBound( NULL ), f_poDomainUpperBound( NULL ),
-	f_poRangeLowerBound( NULL ), f_poRangeUpperBound( NULL ),
-	f_poFormula( NULL ),
-	f_bDetachedRendererActive( false ), f_oDetachedRenderer()
+HWindowMain::HWindowMain( BaseObjectType* baseObject_,
+	Glib::RefPtr<Gnome::Glade::Xml> const& resources_ ) : Gtk::Window( baseObject_ ),
+	_lock( false ), _formulasListView( NULL ), _density( NULL ),
+	f_po3D( NULL ), _multiFormula( NULL ), _showAxis( NULL ),
+	_domainLowerBound( NULL ), _domainUpperBound( NULL ),
+	_rangeLowerBound( NULL ), _rangeUpperBound( NULL ),
+	_formula( NULL ),
+	_detachedRendererActive( false ), _detachedRenderer()
 	{
 	M_PROLOG
-	Gtk::ToolButton* l_poToolButton = NULL;
-	Gtk::MenuItem* l_poMenuItem = NULL;
+	Gtk::ToolButton* toolButton = NULL;
+	Gtk::MenuItem* menuItem = NULL;
 
-	a_roResources->get_widget_derived( "RENDERER", f_poEmbeddedRenderer );
-	HRendererEngineInterface::ptr_t ere( new HFunlab( f_poEmbeddedRenderer ) );
-	f_poEmbeddedRenderer->set_engine( ere );
+	resources_->get_widget_derived( "RENDERER", _embeddedRenderer );
+	HRendererEngineInterface::ptr_t ere( new HFunlab( _embeddedRenderer ) );
+	_embeddedRenderer->set_engine( ere );
 
 	/* Formulas List */
-	a_roResources->get_widget( "TREE_FORMULAS", f_poFormulasListView );
-	f_oFormulasListColumns.add( f_oFormulasListFormulaColumn );
-	f_oFormulasListModel = Gtk::ListStore::create( f_oFormulasListColumns );
-	f_poFormulasListView->set_model( f_oFormulasListModel );
+	resources_->get_widget( "TREE_FORMULAS", _formulasListView );
+	_formulasListColumns.add( _formulasListFormulaColumn );
+	_formulasListModel = Gtk::ListStore::create( _formulasListColumns );
+	_formulasListView->set_model( _formulasListModel );
 
 	/* Very nontrivial column appending! */
 
@@ -156,102 +156,102 @@ HWindowMain::HWindowMain( BaseObjectType* a_poBaseObject,
   get_value_for_cell_t value_getter = &HWindowMain::get_value_for_cell;
   Gtk::TreeViewColumn::SlotCellData slot = sigc::bind<-1>(
 			sigc::ptr_fun( value_getter ),
-			f_oFormulasListFormulaColumn );
+			_formulasListFormulaColumn );
 	col->set_cell_data_func( *pCellRenderer, slot );
-	f_poFormulasListView->append_column( *col );
+	_formulasListView->append_column( *col );
 
 	/* Rest of this stuff is plain and simple. */
 
-	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
-	l_oSelection->set_mode( Gtk::SELECTION_SINGLE );
-	l_oSelection->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_sel_changed ) );
-	f_poFormulasListView->signal_key_press_event().connect( sigc::mem_fun( *this, &HWindowMain::on_key_press ), false );
-	f_poFormulasListView->grab_focus();
+	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
+	selection->set_mode( Gtk::SELECTION_SINGLE );
+	selection->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_sel_changed ) );
+	_formulasListView->signal_key_press_event().connect( sigc::mem_fun( *this, &HWindowMain::on_key_press ), false );
+	_formulasListView->grab_focus();
 
-	a_roResources->get_widget( "DENSITY", f_poDensity );
-	f_poDensity->set_value( setup.f_iDensity );
-	f_poDensity->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_density_changed ) );
+	resources_->get_widget( "DENSITY", _density );
+	_density->set_value( setup._density );
+	_density->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_density_changed ) );
 
-	a_roResources->get_widget( "AXIS", f_poShowAxis );
-	f_poShowAxis->set_active( setup.f_bShowAxis );
-	f_poShowAxis->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_show_axis_changed ) );
+	resources_->get_widget( "AXIS", _showAxis );
+	_showAxis->set_active( setup._showAxis );
+	_showAxis->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_show_axis_changed ) );
 
-	a_roResources->get_widget( "STEREO", f_poStereo );
-	f_poStereo->set_active( setup.f_bStereo );
-	f_poStereo->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_stereo_changed ) );
+	resources_->get_widget( "STEREO", _stereo );
+	_stereo->set_active( setup._stereo );
+	_stereo->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_stereo_changed ) );
 
-	a_roResources->get_widget( "MULTI", f_poMultiFormula );
-	f_poMultiFormula->set_active( setup.f_bMultiFormula );
-	f_poMultiFormula->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_multi_changed ) );
+	resources_->get_widget( "MULTI", _multiFormula );
+	_multiFormula->set_active( setup._multiFormula );
+	_multiFormula->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_multi_changed ) );
 
-	a_roResources->get_widget( "DOMAIN_LOWER_BOUND", f_poDomainLowerBound );
-	f_poDomainLowerBound->set_value( static_cast<double>( setup.f_dDomainLowerBound ) );
-	f_poDomainLowerBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_domain_lower_bound_changed ) );
+	resources_->get_widget( "DOMAIN_LOWER_BOUND", _domainLowerBound );
+	_domainLowerBound->set_value( static_cast<double>( setup._domainLowerBound ) );
+	_domainLowerBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_domain_lower_bound_changed ) );
 
-	a_roResources->get_widget( "DOMAIN_UPPER_BOUND", f_poDomainUpperBound );
-	f_poDomainUpperBound->set_value( static_cast<double>( setup.f_dDomainUpperBound ) );
-	f_poDomainUpperBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_domain_upper_bound_changed ) );
+	resources_->get_widget( "DOMAIN_UPPER_BOUND", _domainUpperBound );
+	_domainUpperBound->set_value( static_cast<double>( setup._domainUpperBound ) );
+	_domainUpperBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_domain_upper_bound_changed ) );
 
-	a_roResources->get_widget( "RANGE_LOWER_BOUND", f_poRangeLowerBound );
-	f_poRangeLowerBound->set_value( static_cast<double>( setup.f_dRangeLowerBound ) );
-	f_poRangeLowerBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_range_lower_bound_changed ) );
+	resources_->get_widget( "RANGE_LOWER_BOUND", _rangeLowerBound );
+	_rangeLowerBound->set_value( static_cast<double>( setup._rangeLowerBound ) );
+	_rangeLowerBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_range_lower_bound_changed ) );
 
-	a_roResources->get_widget( "RANGE_UPPER_BOUND", f_poRangeUpperBound );
-	f_poRangeUpperBound->set_value( static_cast<double>( setup.f_dRangeUpperBound ) );
-	f_poRangeUpperBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_range_upper_bound_changed ) );
+	resources_->get_widget( "RANGE_UPPER_BOUND", _rangeUpperBound );
+	_rangeUpperBound->set_value( static_cast<double>( setup._rangeUpperBound ) );
+	_rangeUpperBound->signal_value_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_range_upper_bound_changed ) );
 
-	a_roResources->get_widget( "FORMULA", f_poFormula );
-	f_poFormula->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_formula_changed ) );
+	resources_->get_widget( "FORMULA", _formula );
+	_formula->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_formula_changed ) );
 
-	a_roResources->get_widget( "MODE_3D", f_po3D );
+	resources_->get_widget( "MODE_3D", f_po3D );
 	f_po3D->set_active( setup.f_b3D );
 	f_po3D->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_3d_changed ) );
 
-	f_oDispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
+	_dispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
 
 	/* NEW */
-	a_roResources->get_widget( "ID_TOOLBAR_NEW", l_poToolButton );
-	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_new ) );
-	a_roResources->get_widget( "ID_MENU_NEW", l_poMenuItem );
-	l_poMenuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_new ) );
+	resources_->get_widget( "ID_TOOLBAR_NEW", toolButton );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_new ) );
+	resources_->get_widget( "ID_MENU_NEW", menuItem );
+	menuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_new ) );
 	/* OPEN */
-	a_roResources->get_widget( "ID_TOOLBAR_OPEN", l_poToolButton );
-	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_open ) );
-	a_roResources->get_widget( "ID_MENU_OPEN", l_poMenuItem );
-	l_poMenuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_open ) );
+	resources_->get_widget( "ID_TOOLBAR_OPEN", toolButton );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_open ) );
+	resources_->get_widget( "ID_MENU_OPEN", menuItem );
+	menuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_open ) );
 
 	/* SAVE_AS */
-	a_roResources->get_widget( "ID_TOOLBAR_SAVE_AS", l_poToolButton );
-	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_save_as ) );
-	a_roResources->get_widget( "ID_MENU_SAVE_AS", l_poMenuItem );
-	l_poMenuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_save_as ) );
+	resources_->get_widget( "ID_TOOLBAR_SAVE_AS", toolButton );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_save_as ) );
+	resources_->get_widget( "ID_MENU_SAVE_AS", menuItem );
+	menuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_save_as ) );
 
 	/* QUIT */
-	a_roResources->get_widget( "ID_TOOLBAR_QUIT", l_poToolButton );
-	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_quit ) );
-	a_roResources->get_widget( "ID_MENU_QUIT", l_poMenuItem );
-	l_poMenuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_quit ) );
+	resources_->get_widget( "ID_TOOLBAR_QUIT", toolButton );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_quit ) );
+	resources_->get_widget( "ID_MENU_QUIT", menuItem );
+	menuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_quit ) );
 
 	/* ABOUT */
-	a_roResources->get_widget( "ID_TOOLBAR_ABOUT", l_poToolButton );
-	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_about ) );
-	a_roResources->get_widget( "ID_MENU_ABOUT", l_poMenuItem );
-	l_poMenuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_about ) );
+	resources_->get_widget( "ID_TOOLBAR_ABOUT", toolButton );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_about ) );
+	resources_->get_widget( "ID_MENU_ABOUT", menuItem );
+	menuItem->signal_activate().connect( sigc::mem_fun( *this, &HWindowMain::on_about ) );
 
 	/* ADD */
-	a_roResources->get_widget( "ID_TOOLBAR_ADD", l_poToolButton );
-	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_add ) );
+	resources_->get_widget( "ID_TOOLBAR_ADD", toolButton );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_add ) );
 /*
-   a_roResources->get_widget ( "ID_MENU_ADD", l_poMenuItem );
-   l_poMenuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_add ) );
+   resources_->get_widget ( "ID_MENU_ADD", menuItem );
+   menuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_add ) );
  */
 
 	/* REMOVE */
-	a_roResources->get_widget( "ID_TOOLBAR_REMOVE", l_poToolButton );
-	l_poToolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_remove ) );
+	resources_->get_widget( "ID_TOOLBAR_REMOVE", toolButton );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_remove ) );
 /*
-   a_roResources->get_widget ( "ID_MENU_REMOVE", l_poMenuItem );
-   l_poMenuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_remove ) );
+   resources_->get_widget ( "ID_MENU_REMOVE", menuItem );
+   menuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_remove ) );
  */
 	return;
 	M_EPILOG
@@ -267,9 +267,9 @@ HWindowMain::~HWindowMain( void )
 void HWindowMain::on_new( void )
 	{
 	M_PROLOG
-	HLocker l_oLock( f_bLock );
+	HLocker lock( _lock );
 
-	f_oFormulasListModel->clear();
+	_formulasListModel->clear();
 	return;
 	M_EPILOG
 	}
@@ -277,63 +277,63 @@ void HWindowMain::on_new( void )
 void HWindowMain::on_open( void )
 	{
 	M_PROLOG
-	HLocker l_oLock( f_bLock );
-	Gtk::FileFilter l_oFileFilter;
-	Gtk::FileChooserDialog l_oFileOpenDialog( *this,
+	HLocker lock( _lock );
+	Gtk::FileFilter fileFilter;
+	Gtk::FileChooserDialog fileOpenDialog( *this,
 	                                          _( "Select formulas file to open ..." ), Gtk::FILE_CHOOSER_ACTION_OPEN );
 
-	l_oFileOpenDialog.set_local_only( true );
-	l_oFileOpenDialog.set_select_multiple( false );
-	l_oFileFilter.set_name( _( "Function formulas." ) );
-	l_oFileFilter.add_pattern( "*.fun" );
-	l_oFileOpenDialog.add_filter( l_oFileFilter );
-	l_oFileOpenDialog.add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
-	l_oFileOpenDialog.add_button( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
-	if ( l_oFileOpenDialog.run() == Gtk::RESPONSE_OK )
-		open( l_oFileOpenDialog.get_filename().c_str() );
+	fileOpenDialog.set_local_only( true );
+	fileOpenDialog.set_select_multiple( false );
+	fileFilter.set_name( _( "Function formulas." ) );
+	fileFilter.add_pattern( "*.fun" );
+	fileOpenDialog.add_filter( fileFilter );
+	fileOpenDialog.add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
+	fileOpenDialog.add_button( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
+	if ( fileOpenDialog.run() == Gtk::RESPONSE_OK )
+		open( fileOpenDialog.get_filename().c_str() );
 
 	return;
 	M_EPILOG
 	}
 
-void HWindowMain::open( HString const& a_oPath )
+void HWindowMain::open( HString const& path_ )
 	{
 	M_PROLOG
-	if ( a_oPath.is_empty() )
+	if ( path_.is_empty() )
 		M_THROW( _( "Empty path." ), errno );
 
-	int l_iIndex = 0;
-	HString l_oLine;
-	Gtk::TreeModel::Row l_oRow;
+	int index = 0;
+	HString line;
+	Gtk::TreeModel::Row row;
 	try
 		{
-		HFile l_oFile( a_oPath, HFile::OPEN::READING );
-		if ( !!l_oFile )
+		HFile file( path_, HFile::OPEN::READING );
+		if ( !!file )
 			{
-			f_oFormulasListModel->clear();
-			while ( l_oFile.read_line( l_oLine, HFile::READ::STRIP_NEWLINES ) >= 0 )
+			_formulasListModel->clear();
+			while ( file.read_line( line, HFile::READ::STRIP_NEWLINES ) >= 0 )
 				{
-				l_oRow = *( f_oFormulasListModel->append() );
-				l_oRow[ f_oFormulasListFormulaColumn ] = plot_desc_from_string( l_oLine );
-				l_iIndex ++;
+				row = *( _formulasListModel->append() );
+				row[ _formulasListFormulaColumn ] = plot_desc_from_string( line );
+				index ++;
 				}
 			}
 		}
 	catch ( HException const& e )
 		{
-		Gtk::MessageDialog l_oInfo( *this, e.what(), true );
-		l_oInfo.set_title( _( "Error loading file ..." ) );
-		Pango::FontDescription l_oFontDesc( "Sans Bold 14" );
-		set_font_all( l_oFontDesc, &l_oInfo );
-		l_oInfo.run();
+		Gtk::MessageDialog info( *this, e.what(), true );
+		info.set_title( _( "Error loading file ..." ) );
+		Pango::FontDescription fontDesc( "Sans Bold 14" );
+		set_font_all( fontDesc, &info );
+		info.run();
 		}
-	if ( l_iIndex )
+	if ( index )
 		{
-		f_poFormulasListView->grab_focus();
-		Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
-		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
-		Gtk::TreeIter l_oIter = l_oRows.begin();
-		f_poFormulasListView->set_cursor ( f_oFormulasListModel->get_path ( l_oIter ) );
+		_formulasListView->grab_focus();
+		Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
+		Gtk::TreeModel::Children rows = _formulasListModel->children();
+		Gtk::TreeIter iter = rows.begin();
+		_formulasListView->set_cursor ( _formulasListModel->get_path ( iter ) );
 		}
 	return;
 	M_EPILOG
@@ -342,39 +342,39 @@ void HWindowMain::open( HString const& a_oPath )
 void HWindowMain::on_save_as( void )
 	{
 	M_PROLOG
-	HLocker l_oLock( f_bLock );
-	Gtk::FileFilter l_oFileFilter;
-	Gtk::FileChooserDialog l_oFileOpenDialog( *this,
+	HLocker lock( _lock );
+	Gtk::FileFilter fileFilter;
+	Gtk::FileChooserDialog fileOpenDialog( *this,
 	                                          _( "Enter file name to save Your formulas ..." ), Gtk::FILE_CHOOSER_ACTION_SAVE );
 
-	l_oFileOpenDialog.set_local_only( true );
-	l_oFileOpenDialog.set_select_multiple( false );
-	l_oFileFilter.set_name( _( "Function formulas." ) );
-	l_oFileFilter.add_pattern( "*.fun" );
-	l_oFileOpenDialog.add_filter( l_oFileFilter );
-	l_oFileOpenDialog.add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
-	l_oFileOpenDialog.add_button( Gtk::Stock::SAVE, Gtk::RESPONSE_OK );
-	if ( l_oFileOpenDialog.run() == Gtk::RESPONSE_OK )
-		save( l_oFileOpenDialog.get_filename().c_str() );
+	fileOpenDialog.set_local_only( true );
+	fileOpenDialog.set_select_multiple( false );
+	fileFilter.set_name( _( "Function formulas." ) );
+	fileFilter.add_pattern( "*.fun" );
+	fileOpenDialog.add_filter( fileFilter );
+	fileOpenDialog.add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
+	fileOpenDialog.add_button( Gtk::Stock::SAVE, Gtk::RESPONSE_OK );
+	if ( fileOpenDialog.run() == Gtk::RESPONSE_OK )
+		save( fileOpenDialog.get_filename().c_str() );
 
 	return;
 	M_EPILOG
 	}
 
-void HWindowMain::save( HString const& a_oPath )
+void HWindowMain::save( HString const& path_ )
 	{
 	M_PROLOG
-	if ( a_oPath.is_empty() )
+	if ( path_.is_empty() )
 		M_THROW( _( "Empty path." ), errno );
 
-	HFile l_oFile( a_oPath, HFile::OPEN::WRITING );
-	if ( !!l_oFile )
+	HFile file( path_, HFile::OPEN::WRITING );
+	if ( !!file )
 		{
-		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
-		for ( Gtk::TreeIter l_oIter = l_oRows.begin(); l_oIter != l_oRows.end(); ++ l_oIter )
-			l_oFile << l_oIter->get_value( f_oFormulasListFormulaColumn ) << endl;
+		Gtk::TreeModel::Children rows = _formulasListModel->children();
+		for ( Gtk::TreeIter iter = rows.begin(); iter != rows.end(); ++ iter )
+			file << iter->get_value( _formulasListFormulaColumn ) << endl;
 
-		l_oFile.close();
+		file.close();
 		}
 	return;
 	M_EPILOG
@@ -383,7 +383,7 @@ void HWindowMain::save( HString const& a_oPath )
 void HWindowMain::on_quit( void )
 	{
 	M_PROLOG
-	HLocker l_oLock( f_bLock );
+	HLocker lock( _lock );
 
 	Gtk::Main::quit();
 	return;
@@ -393,14 +393,14 @@ void HWindowMain::on_quit( void )
 void HWindowMain::on_about( void )
 	{
 	M_PROLOG
-	HLocker l_oLock( f_bLock );
-	HString l_oMsg;
-	l_oMsg.format( _( "The funlab program, very fancy GUI application that\n"
+	HLocker lock( _lock );
+	HString msg;
+	msg.format( _( "The funlab program, very fancy GUI application that\n"
 			"can be used for rendering function surfaces.\n"
 			"Welcome to funlab %s" ), PACKAGE_STRING );
-	Gtk::MessageDialog l_oMessageAbout( *this, l_oMsg.raw() );
-	l_oMessageAbout.set_title( _( "About funlab" ) );
-	l_oMessageAbout.run();
+	Gtk::MessageDialog messageAbout( *this, msg.raw() );
+	messageAbout.set_title( _( "About funlab" ) );
+	messageAbout.run();
 	return;
 	M_EPILOG
 	}
@@ -408,10 +408,10 @@ void HWindowMain::on_about( void )
 void HWindowMain::on_add( void )
 	{
 	M_PROLOG
-	HLocker l_oLock( f_bLock );
-	Gtk::TreeIter l_oIter = f_oFormulasListModel->append();
-	f_poFormulasListView->set_cursor( f_oFormulasListModel->get_path( l_oIter ) );
-	f_poFormulasListView->grab_focus();
+	HLocker lock( _lock );
+	Gtk::TreeIter iter = _formulasListModel->append();
+	_formulasListView->set_cursor( _formulasListModel->get_path( iter ) );
+	_formulasListView->grab_focus();
 	return;
 	M_EPILOG
 	}
@@ -419,29 +419,29 @@ void HWindowMain::on_add( void )
 void HWindowMain::on_remove( void )
 	{
 	M_PROLOG
-	HLocker l_oLock( f_bLock );
+	HLocker lock( _lock );
 
-	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
-	Gtk::TreeIter l_oIter = l_oSelection->get_selected();
-	if ( l_oIter )
+	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
+	Gtk::TreeIter iter = selection->get_selected();
+	if ( iter )
 		{
-		Gtk::TreeModel::Children l_oRows = f_oFormulasListModel->children();
-		Gtk::TreeIter l_oIterNew = l_oIter;
-		++ l_oIterNew;
-		if ( l_oIterNew == l_oRows.end() )
+		Gtk::TreeModel::Children rows = _formulasListModel->children();
+		Gtk::TreeIter iterNew = iter;
+		++ iterNew;
+		if ( iterNew == rows.end() )
 			{
-			if ( l_oIter != l_oRows.begin() )
+			if ( iter != rows.begin() )
 				{
-				l_oIterNew = l_oIter;
-				-- l_oIterNew;
+				iterNew = iter;
+				-- iterNew;
 				}
 			}
 
-		f_oFormulasListModel->erase( l_oIter );
-		if ( l_oIterNew )
-			f_poFormulasListView->set_cursor( f_oFormulasListModel->get_path( l_oIterNew ) );
+		_formulasListModel->erase( iter );
+		if ( iterNew )
+			_formulasListView->set_cursor( _formulasListModel->get_path( iterNew ) );
 
-		f_poFormulasListView->grab_focus();
+		_formulasListView->grab_focus();
 		}
 	return;
 	M_EPILOG
@@ -451,15 +451,15 @@ HFunlab* HWindowMain::funlab( void )
 	{
 	M_PROLOG
 	HFunlab* f = NULL;
-	if ( ! f_bLock && f_bDetachedRendererActive )
+	if ( ! _lock && _detachedRendererActive )
 		{
-		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer );
+		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*_detachedRenderer );
 		if ( dr )
 			f = dynamic_cast<HFunlab*>( &( *dr->get_engine() ) );
 		}
 	else
 		{
-		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( f_poEmbeddedRenderer );
+		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( _embeddedRenderer );
 		if ( er )
 			f = dynamic_cast<HFunlab*>( &( *er->get_engine() ) );
 		}
@@ -473,7 +473,7 @@ void HWindowMain::selected_row_callback( Gtk::TreeModel::iterator const& iter )
 	HFunlab* f = NULL;
 	if ( iter && ( f = funlab() ) )
 		{
-		f->push_formula( iter->get_value( f_oFormulasListFormulaColumn ) );
+		f->push_formula( iter->get_value( _formulasListFormulaColumn ) );
 		update_drawing( false );
 		}
 	M_EPILOG
@@ -482,25 +482,25 @@ void HWindowMain::selected_row_callback( Gtk::TreeModel::iterator const& iter )
 void HWindowMain::on_sel_changed( void )
 	{
 	M_PROLOG
-	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
+	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
 	HFunlab* f = funlab();
 	if ( f )
 		{
 		f->clear();
-		if ( l_oSelection->get_mode() == Gtk::SELECTION_MULTIPLE )
-			l_oSelection->selected_foreach_iter( sigc::mem_fun( *this, &HWindowMain::selected_row_callback ) );
+		if ( selection->get_mode() == Gtk::SELECTION_MULTIPLE )
+			selection->selected_foreach_iter( sigc::mem_fun( *this, &HWindowMain::selected_row_callback ) );
 		else
 			{
-			Gtk::TreeIter iter = l_oSelection->get_selected();
+			Gtk::TreeIter iter = selection->get_selected();
 			if ( iter )
 				{
-				OPlotDesc plot = iter->get_value( f_oFormulasListFormulaColumn );
-				f_poFormula->set_text( plot._formula.raw() );
+				OPlotDesc plot = iter->get_value( _formulasListFormulaColumn );
+				_formula->set_text( plot._formula.raw() );
 				f_po3D->set_active( plot._3d );
-				f_poDomainLowerBound->set_value( static_cast<double>( plot._domainLowerBound ) );
-				f_poDomainUpperBound->set_value( static_cast<double>( plot._domainUpperBound ) );
-				f_poRangeLowerBound->set_value( static_cast<double>( plot._rangeLowerBound ) );
-				f_poRangeUpperBound->set_value( static_cast<double>( plot._rangeUpperBound ) );
+				_domainLowerBound->set_value( static_cast<double>( plot._domainLowerBound ) );
+				_domainUpperBound->set_value( static_cast<double>( plot._domainUpperBound ) );
+				_rangeLowerBound->set_value( static_cast<double>( plot._rangeLowerBound ) );
+				_rangeUpperBound->set_value( static_cast<double>( plot._rangeUpperBound ) );
 				f->push_formula( plot );
 				update_drawing( false );
 				}
@@ -512,23 +512,23 @@ void HWindowMain::on_sel_changed( void )
 
 void HWindowMain::update_drawing( bool full )
 	{
-	if ( ! f_bLock && f_bDetachedRendererActive )
+	if ( ! _lock && _detachedRendererActive )
 		{
-		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer );
+		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*_detachedRenderer );
 		M_ASSERT( dr );
 		}
 	else
 		{
-		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( f_poEmbeddedRenderer );
+		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( _embeddedRenderer );
 		M_ASSERT( er );
 		er->invoke_refresh( full );
 		}
 	}
 
-bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
+bool HWindowMain::on_key_press( GdkEventKey* eventKey_ )
 	{
 	M_PROLOG
-	switch ( a_poEventKey->keyval )
+	switch ( eventKey_->keyval )
 		{
 		case ( GDK_Delete ):
 			on_remove();
@@ -538,21 +538,21 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 		break;
 		case ( ' ' ):
 			{
-			Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
-			Gtk::TreeIter l_oIter = l_oSelection->get_selected();
-			if ( l_oIter )
+			Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
+			Gtk::TreeIter iter = selection->get_selected();
+			if ( iter )
 				{
-				OPlotDesc const& l_oPlot = l_oIter->get_value( f_oFormulasListFormulaColumn );
+				OPlotDesc const& plot = iter->get_value( _formulasListFormulaColumn );
 				HDetachedRenderer* dr = NULL;
-				f_oDetachedRenderer = HRendererSurfaceInterface::ptr_t( dr = new HDetachedRenderer( this ) );
-				HRendererEngineInterface::ptr_t dre( new HFunlab( &*f_oDetachedRenderer ) );
+				_detachedRenderer = HRendererSurfaceInterface::ptr_t( dr = new HDetachedRenderer( this ) );
+				HRendererEngineInterface::ptr_t dre( new HFunlab( &*_detachedRenderer ) );
 				dr->set_engine( dre );
 				HFunlab* f = dynamic_cast<HFunlab*>( &(*dr->get_engine() ) );
-				if ( f && f->push_formula( l_oPlot ) )
-					show_error_message( l_oPlot._formula.raw(), f->error(), f->error_position() );
+				if ( f && f->push_formula( plot ) )
+					show_error_message( plot._formula.raw(), f->error(), f->error_position() );
 				else
 					dr->render_surface();
-				f_bDetachedRendererActive = true;
+				_detachedRendererActive = true;
 				}
 			}
 		break;
@@ -566,80 +566,80 @@ bool HWindowMain::on_key_press( GdkEventKey* a_poEventKey )
 void HWindowMain::shutdown_renderer( void )
 	{
 	cout << __PRETTY_FUNCTION__ << endl;
-	dynamic_cast<HDetachedRenderer*>( &*f_oDetachedRenderer )->shutdown();
-	f_oDetachedRenderer = HDetachedRenderer::ptr_t();
-	f_bDetachedRendererActive = false;
+	dynamic_cast<HDetachedRenderer*>( &*_detachedRenderer )->shutdown();
+	_detachedRenderer = HDetachedRenderer::ptr_t();
+	_detachedRendererActive = false;
 	}
 
 void HWindowMain::do_on_event( HKeyboardEvent const* e )
 	{
 	cout << __PRETTY_FUNCTION__ << endl;
 	if ( e->get_code() == 'q' )
-		f_oDispatcher();
+		_dispatcher();
 	return;
 	}
 
-void HWindowMain::show_error_message( char const* const a_pcFormula,
-	char const* const a_pcMessage, int a_iPosition )
+void HWindowMain::show_error_message( char const* const formula_,
+	char const* const message_, int position_ )
 	{
 	M_PROLOG
-	int l_iCtr = 0;
-	HString l_oError, l_oArrow;
-	for ( l_iCtr = 0; l_iCtr < a_iPosition; l_iCtr ++ )
-		l_oArrow += '-';
-	l_oArrow += 'v';
-	l_oError.format( "<b>%s at this place:<tt>\n\n%s\n%s</tt></b>",
-		a_pcMessage, l_oArrow.raw(),
-		a_pcFormula );
-	Gtk::MessageDialog l_oInfo( *this,
-			l_oError.raw(), true );
-	l_oInfo.set_title( _( "Formula syntax error ..." ) );
-	Pango::FontDescription l_oFontDesc( "Sans Bold 14" );
-	set_font_all( l_oFontDesc, &l_oInfo );
-	l_oInfo.run();
+	int ctr = 0;
+	HString error, arrow;
+	for ( ctr = 0; ctr < position_; ctr ++ )
+		arrow += '-';
+	arrow += 'v';
+	error.format( "<b>%s at this place:<tt>\n\n%s\n%s</tt></b>",
+		message_, arrow.raw(),
+		formula_ );
+	Gtk::MessageDialog info( *this,
+			error.raw(), true );
+	info.set_title( _( "Formula syntax error ..." ) );
+	Pango::FontDescription fontDesc( "Sans Bold 14" );
+	set_font_all( fontDesc, &info );
+	info.run();
 	return;
 	M_EPILOG
 	}
 
-void HWindowMain::set_font_all( Pango::FontDescription const& a_oFontDesc,
-	Gtk::Widget* a_poWidget )
+void HWindowMain::set_font_all( Pango::FontDescription const& fontDesc_,
+	Gtk::Widget* widget_ )
 	{
 	M_PROLOG
-	if ( !a_poWidget )
+	if ( !widget_ )
 		return;
-	a_poWidget->modify_font( a_oFontDesc );
-	Gtk::Dialog* l_poDialog = dynamic_cast<Gtk::Dialog*>( a_poWidget );
-	Gtk::Box* l_poBox = dynamic_cast<Gtk::Box*>( a_poWidget );
-	Gtk::Window* l_poWindow = dynamic_cast<Gtk::Window*>( a_poWidget );
-	Gtk::Label* l_poLabel = dynamic_cast<Gtk::Label*>( a_poWidget );
-	if ( l_poLabel )
-		l_poLabel->set_line_wrap( false );
-	if ( l_poDialog )
+	widget_->modify_font( fontDesc_ );
+	Gtk::Dialog* dialog = dynamic_cast<Gtk::Dialog*>( widget_ );
+	Gtk::Box* box = dynamic_cast<Gtk::Box*>( widget_ );
+	Gtk::Window* window = dynamic_cast<Gtk::Window*>( widget_ );
+	Gtk::Label* label = dynamic_cast<Gtk::Label*>( widget_ );
+	if ( label )
+		label->set_line_wrap( false );
+	if ( dialog )
 		{
-		set_font_all( a_oFontDesc, l_poDialog->get_vbox() );
-		set_font_all( a_oFontDesc, l_poDialog->get_action_area() );
+		set_font_all( fontDesc_, dialog->get_vbox() );
+		set_font_all( fontDesc_, dialog->get_action_area() );
 		}
-	else if ( l_poWindow )
+	else if ( window )
 		{
-		Glib::ListHandle<Widget*> l_oChildren = l_poWindow->get_children();
-		for ( Glib::ListHandle<Widget*>::iterator l_oChildIterator = l_oChildren.begin();
-		      l_oChildIterator != l_oChildren.end(); ++ l_oChildIterator )
-			set_font_all( a_oFontDesc, *l_oChildIterator );
+		Glib::ListHandle<Widget*> children = window->get_children();
+		for ( Glib::ListHandle<Widget*>::iterator childIterator = children.begin();
+		      childIterator != children.end(); ++ childIterator )
+			set_font_all( fontDesc_, *childIterator );
 		}
-	else if ( l_poBox )
+	else if ( box )
 		{
-		Gtk::Box_Helpers::BoxList& l_oBoxList = l_poBox->children();
-		for ( Gtk::Box_Helpers::BoxList::iterator l_oBoxIterator = l_oBoxList.begin();
-		      l_oBoxIterator != l_oBoxList.end(); ++ l_oBoxIterator )
-			set_font_all( a_oFontDesc, l_oBoxIterator->get_widget() );
+		Gtk::Box_Helpers::BoxList& boxList = box->children();
+		for ( Gtk::Box_Helpers::BoxList::iterator boxIterator = boxList.begin();
+		      boxIterator != boxList.end(); ++ boxIterator )
+			set_font_all( fontDesc_, boxIterator->get_widget() );
 
-		Glib::ListHandle<Widget*> l_oChildren = l_poBox->get_children();
-		for ( Glib::ListHandle<Widget*>::iterator l_oChildIterator = l_oChildren.begin();
-		      l_oChildIterator != l_oChildren.end(); ++ l_oChildIterator )
-			set_font_all( a_oFontDesc, *l_oChildIterator );
+		Glib::ListHandle<Widget*> children = box->get_children();
+		for ( Glib::ListHandle<Widget*>::iterator childIterator = children.begin();
+		      childIterator != children.end(); ++ childIterator )
+			set_font_all( fontDesc_, *childIterator );
 		}
 
-//	Gtk::MessageDialog o ( * this, a_poWidget->get_name() );
+//	Gtk::MessageDialog o ( * this, widget_->get_name() );
 //	o.run();
 	return;
 	M_EPILOG
@@ -647,19 +647,19 @@ void HWindowMain::set_font_all( Pango::FontDescription const& a_oFontDesc,
 
 void HWindowMain::on_density_changed( void )
 	{
-	setup.f_iDensity = static_cast<int>( f_poDensity->get_value() );
+	setup._density = static_cast<int>( _density->get_value() );
 	update_drawing();
 	}
 
 void HWindowMain::on_show_axis_changed( void )
 	{
-	setup.f_bShowAxis = f_poShowAxis->get_active();
+	setup._showAxis = _showAxis->get_active();
 	update_drawing();
 	}
 
 void HWindowMain::on_stereo_changed( void )
 	{
-	setup.f_bStereo = f_poStereo->get_active();
+	setup._stereo = _stereo->get_active();
 	update_drawing();
 	}
 
@@ -670,9 +670,9 @@ void HWindowMain::on_3d_changed( void )
 
 void HWindowMain::on_multi_changed( void )
 	{
-	setup.f_bMultiFormula = f_poMultiFormula->get_active();
-	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
-	l_oSelection->set_mode( setup.f_bMultiFormula ? Gtk::SELECTION_MULTIPLE : Gtk::SELECTION_SINGLE );
+	setup._multiFormula = _multiFormula->get_active();
+	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
+	selection->set_mode( setup._multiFormula ? Gtk::SELECTION_MULTIPLE : Gtk::SELECTION_SINGLE );
 	update_drawing();
 	}
 
@@ -680,17 +680,17 @@ void HWindowMain::on_plot_data_changed( void )
 	{
 	OPlotDesc plot;
 	plot._3d = f_po3D->get_active();
-	plot._domainLowerBound = f_poDomainLowerBound->get_value();
-	plot._domainUpperBound = f_poDomainUpperBound->get_value();
-	plot._rangeLowerBound = f_poRangeLowerBound->get_value();
-	plot._rangeUpperBound = f_poRangeUpperBound->get_value();
-	plot._formula = f_poFormula->get_text().c_str();
-	Glib::RefPtr<Gtk::TreeSelection> l_oSelection = f_poFormulasListView->get_selection();
-	if ( l_oSelection->get_mode() != Gtk::SELECTION_MULTIPLE )
+	plot._domainLowerBound = _domainLowerBound->get_value();
+	plot._domainUpperBound = _domainUpperBound->get_value();
+	plot._rangeLowerBound = _rangeLowerBound->get_value();
+	plot._rangeUpperBound = _rangeUpperBound->get_value();
+	plot._formula = _formula->get_text().c_str();
+	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
+	if ( selection->get_mode() != Gtk::SELECTION_MULTIPLE )
 		{
-		Gtk::TreeIter iter = l_oSelection->get_selected();
+		Gtk::TreeIter iter = selection->get_selected();
 		if ( iter )
-			iter->set_value( f_oFormulasListFormulaColumn, plot );
+			iter->set_value( _formulasListFormulaColumn, plot );
 		}
 	HFunlab* f = funlab();
 	if ( f )
@@ -705,7 +705,7 @@ void HWindowMain::on_plot_data_changed( void )
 void HWindowMain::on_formula_changed( void )
 	{
 	HExpression e;
-	Glib::ustring s( f_poFormula->get_text() );
+	Glib::ustring s( _formula->get_text() );
 	try
 		{
 		e.compile( s.c_str() );
@@ -713,48 +713,48 @@ void HWindowMain::on_formula_changed( void )
 		}
 	catch ( HExpressionException const& ex )
 		{
-/*		f_poFormula->select_region( e.get_error_token(), static_cast<int>( s.length() - 1 ) ); */
+/*		_formula->select_region( e.get_error_token(), static_cast<int>( s.length() - 1 ) ); */
 		}
 	return;
 	}
 
 void HWindowMain::on_domain_lower_bound_changed( void )
 	{
-	double nval = f_poDomainLowerBound->get_value();
-	if ( nval < setup.f_dDomainUpperBound )
-		setup.f_dDomainLowerBound = nval;
+	double nval = _domainLowerBound->get_value();
+	if ( nval < setup._domainUpperBound )
+		setup._domainLowerBound = nval;
 	else
-		f_poDomainLowerBound->set_value( static_cast<double>( setup.f_dDomainLowerBound ) );
+		_domainLowerBound->set_value( static_cast<double>( setup._domainLowerBound ) );
 	on_plot_data_changed();
 	}
 
 void HWindowMain::on_domain_upper_bound_changed( void )
 	{
-	double nval = f_poDomainUpperBound->get_value();
-	if ( nval > setup.f_dDomainLowerBound )
-		setup.f_dDomainUpperBound = nval;
+	double nval = _domainUpperBound->get_value();
+	if ( nval > setup._domainLowerBound )
+		setup._domainUpperBound = nval;
 	else
-		f_poDomainUpperBound->set_value( static_cast<double>( setup.f_dDomainUpperBound ) );
+		_domainUpperBound->set_value( static_cast<double>( setup._domainUpperBound ) );
 	on_plot_data_changed();
 	}
 
 void HWindowMain::on_range_lower_bound_changed( void )
 	{
-	double nval = f_poRangeLowerBound->get_value();
-	if ( nval < setup.f_dRangeUpperBound )
-		setup.f_dRangeLowerBound = nval;
+	double nval = _rangeLowerBound->get_value();
+	if ( nval < setup._rangeUpperBound )
+		setup._rangeLowerBound = nval;
 	else
-		f_poRangeLowerBound->set_value( static_cast<double>( setup.f_dRangeLowerBound ) );
+		_rangeLowerBound->set_value( static_cast<double>( setup._rangeLowerBound ) );
 	on_plot_data_changed();
 	}
 
 void HWindowMain::on_range_upper_bound_changed( void )
 	{
-	double nval = f_poRangeUpperBound->get_value();
-	if ( nval > setup.f_dRangeLowerBound )
-		setup.f_dRangeUpperBound = nval;
+	double nval = _rangeUpperBound->get_value();
+	if ( nval > setup._rangeLowerBound )
+		setup._rangeUpperBound = nval;
 	else
-		f_poRangeUpperBound->set_value( static_cast<double>( setup.f_dRangeUpperBound ) );
+		_rangeUpperBound->set_value( static_cast<double>( setup._rangeUpperBound ) );
 	on_plot_data_changed();
 	}
 
@@ -767,17 +767,17 @@ void HWindowMain::get_value_for_cell( Gtk::CellRenderer* cell, Gtk::TreeModel::i
 		pTextRenderer->property_text() = iter->get_value( col )._formula.raw();
 	}
 
-int gui_start( int a_iArgc, char* a_ppcArgv[] )
+int gui_start( int argc_, char* argv_[] )
 	{
 	M_PROLOG
 	try
 		{
-		Gtk::Main l_oGUI( a_iArgc, a_ppcArgv );
-		Glib::RefPtr<Gnome::Glade::Xml> l_oResources = Gnome::Glade::Xml::create(
-			setup.f_oResourcePath.raw() );
-		HWindowMain* l_poWindowMain = NULL;
-		l_oResources->get_widget_derived( "WINDOW_MAIN", l_poWindowMain );
-		l_oGUI.run( *l_poWindowMain );
+		Gtk::Main gUI( argc_, argv_ );
+		Glib::RefPtr<Gnome::Glade::Xml> resources = Gnome::Glade::Xml::create(
+			setup._resourcePath.raw() );
+		HWindowMain* windowMain = NULL;
+		resources->get_widget_derived( "WINDOW_MAIN", windowMain );
+		gUI.run( *windowMain );
 		}
 	catch ( Glib::Exception& e )
 		{

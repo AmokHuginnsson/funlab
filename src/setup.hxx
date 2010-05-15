@@ -42,25 +42,25 @@ inline std::ostream& operator << ( std::ostream& o, yaal::hcore::HString const& 
 
 struct OSetup
 	{
-	bool f_bQuiet;			/* --quiet, --silent */
-	bool f_bVerbose;		/* --verbose */
-	bool f_bStereo;
+	bool _quiet;			/* --quiet, --silent */
+	bool _verbose;		/* --verbose */
+	bool _stereo;
 	bool f_b3D;
-	bool f_bShowAxis;
-	bool f_bMultiFormula;
-	int f_iDensity;
-	int f_iResolutionX;
-	int f_iResolutionY;
-	double f_dAspect;
-	double long f_dDomainLowerBound;
-	double long f_dDomainUpperBound;
-	double long f_dRangeLowerBound;
-	double long f_dRangeUpperBound;
-	char * f_pcProgramName;
-	yaal::hcore::HString f_oLogPath;
-	yaal::hcore::HString f_oFormula;
-	yaal::hcore::HString f_oResourcePath;
-	yaal::hcore::HString f_oIconPath;
+	bool _showAxis;
+	bool _multiFormula;
+	int _density;
+	int _resolutionX;
+	int _resolutionY;
+	double _aspect;
+	double long _domainLowerBound;
+	double long _domainUpperBound;
+	double long _rangeLowerBound;
+	double long _rangeUpperBound;
+	char * _programName;
+	yaal::hcore::HString _logPath;
+	yaal::hcore::HString _formula;
+	yaal::hcore::HString _resourcePath;
+	yaal::hcore::HString _iconPath;
 	/* self-sufficient */
 	OSetup( void );
 	void test_setup( void );

@@ -50,46 +50,46 @@ OSetup setup;
 
 }
 
-int main ( int a_iArgc, char * a_ppcArgv [ ] )
+int main ( int argc_, char * argv_ [ ] )
 	{
 	M_PROLOG
 /* variables declarations for main loop: */
-	int l_iOpt = 0;
-	int l_iCtr = 0, l_iPosition = 0;
-	HString l_oArrow;
+	int opt = 0;
+	int ctr = 0, position = 0;
+	HString arrow;
 /* end. */
 	try
 		{
 /* TO-DO: enter main loop code here */
 		HSignalServiceFactory::get_instance();
-		setup.f_pcProgramName = a_ppcArgv [ 0 ];
-		l_iOpt = handle_program_options( a_iArgc, a_ppcArgv );
-		hcore::log.rehash( setup.f_oLogPath, setup.f_pcProgramName );
+		setup._programName = argv_ [ 0 ];
+		opt = handle_program_options( argc_, argv_ );
+		hcore::log.rehash( setup._logPath, setup._programName );
 		setup.test_setup();
 /*		if ( ! console::is_enabled() )enter_curses (); / * enabling ncurses ablilities*/
 /* *BOOM* */
-		if ( !! setup.f_oFormula )
+		if ( !! setup._formula )
 			{
-			HDetachedRenderer l_oRenderer;
+			HDetachedRenderer renderer;
 			HFunlab* pf = NULL;
-			HFunlab::ptr_t f( pf = new HFunlab( &l_oRenderer ) );
-			l_iOpt = pf->push_formula( setup.f_oFormula ) ? 1 : 0;
-			if ( l_iOpt )
+			HFunlab::ptr_t f( pf = new HFunlab( &renderer ) );
+			opt = pf->push_formula( setup._formula ) ? 1 : 0;
+			if ( opt )
 				{
-				l_iPosition = pf->error_position();
-				for ( l_iCtr = 0; l_iCtr < l_iPosition; l_iCtr ++ )
-					l_oArrow += '-';
-				l_oArrow += 'v';
-				cerr << _( "Formula syntax error ...\n" ) << pf->error() << _( " at this place:\n" ) << l_oArrow << "\n" << setup.f_oFormula << endl;
+				position = pf->error_position();
+				for ( ctr = 0; ctr < position; ctr ++ )
+					arrow += '-';
+				arrow += 'v';
+				cerr << _( "Formula syntax error ...\n" ) << pf->error() << _( " at this place:\n" ) << arrow << "\n" << setup._formula << endl;
 				}
 			else
 				{
-				l_oRenderer.set_engine( f );
-				l_oRenderer.render_surface();
+				renderer.set_engine( f );
+				renderer.render_surface();
 				}
 			}
 		else
-			l_iOpt = gui_start ( a_iArgc, a_ppcArgv );
+			opt = gui_start ( argc_, argv_ );
 		HConsole& cons = HCons::get_instance();
 		if ( cons.is_enabled() )
 			cons.leave_curses (); /* ending ncurses sesion */
@@ -103,7 +103,7 @@ int main ( int a_iArgc, char * a_ppcArgv [ ] )
 		throw;
 		}
 	cerr << _( "Done" ) << endl;
-	return ( l_iOpt );
+	return ( opt );
 	M_FINAL
 	}
 

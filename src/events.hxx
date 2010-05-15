@@ -52,12 +52,12 @@ public:
 			} mod_t;
 		};
 private:
-	int f_iCode;
-	MOD::mod_t f_eMod;
+	int _code;
+	MOD::mod_t _mod;
 public:
-	HKeyboardEvent( int const& code, MOD::mod_t const& a_eMod = MOD::NONE ) : f_iCode( code ), f_eMod( a_eMod ) { }
-	int get_code( void ) const { return ( f_iCode ); }
-	MOD::mod_t get_mod( void ) const { return ( f_eMod ); }
+	HKeyboardEvent( int const& code, MOD::mod_t const& mod_ = MOD::NONE ) : _code( code ), _mod( mod_ ) { }
+	int get_code( void ) const { return ( _code ); }
+	MOD::mod_t get_mod( void ) const { return ( _mod ); }
 	};
 
 class HMouseEvent
@@ -89,8 +89,8 @@ public:
 			} button_t;
 		};
 private:
-	TYPE::type_t f_eType;
-	BUTTON::button_t f_eButton;
+	TYPE::type_t _type;
+	BUTTON::button_t _button;
 	int f_iX;
 	int f_iY;
 public:

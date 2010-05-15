@@ -35,7 +35,7 @@ namespace funlab
 {
 
 HMouseEvent::HMouseEvent( TYPE::type_t const& type )
-	: f_eType( type ), f_eButton( BUTTON::NONE ), f_iX( 0 ), f_iY( 0 )
+	: _type( type ), _button( BUTTON::NONE ), f_iX( 0 ), f_iY( 0 )
 	{
 	}
 
@@ -51,12 +51,12 @@ int HMouseEvent::get_y( void ) const
 
 HMouseEvent::TYPE::type_t HMouseEvent::get_type( void ) const
 	{
-	return ( f_eType );
+	return ( _type );
 	}
 
 HMouseEvent::BUTTON::button_t HMouseEvent::get_button( void ) const
 	{
-	return ( f_eButton );
+	return ( _button );
 	}
 
 void HMouseEvent::set_pos( int const& x, int const& y )
@@ -67,7 +67,7 @@ void HMouseEvent::set_pos( int const& x, int const& y )
 
 void HMouseEvent::set_button( BUTTON::button_t const& b )
 	{
-	f_eButton = b;
+	_button = b;
 	}
 
 }

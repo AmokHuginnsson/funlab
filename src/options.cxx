@@ -43,10 +43,10 @@ using namespace yaal::tools::util;
 namespace funlab
 {
 
-bool set_variables( HString& a_roOption, HString& a_roValue )
+bool set_variables( HString& option_, HString& value_ )
 	{
 	::fprintf( stdout, "option: [%s], value: [%s]\n",
-			a_roOption.raw(), a_roValue.raw() );
+			option_.raw(), value_.raw() );
 	return ( false );
 	}
 
@@ -59,47 +59,47 @@ void version( void* )
 
 /* Set all the option flags according to the switches specified.
    Return the index of the first non-option argument.                    */
-int handle_program_options( int a_iArgc, char** a_ppcArgv )
+int handle_program_options( int argc_, char** argv_ )
 	{
 	M_PROLOG
 	HProgramOptionsHandler po;
-	OOptionInfo info( po, setup.f_pcProgramName, "renders three dimensional function surfaces", NULL );
+	OOptionInfo info( po, setup._programName, "renders three dimensional function surfaces", NULL );
 	bool stop = false;
-	po( "log_path", program_options_helper::option_value( setup.f_oLogPath ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path pointing to file for application logs", "path" )
-		( "resource_path", program_options_helper::option_value( setup.f_oResourcePath ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to XUL resources", "path" )
-		( "icon_path", program_options_helper::option_value( setup.f_oIconPath ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to icon resources", "path" )
-		( "resolution-x", program_options_helper::option_value( setup.f_iResolutionX ), 'X', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set x resolution to val value", "val" )
-		( "resolution-y", program_options_helper::option_value( setup.f_iResolutionY ), 'Y', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set y resolution to val value", "val" )
-		( "aspect", program_options_helper::option_value( setup.f_dAspect ), 'a', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set aspect of drawing to value of expr", "expr" )
-		( "domain-lower-bound", program_options_helper::option_value( setup.f_dDomainLowerBound ), '[', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set lower bound for domain interval to val", "val" )
-		( "domain-upper-bound", program_options_helper::option_value( setup.f_dDomainUpperBound ), ']', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set upper bound for domain interval to val", "val" )
-		( "range-lower-bound", program_options_helper::option_value( setup.f_dRangeLowerBound ), '{', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set lower bound for range interval to val", "val" )
-		( "range-upper-bound", program_options_helper::option_value( setup.f_dRangeUpperBound ), '}', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set upper bound for range interval to val", "val" )
-		( "density", program_options_helper::option_value( setup.f_iDensity ), 'D', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set graph density to val", "val" )
-		( "stereo", program_options_helper::option_value( setup.f_bStereo ), 'S', HProgramOptionsHandler::OOption::TYPE::NONE, "generate stereo picture" )
+	po( "log_path", program_options_helper::option_value( setup._logPath ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path pointing to file for application logs", "path" )
+		( "resource_path", program_options_helper::option_value( setup._resourcePath ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to XUL resources", "path" )
+		( "icon_path", program_options_helper::option_value( setup._iconPath ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to icon resources", "path" )
+		( "resolution-x", program_options_helper::option_value( setup._resolutionX ), 'X', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set x resolution to val value", "val" )
+		( "resolution-y", program_options_helper::option_value( setup._resolutionY ), 'Y', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set y resolution to val value", "val" )
+		( "aspect", program_options_helper::option_value( setup._aspect ), 'a', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set aspect of drawing to value of expr", "expr" )
+		( "domain-lower-bound", program_options_helper::option_value( setup._domainLowerBound ), '[', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set lower bound for domain interval to val", "val" )
+		( "domain-upper-bound", program_options_helper::option_value( setup._domainUpperBound ), ']', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set upper bound for domain interval to val", "val" )
+		( "range-lower-bound", program_options_helper::option_value( setup._rangeLowerBound ), '{', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set lower bound for range interval to val", "val" )
+		( "range-upper-bound", program_options_helper::option_value( setup._rangeUpperBound ), '}', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set upper bound for range interval to val", "val" )
+		( "density", program_options_helper::option_value( setup._density ), 'D', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "set graph density to val", "val" )
+		( "stereo", program_options_helper::option_value( setup._stereo ), 'S', HProgramOptionsHandler::OOption::TYPE::NONE, "generate stereo picture" )
 		( "3D", program_options_helper::option_value( setup.f_b3D ), '3', HProgramOptionsHandler::OOption::TYPE::NONE, "draw 3D function surfaces" )
-		( "show-axis", program_options_helper::option_value( setup.f_bShowAxis ), 'A', HProgramOptionsHandler::OOption::TYPE::NONE, "draw multiple functions at once" )
-		( "multi-formula", program_options_helper::option_value( setup.f_bMultiFormula ), 'M', HProgramOptionsHandler::OOption::TYPE::NONE, "draw axes" )
-		( "formula", program_options_helper::option_value( setup.f_oFormula ), 'F', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "render specified formula", "eq" )
-		( "quiet", program_options_helper::option_value( setup.f_bQuiet ), 'q', HProgramOptionsHandler::OOption::TYPE::NONE, "inhibit usual output" )
-		( "silent", program_options_helper::option_value( setup.f_bQuiet ), 'q', HProgramOptionsHandler::OOption::TYPE::NONE, "inhibit usual output" )
-		( "verbose", program_options_helper::option_value( setup.f_bVerbose ), 'v', HProgramOptionsHandler::OOption::TYPE::NONE, "print more information" )
+		( "show-axis", program_options_helper::option_value( setup._showAxis ), 'A', HProgramOptionsHandler::OOption::TYPE::NONE, "draw multiple functions at once" )
+		( "multi-formula", program_options_helper::option_value( setup._multiFormula ), 'M', HProgramOptionsHandler::OOption::TYPE::NONE, "draw axes" )
+		( "formula", program_options_helper::option_value( setup._formula ), 'F', HProgramOptionsHandler::OOption::TYPE::REQUIRED, "render specified formula", "eq" )
+		( "quiet", program_options_helper::option_value( setup._quiet ), 'q', HProgramOptionsHandler::OOption::TYPE::NONE, "inhibit usual output" )
+		( "silent", program_options_helper::option_value( setup._quiet ), 'q', HProgramOptionsHandler::OOption::TYPE::NONE, "inhibit usual output" )
+		( "verbose", program_options_helper::option_value( setup._verbose ), 'v', HProgramOptionsHandler::OOption::TYPE::NONE, "print more information" )
 		( "help", program_options_helper::option_value( stop ), 'h', HProgramOptionsHandler::OOption::TYPE::NONE, "display this help and stop", program_options_helper::callback( util::show_help, &info ) )
 		( "dump-configuration", program_options_helper::option_value( stop ), 'W', HProgramOptionsHandler::OOption::TYPE::NONE, "dump current configuration", program_options_helper::callback( util::dump_configuration, &info ) )
 		( "version", program_options_helper::no_value, 'V', HProgramOptionsHandler::OOption::TYPE::NONE, "output version information and stop", program_options_helper::callback( version, NULL ) );
 	po.process_rc_file( "funlab", "", NULL );
-	if ( setup.f_oLogPath.is_empty() )
-		setup.f_oLogPath = "funlab.log";
-	int l_iUnknown = 0, l_iNonOption = 0;
-	l_iNonOption = po.process_command_line( a_iArgc, a_ppcArgv, &l_iUnknown );
-	if ( l_iUnknown > 0 )
+	if ( setup._logPath.is_empty() )
+		setup._logPath = "funlab.log";
+	int unknown = 0, nonOption = 0;
+	nonOption = po.process_command_line( argc_, argv_, &unknown );
+	if ( unknown > 0 )
 		{
 		util::show_help( &info );
-		throw l_iUnknown;
+		throw unknown;
 		}
 	if ( stop )
 		throw 0;
-	return ( l_iNonOption );
+	return ( nonOption );
 	M_EPILOG
 	}
 

@@ -62,24 +62,24 @@ bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event_ )
 			}
 		Gtk::Allocation allocation = get_allocation();
 		
-		_context->scale( allocation.get_width() / static_cast<double>( setup.f_iResolutionX ),
-				allocation.get_height() / static_cast<double>( setup.f_iResolutionY ) );
+		_context->scale( allocation.get_width() / static_cast<double>( setup._resolutionX ),
+				allocation.get_height() / static_cast<double>( setup._resolutionY ) );
 		_context->set_line_width( 0.5 );
 //		_context->set_antialias( Cairo::ANTIALIAS_NONE );
 //		_context->set_line_cap( Cairo::LINE_CAP_ROUND );
-		f_oEngine->draw_frame();
+		_engine->draw_frame();
 		}
 	return ( true );
 	}
 
 double HEmbeddedRenderer::do_get_width( void ) const
 	{
-	return ( setup.f_iResolutionX );
+	return ( setup._resolutionX );
 	}
 
 double HEmbeddedRenderer::do_get_height( void ) const
 	{
-	return ( setup.f_iResolutionY );
+	return ( setup._resolutionY );
 	}
 
 void HEmbeddedRenderer::do_put_pixel( double, double, yaal::u32_t )
@@ -171,7 +171,7 @@ bool HEmbeddedRenderer::on_scroll_event( GdkEventScroll* ev )
 		}
 	if ( ! skip )
 		{
-		f_oEngine->on_event( &e );
+		_engine->on_event( &e );
 		invoke_refresh( false );
 		}
 	return ( true );
@@ -184,7 +184,7 @@ bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev )
 	int dx = yaal::abs( nx - _move._x );
 	int dy = yaal::abs( ny - _move._y );
 
-	if ( ( dx < ( setup.f_iResolutionX >> 1 ) ) && ( dy < ( setup.f_iResolutionY >> 1 ) ) )
+	if ( ( dx < ( setup._resolutionX >> 1 ) ) && ( dy < ( setup._resolutionY >> 1 ) ) )
 		{
 		HMouseEvent e( HMouseEvent::TYPE::MOVE );
 		e.set_pos( nx - _move._x, ny - _move._y );
@@ -206,7 +206,7 @@ bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev )
 			}
 		if ( ! skip )
 			{
-			f_oEngine->on_event( &e );
+			_engine->on_event( &e );
 			invoke_refresh( false );
 			}
 		}
@@ -226,9 +226,9 @@ void HEmbeddedRenderer::invoke_refresh( bool full )
 	{
 	if ( full )
 		{
-		HFunlab* f = dynamic_cast<HFunlab*>( &*f_oEngine );
+		HFunlab* f = dynamic_cast<HFunlab*>( &*_engine );
 		M_ASSERT( f );
-		f->regen_cache( setup.f_iDensity );
+		f->regen_cache( setup._density );
 		}
   Glib::RefPtr<Gdk::Window> win = get_window();
 	if ( win )

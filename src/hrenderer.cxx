@@ -81,7 +81,7 @@ void HRendererSurfaceInterface::fill_rect( double x, double y, double w, double 
 void HRendererSurfaceBase::set_engine( HRendererEngineInterface::ptr_t engine )
 	{
 	M_PROLOG
-	f_oEngine = engine;
+	_engine = engine;
 	return;
 	M_EPILOG
 	}
@@ -96,7 +96,7 @@ HRendererEngineInterface::ptr_t HRendererSurfaceInterface::get_engine( void )
 HRendererEngineInterface::ptr_t HRendererSurfaceBase::do_get_engine( void )
 	{
 	M_PROLOG
-	return ( f_oEngine );
+	return ( _engine );
 	M_EPILOG
 	}
 
