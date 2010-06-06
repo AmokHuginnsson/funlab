@@ -134,7 +134,7 @@ int HDetachedRenderer::init( int width_, int height_, int bpp_ )
 	SDL_WarpMouse( static_cast<Uint16>( setup._resolutionX >> 1 ),
 			static_cast<Uint16>( setup._resolutionY >> 1 ) );
 	_loop = true;
-	_thread.spawn( bound_call( &HDetachedRenderer::run, this ) );
+	_thread.spawn( call( &HDetachedRenderer::run, this ) );
 	return ( 0 );
 	M_EPILOG
 	}
