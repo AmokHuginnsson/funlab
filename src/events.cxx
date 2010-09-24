@@ -59,7 +59,7 @@ HMouseEvent::BUTTON::button_t HMouseEvent::get_button( void ) const
 	return ( _button );
 	}
 
-void HMouseEvent::set_pos( int const& x, int const& y )
+void HMouseEvent::set_pos( int x, int y )
 	{
 	f_iX = x;
 	f_iY = y;

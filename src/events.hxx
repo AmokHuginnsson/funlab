@@ -55,7 +55,7 @@ private:
 	int _code;
 	MOD::mod_t _mod;
 public:
-	HKeyboardEvent( int const& code, MOD::mod_t const& mod_ = MOD::NONE ) : _code( code ), _mod( mod_ ) { }
+	HKeyboardEvent( int code, MOD::mod_t const& mod_ = MOD::NONE ) : _code( code ), _mod( mod_ ) { }
 	int get_code( void ) const { return ( _code ); }
 	MOD::mod_t get_mod( void ) const { return ( _mod ); }
 	};
@@ -95,7 +95,7 @@ private:
 	int f_iY;
 public:
 	HMouseEvent( TYPE::type_t const& );
-	void set_pos( int const&, int const& );
+	void set_pos( int, int );
 	void set_button( BUTTON::button_t const& );
 	TYPE::type_t get_type( void ) const;
 	int get_x( void ) const;
