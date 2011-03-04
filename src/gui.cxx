@@ -311,7 +311,7 @@ void HWindowMain::open( HString const& path_ )
 		if ( !!file )
 			{
 			_formulasListModel->clear();
-			while ( file.read_line( line, HFile::READ::STRIP_NEWLINES ) >= 0 )
+			while ( file.read_line( line ) >= 0 )
 				{
 				row = *( _formulasListModel->append() );
 				row[ _formulasListFormulaColumn ] = plot_desc_from_string( line );
