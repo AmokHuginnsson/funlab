@@ -28,7 +28,6 @@ Copyright:
 #define FUNLAB_HEMBEDDEDRENDERER_HXX_INCLUDED
 
 #include <gtkmm.h>
-#include <libglademm/xml.h>
 #include <yaal/hcore/base.hxx>
 
 #include "hrenderer.hxx"
@@ -53,7 +52,7 @@ class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea
 	OLineBuffer _lineBuffer;
 	Cairo::RefPtr<Cairo::Context> _context;
 public:
-	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
+	HEmbeddedRenderer( BaseObjectType*, Glib::RefPtr<Gtk::Builder> const& );
 	virtual ~HEmbeddedRenderer( void );
 	void invoke_refresh( bool );
 protected:

@@ -25,9 +25,7 @@ Copyright:
 */
 
 #include <gtkmm.h>
-#include <libglademm/xml.h>
 #include <cairomm/context.h>
-#include <iostream>
 #include <libintl.h>
 
 #include <yaal/yaal.hxx>
@@ -77,7 +75,7 @@ protected:
 	HEmbeddedRenderer* _embeddedRenderer;
 	HDetachedRenderer::ptr_t _detachedRenderer;
 public:
-	HWindowMain( BaseObjectType*, Glib::RefPtr<Gnome::Glade::Xml> const& );
+	HWindowMain( BaseObjectType*, Glib::RefPtr<Gtk::Builder> const& );
 	virtual ~HWindowMain( void );
 protected:
 	void shutdown_renderer( void );
@@ -113,7 +111,7 @@ protected:
 	};
 
 HWindowMain::HWindowMain( BaseObjectType* baseObject_,
-	Glib::RefPtr<Gnome::Glade::Xml> const& resources_ ) : Gtk::Window( baseObject_ ),
+	Glib::RefPtr<Gtk::Builder> const& resources_ ) : Gtk::Window( baseObject_ ),
 	_lock( false ), _formulasListView( NULL ), _density( NULL ),
 	f_po3D( NULL ), _multiFormula( NULL ), _showAxis( NULL ),
 	_domainLowerBound( NULL ), _domainUpperBound( NULL ),
@@ -279,9 +277,7 @@ void HWindowMain::on_open( void )
 	M_PROLOG
 	HLocker lock( _lock );
 	Gtk::FileFilter fileFilter;
-	Gtk::FileChooserDialog fileOpenDialog( *this,
-	                                          _( "Select formulas file to open ..." ), Gtk::FILE_CHOOSER_ACTION_OPEN );
-
+	Gtk::FileChooserDialog fileOpenDialog( *this, _( "Select formulas file to open ..." ), Gtk::FILE_CHOOSER_ACTION_OPEN );
 	fileOpenDialog.set_local_only( true );
 	fileOpenDialog.set_select_multiple( false );
 	fileFilter.set_name( _( "Function formulas." ) );
@@ -344,9 +340,7 @@ void HWindowMain::on_save_as( void )
 	M_PROLOG
 	HLocker lock( _lock );
 	Gtk::FileFilter fileFilter;
-	Gtk::FileChooserDialog fileOpenDialog( *this,
-	                                          _( "Enter file name to save Your formulas ..." ), Gtk::FILE_CHOOSER_ACTION_SAVE );
-
+	Gtk::FileChooserDialog fileOpenDialog( *this, _( "Enter file name to save Your formulas ..." ), Gtk::FILE_CHOOSER_ACTION_SAVE );
 	fileOpenDialog.set_local_only( true );
 	fileOpenDialog.set_select_multiple( false );
 	fileFilter.set_name( _( "Function formulas." ) );
@@ -356,7 +350,6 @@ void HWindowMain::on_save_as( void )
 	fileOpenDialog.add_button( Gtk::Stock::SAVE, Gtk::RESPONSE_OK );
 	if ( fileOpenDialog.run() == Gtk::RESPONSE_OK )
 		save( fileOpenDialog.get_filename().c_str() );
-
 	return;
 	M_EPILOG
 	}
@@ -773,8 +766,7 @@ int gui_start( int argc_, char* argv_[] )
 	try
 		{
 		Gtk::Main gUI( argc_, argv_ );
-		Glib::RefPtr<Gnome::Glade::Xml> resources = Gnome::Glade::Xml::create(
-			setup._resourcePath.raw() );
+		Glib::RefPtr<Gtk::Builder> resources( Gtk::Builder::create_from_file( setup._resourcePath.raw() ) );
 		HWindowMain* windowMain = NULL;
 		resources->get_widget_derived( "WINDOW_MAIN", windowMain );
 		gUI.run( *windowMain );

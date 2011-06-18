@@ -3,12 +3,12 @@
 
 log_path ${HOME}/src/funlab/x_funlab.log
 icon_path ${HOME}/src/funlab/res/funlab.xpm
-resource_path ${HOME}/src/funlab/res/funlab.glade
+resource_path ${HOME}/src/funlab/res/funlab.ui
 resolution_x 800
 resolution_y 600
 aspect 1
 density 32
-stereo false
+# stereo false
 3D true
 show-axis false
 multi-formula false

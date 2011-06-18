@@ -39,7 +39,7 @@ using namespace yaal;
 namespace funlab
 {
 
-HEmbeddedRenderer::HEmbeddedRenderer( BaseObjectType* obj, Glib::RefPtr<Gnome::Glade::Xml> const& )
+HEmbeddedRenderer::HEmbeddedRenderer( BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& )
 	: Gtk::DrawingArea( obj ), _lineBuffer(), _context()
 	{
 	}
