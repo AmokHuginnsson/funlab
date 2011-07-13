@@ -88,7 +88,7 @@ HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 	_error(), _errorIndex( 0 )
 	{
 	int i = 0;
-	_trygo = xcalloc<double>( TRYGO_BASE );
+	_trygo = memory::calloc<double>( TRYGO_BASE );
 	for ( i = 0; i < TRYGO_BASE; i ++ )
 		_trygo[ i ] = sin( ( ( double ) i * M_PI ) / static_cast<double>( 2 * TRYGO_BASE ) );
 	}
@@ -96,7 +96,7 @@ HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 HFunlab::~HFunlab( void )
 	{
 	if ( _trygo )
-		xfree( _trygo );
+		memory::free( _trygo );
 	}
 
 void HFunlab::generate_surface( void )

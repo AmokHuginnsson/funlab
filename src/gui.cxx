@@ -124,7 +124,7 @@ HWindowMain::HWindowMain( BaseObjectType* baseObject_,
 	Gtk::MenuItem* menuItem = NULL;
 
 	resources_->get_widget_derived( "RENDERER", _embeddedRenderer );
-	HRendererEngineInterface::ptr_t ere( new HFunlab( _embeddedRenderer ) );
+	HRendererEngineInterface::ptr_t ere( make_pointer<HFunlab>( _embeddedRenderer ) );
 	_embeddedRenderer->set_engine( ere );
 
 	/* Formulas List */
@@ -536,9 +536,9 @@ bool HWindowMain::on_key_press( GdkEventKey* eventKey_ )
 			if ( iter )
 				{
 				OPlotDesc const& plot = iter->get_value( _formulasListFormulaColumn );
-				HDetachedRenderer* dr = NULL;
-				_detachedRenderer = HRendererSurfaceInterface::ptr_t( dr = new HDetachedRenderer( this ) );
-				HRendererEngineInterface::ptr_t dre( new HFunlab( &*_detachedRenderer ) );
+				_detachedRenderer = make_pointer<HDetachedRenderer>( this );
+				HDetachedRenderer* dr( static_cast<HDetachedRenderer*>( _detachedRenderer.get() ) );
+				HRendererEngineInterface::ptr_t dre( make_pointer<HFunlab>( &*_detachedRenderer ) );
 				dr->set_engine( dre );
 				HFunlab* f = dynamic_cast<HFunlab*>( &(*dr->get_engine() ) );
 				if ( f && f->push_formula( plot ) )

@@ -72,8 +72,8 @@ int main ( int argc_, char * argv_ [ ] )
 		if ( !! setup._formula )
 			{
 			HDetachedRenderer renderer;
-			HFunlab* pf = NULL;
-			HFunlab::ptr_t f( pf = new HFunlab( &renderer ) );
+			HFunlab::ptr_t f( make_pointer<HFunlab>( &renderer ) );
+			HFunlab* pf( static_cast<HFunlab*>( f.get() ) );
 			opt = pf->push_formula( setup._formula ) ? 1 : 0;
 			if ( opt )
 				{
