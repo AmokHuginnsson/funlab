@@ -37,21 +37,17 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-namespace funlab
-{
+namespace funlab {
 
 #define TRYGO_BASE 8192
 
 HFunlab::HMesh::HMesh( void )
 	: _size( 0 ), _surfaces( 0 ),
-	_values(), _valuesBackbone()
-	{
-	}
+	_values(), _valuesBackbone() {
+}
 
-void HFunlab::HMesh::set_size( int size, int surfaces )
-	{
-	if ( ( surfaces > 0 ) && ( size > 0 ) )
-		{
+void HFunlab::HMesh::set_size( int size, int surfaces ) {
+	if ( ( surfaces > 0 ) && ( size > 0 ) ) {
 		_size = size;
 		_surfaces = surfaces;
 		_values.realloc( chunk_size<OValue>( size * size * surfaces ) );
@@ -60,19 +56,17 @@ void HFunlab::HMesh::set_size( int size, int surfaces )
 		OValue** bone = _valuesBackbone.get<OValue*>();
 		for ( int i = 0; i < ( _surfaces * _size ); ++ i, ptr += _size, ++ bone )
 			*bone = ptr;
-		}
+	}
 	return;
-	}
+}
 
-int HFunlab::HMesh::get_size( void ) const
-	{
+int HFunlab::HMesh::get_size( void ) const {
 	return ( _size );
-	}
+}
 
-HFunlab::HMesh::OValue** HFunlab::HMesh::fast( int surface )
-	{
+HFunlab::HMesh::OValue** HFunlab::HMesh::fast( int surface ) {
 	return ( _valuesBackbone.get<OValue*>() + _size * surface );
-	}
+}
 
 HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 	: _red( 0 ), _green( 0 ), _blue( 0 ),
@@ -85,61 +79,50 @@ HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 	_cosGamma( 0 ), _sinGamma( 0 ),
 	_cache( 0, 0, 0 ), _trygo( NULL ),
 	_plots(), _renderer( renderer_ ),
-	_error(), _errorIndex( 0 )
-	{
+	_error(), _errorIndex( 0 ) {
 	int i = 0;
 	_trygo = memory::calloc<double>( TRYGO_BASE );
 	for ( i = 0; i < TRYGO_BASE; i ++ )
 		_trygo[ i ] = sin( ( ( double ) i * M_PI ) / static_cast<double>( 2 * TRYGO_BASE ) );
-	}
+}
 
-HFunlab::~HFunlab( void )
-	{
+HFunlab::~HFunlab( void ) {
 	if ( _trygo )
 		memory::free( _trygo );
-	}
+}
 
-void HFunlab::generate_surface( void )
-	{
+void HFunlab::generate_surface( void ) {
 	M_PROLOG
 	int size = _mesh.get_size();
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
-	if ( size && setup.f_b3D )
-		{
+	if ( size && setup.f_b3D ) {
 		int formula = 0;
-		for ( plots_t::iterator it = _plots.begin(); it != _plots.end(); ++ it, ++ formula )
-			{
+		for ( plots_t::iterator it = _plots.begin(); it != _plots.end(); ++ it, ++ formula ) {
 			double long* variables = it->_expression.variables();
 			_xVariable = ( variables + 'X' ) - 'A';
 			_yVariable = ( variables + 'Y' ) - 'A';
 			( *_yVariable ) = it->_domainLowerBound;
 			HMesh::OValue** values = _mesh.fast( formula );
-			for ( int j = 0; j < size; ++ j )
-				{
+			for ( int j = 0; j < size; ++ j ) {
 				( *_xVariable ) = it->_domainLowerBound;
-				for ( int i = 0; i < size; ++ i )
-					{
-					try
-						{
+				for ( int i = 0; i < size; ++ i ) {
+					try {
 						values[ i ][ j ]._value = static_cast<double>( it->_expression.evaluate() );
 						values[ i ][ j ]._valid = true;
-						}
-					catch ( HExpressionException& )
-						{
+					} catch ( HExpressionException& ) {
 						values[ i ][ j ]._valid = false;
-						}
-					( *_xVariable ) += gridSize;
 					}
-				( *_yVariable ) += gridSize;
+					( *_xVariable ) += gridSize;
 				}
+				( *_yVariable ) += gridSize;
 			}
 		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HFunlab::precalculate( void )
-	{
+void HFunlab::precalculate( void ) {
 	_cosAlpha = cosq( static_cast<int unsigned>( _angleX ) );
 	_sinAlpha = sinq( static_cast<int unsigned>( _angleX ) );
 	_cosBeta = cosq( static_cast<int unsigned>( _angleY ) );
@@ -151,30 +134,26 @@ void HFunlab::precalculate( void )
 	_cache._preCalcC = _cosAlpha * _cosGamma;
 	_color = _renderer->RGB( _red, _green, _blue );
 	return;
-	}
+}
 
-double HFunlab::sinq( int unsigned angle_ )
-	{
+double HFunlab::sinq( int unsigned angle_ ) {
 	angle_ &= ( ( 4 * TRYGO_BASE ) - 1 );
-	if ( angle_ > ( ( 2 * TRYGO_BASE ) - 1 ) )
-		{
+	if ( angle_ > ( ( 2 * TRYGO_BASE ) - 1 ) ) {
 		angle_ -= ( 2 * TRYGO_BASE );
 		if ( angle_ > ( TRYGO_BASE - 1 ) )
 			angle_ = ( ( 2 * TRYGO_BASE ) - 1 ) - angle_;
 		return ( - _trygo[ angle_ ] );
-		}
+	}
 	if ( angle_ > ( TRYGO_BASE - 1 ) )
 		angle_ = ( ( 2 * TRYGO_BASE ) - 1 ) - angle_;
 	return ( _trygo [ angle_ ] );
-	}
+}
 
-double HFunlab::cosq( int unsigned angle_ )
-	{
+double HFunlab::cosq( int unsigned angle_ ) {
 	return ( sinq( angle_ + TRYGO_BASE ) );
-	}
+}
 
-bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _r )
-	{
+bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _r ) {
 	M_PROLOG
 	double long x = 0, y = 0, z = 0;
 	x = _x * _cosBeta * _cosGamma - _y * _sinGamma * _cosBeta - _z * _sinBeta;
@@ -188,13 +167,12 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 	y += _dY;
 	z += _dZ;
 
-	if ( setup._stereo )
-		{
+	if ( setup._stereo ) {
 		int alpha = ( _dX > 0 ) ? 3 : - 3;
 		double long ox = x;
 		x = x * cosq( alpha ) - y * sinq( alpha );
 		y = y * cosq( alpha ) + ox * sinq( alpha );
-		}
+	}
 	
 	if ( y > 0 )
 		return ( false );
@@ -208,31 +186,26 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 	_r += ( setup._resolutionY >> 1 );
 	return ( true );
 	M_EPILOG
-	}
+}
 
-void HFunlab::do_draw_frame( void )
-	{
+void HFunlab::do_draw_frame( void ) {
 	M_PROLOG
 	int size = _mesh.get_size();
 	_fOV = 240.0;
 	_renderer->clear( _renderer->RGB( 0, 0, 0 ) );
 	precalculate();
 	u32_t red = 0, blue = 0;
-	if ( setup._stereo )
-		{
+	if ( setup._stereo ) {
 		red = _renderer->RGB( 0xff, 0, 0 );
 		blue = _renderer->RGB( 0, 0, 0xff );
-		}
+	}
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
-	if ( setup.f_b3D )
-		{
-		if ( size )
-			{
+	if ( setup.f_b3D ) {
+		if ( size ) {
 			if ( ! setup._stereo && setup._showAxis )
 				draw_axis();
 			int sfSize = static_cast<int>( _plots.size() );
-			for ( int sf = 0; sf < sfSize; ++ sf )
-				{
+			for ( int sf = 0; sf < sfSize; ++ sf ) {
 				bool valid = false, oldvalid = false;
 				int f = 0, i = 0, j = 0, c = 0, r = 0, oldc = 0, oldr = 0;
 				double long x = 0, y = 0;
@@ -240,18 +213,14 @@ void HFunlab::do_draw_frame( void )
 				ONode* nodes = _node.get<ONode>();
 				yaal::fill( nodes, nodes + size, ONode() );
 
-				for ( f = 0; f < ( setup._stereo ? 2 : 1 ); f ++ )
-					{
+				for ( f = 0; f < ( setup._stereo ? 2 : 1 ); f ++ ) {
 					_dX = setup._stereo ? ( f ? - 4 : 4 ) : 0;
 					y = setup._domainLowerBound;
-					for ( j = 0; j < size; ++ j )
-						{
+					for ( j = 0; j < size; ++ j ) {
 						x = setup._domainLowerBound;
-						for ( i = 0; i < size; ++ i )
-							{
+						for ( i = 0; i < size; ++ i ) {
 							valid = values[ i ][ j ]._valid && T( x, y, values[ i ][ j ]._value, c, r );
-							if ( valid && oldvalid && nodes[ i ]._valid )
-								{
+							if ( valid && oldvalid && nodes[ i ]._valid ) {
 								if ( i > 0 )
 									_renderer->line( oldc, oldr, c, r,
 											setup._stereo ? ( f ? red : blue ) : _color );
@@ -259,7 +228,7 @@ void HFunlab::do_draw_frame( void )
 									_renderer->line( c, r, nodes[ i ]._col,
 											nodes[ i ]._row,
 											setup._stereo ? ( f ? red : blue ) : _color );
-								}
+							}
 							nodes[ i ]._col = c;
 							nodes[ i ]._row = r;
 							nodes[ i ]._valid = valid;
@@ -267,46 +236,38 @@ void HFunlab::do_draw_frame( void )
 							oldr = r;
 							oldvalid = valid;
 							x += gridSize;
-							}
-						y += gridSize;
 						}
+						y += gridSize;
 					}
 				}
 			}
 		}
-	else
-		{
-		for ( plots_t::iterator it = _plots.begin(); it != _plots.end(); ++ it )
-			{
+	} else {
+		for ( plots_t::iterator it = _plots.begin(); it != _plots.end(); ++ it ) {
 			double long* variables = it->_expression.variables();
 			_xVariable = ( variables + 'X' ) - 'A';
 			( *_xVariable ) = it->_domainLowerBound;
 			gridSize = ( it->_domainUpperBound - it->_domainLowerBound ) / static_cast<double long>( setup._resolutionX );
 			double long oldVal = 0;
-			for ( int x = 0; x < setup._resolutionX; ++ x )
-				{
-				try
-					{
+			for ( int x = 0; x < setup._resolutionX; ++ x ) {
+				try {
 					double long val = static_cast<double long>( it->_expression.evaluate() ) * setup._resolutionY;
 					if ( x )
 						_renderer->line( x, - static_cast<double>( val ) + setup._resolutionY / 2, x - 1, - static_cast<double>( oldVal ) + setup._resolutionY / 2, _color );
 					oldVal = val;
-					}
-				catch ( HExpressionException& )
-					{
-					}
-				( *_xVariable ) += gridSize;
+				} catch ( HExpressionException& ) {
 				}
+				( *_xVariable ) += gridSize;
 			}
 		}
+	}
 	usleep( 1000 );
 	_renderer->commit();
 	return;
 	M_EPILOG
-	}
+}
 
-void HFunlab::draw_axis( void )
-	{
+void HFunlab::draw_axis( void ) {
 	u32_t WHITE = 0xffffffff;
 	double long frac = 4.;
 	int x1, x2, y1, y2;
@@ -321,8 +282,7 @@ void HFunlab::draw_axis( void )
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
 	double long x = setup._domainLowerBound;
 	double long a = gridSize / frac;
-	for ( int i = 0; i < size; ++ i )
-		{
+	for ( int i = 0; i < size; ++ i ) {
 		if ( T( x, - a, 0, x1, y1 ) && T( x, a, 0, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
 		if ( T( x, 0, - a, x1, y1 ) && T( x, 0, a, x2, y2 ) )
@@ -336,7 +296,7 @@ void HFunlab::draw_axis( void )
 		if ( T( 0, - a, x, x1, y1 ) && T( 0, a, x, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
 		x += gridSize;
-		}
+	}
 	double long t = setup._domainUpperBound + a;
 	double long d = setup._domainUpperBound - a;
 	if ( T( t, 0, 0, x1, y1 ) && T( d, a, 0, x2, y2 ) )
@@ -365,16 +325,12 @@ void HFunlab::draw_axis( void )
 		_renderer->line( x1, y1, x2, y2, WHITE );
 	if ( T( 0, 0, t, x1, y1 ) && T( 0, - a, d, x2, y2 ) )
 		_renderer->line( x1, y1, x2, y2, WHITE );
-	}
+}
 
-void HFunlab::do_on_event( HMouseEvent const* e )
-	{
-	switch ( e->get_type() )
-		{
-		case ( HMouseEvent::TYPE::PRESS ):
-			{
-			switch ( e->get_button() )
-				{
+void HFunlab::do_on_event( HMouseEvent const* e ) {
+	switch ( e->get_type() ) {
+		case ( HMouseEvent::TYPE::PRESS ): {
+			switch ( e->get_button() ) {
 				case ( HMouseEvent::BUTTON::B_4 ):
 					_dY ++;
 				break;
@@ -383,13 +339,11 @@ void HFunlab::do_on_event( HMouseEvent const* e )
 				break;
 				default:
 				break;
-				}
 			}
+		}
 		break;
-		case ( HMouseEvent::TYPE::MOVE ):
-			{
-			switch ( e->get_button() )
-				{
+		case ( HMouseEvent::TYPE::MOVE ): {
+			switch ( e->get_button() ) {
 				case ( HMouseEvent::BUTTON::B_1 ):
 					_angleZ += e->get_x() << 2;
 					_angleX -= e->get_y() << 2;
@@ -404,72 +358,56 @@ void HFunlab::do_on_event( HMouseEvent const* e )
 				break;
 				default:
 				break;
-				}
 			}
+		}
 		default:
 		break;
-		}
-	return;
 	}
+	return;
+}
 
-void HFunlab::do_on_event( HKeyboardEvent const* e )
-	{
-	switch ( e->get_code() )
-		{
-		case ( 'r' ):
-			{
-			if ( e->get_mod() & HKeyboardEvent::MOD::SHIFT )
-				{
+void HFunlab::do_on_event( HKeyboardEvent const* e ) {
+	switch ( e->get_code() ) {
+		case ( 'r' ): {
+			if ( e->get_mod() & HKeyboardEvent::MOD::SHIFT ) {
 				_red += 240;
 				_red %= 256;
-				}
-			else
-				{
+			} else {
 				_red += 16;
 				_red %= 256;
-				}
 			}
+		}
 		break;
-		case ( 'g' ):
-			{
-			if ( e->get_mod() & ( HKeyboardEvent::MOD::SHIFT ) )
-				{
+		case ( 'g' ): {
+			if ( e->get_mod() & ( HKeyboardEvent::MOD::SHIFT ) ) {
 				_green += 240;
 				_green %= 256;
-				}
-			else
-				{
+			} else {
 				_green += 16;
 				_green %= 256;
-				}
 			}
+		}
 		break;
-		case ( 'b' ):
-			{
-			if ( e->get_mod() & ( HKeyboardEvent::MOD::SHIFT ) )
-				{
+		case ( 'b' ): {
+			if ( e->get_mod() & ( HKeyboardEvent::MOD::SHIFT ) ) {
 				_blue += 240;
 				_blue %= 256;
-				}
-			else
-				{
+			} else {
 				_blue += 16;
 				_blue %= 256;
-				}
 			}
+		}
 		break;
 		default:
 		break;
-		}
 	}
+}
 
-bool HFunlab::push_formula( OPlotDesc formula_ )
-	{
+bool HFunlab::push_formula( OPlotDesc formula_ ) {
 	M_PROLOG
 	if ( ! formula_._formula )
 		return ( true );
-	try
-		{
+	try {
 		formula_._expression.compile( formula_._formula );
 		_plots.push_back( formula_ );
 		_dY = - 15.0;
@@ -478,47 +416,41 @@ bool HFunlab::push_formula( OPlotDesc formula_ )
 		_blue = 0xf8;
 		_errorIndex = 0;
 		regen_cache( setup._density );
-		}
-	catch ( HExpressionException& e )
-		{
+	} catch ( HExpressionException& e ) {
 		_error = formula_._expression.get_error();
 		_errorIndex = formula_._expression.get_error_token();
-		}
+	}
 	return ( _errorIndex ? true : false );
 	M_EPILOG
-	}
+}
 
-void HFunlab::regen_cache( int size )
-	{
+void HFunlab::regen_cache( int size ) {
 	M_PROLOG
 	_node.realloc( chunk_size<ONode>( size ) );
 	_mesh.set_size( size, static_cast<int>( _plots.size() ) );
 	if ( ! _plots.empty() )
 		generate_surface();
 	M_EPILOG
-	}
+}
 
-char const* HFunlab::error( void ) const
-	{
+char const* HFunlab::error( void ) const {
 	M_PROLOG
 	return ( _error.raw() );
 	M_EPILOG
-	}
+}
 
-int HFunlab::error_position( void ) const
-	{
+int HFunlab::error_position( void ) const {
 	M_PROLOG
 	return ( _errorIndex );
 	M_EPILOG
-	}
+}
 
-void HFunlab::clear( void )
-	{
+void HFunlab::clear( void ) {
 	M_PROLOG
 	_plots.clear();
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

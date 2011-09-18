@@ -34,14 +34,12 @@ Copyright:
 
 #define out ( cout << __FILE__ + OSetup::PATH_OFFSET << ":" << __LINE__ << ": " )
 
-namespace funlab
-{
+namespace funlab {
 
 inline std::ostream& operator << ( std::ostream& o, yaal::hcore::HString const& s )
 	{ return ( o << s.raw() ); }
 
-struct OSetup
-	{
+struct OSetup {
 	bool _quiet;			/* --quiet, --silent */
 	bool _verbose;		/* --verbose */
 	bool _stereo;
@@ -67,7 +65,7 @@ struct OSetup
 private:
 	OSetup( OSetup const& );
 	OSetup& operator = ( OSetup const& );
-	};
+};
 
 extern OSetup setup;
 

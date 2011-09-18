@@ -42,18 +42,15 @@ M_VCSID( "$Id: "__ID__" $" )
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-namespace funlab
-{
+namespace funlab {
 
-class HWindowMain : public Gtk::Window, public HKeyboardEventListener
-	{
-	class HLocker
-		{
+class HWindowMain : public Gtk::Window, public HKeyboardEventListener {
+	class HLocker {
 		bool& _lock;
 		explicit HLocker( bool& lock_ ) : _lock( lock_ ) { _lock = true; }
 		virtual ~HLocker( void ) { _lock = false; }
 		friend class HWindowMain;
-		};
+	};
 protected:
 	bool _lock;
 	Glib::RefPtr<Gtk::ListStore> _formulasListModel;
@@ -108,7 +105,7 @@ protected:
 	HFunlab* funlab( void );
 	void open( HString const& );
 	void save( HString const& );
-	};
+};
 
 HWindowMain::HWindowMain( BaseObjectType* baseObject_,
 	Glib::RefPtr<Gtk::Builder> const& resources_ ) : Gtk::Window( baseObject_ ),
@@ -117,8 +114,7 @@ HWindowMain::HWindowMain( BaseObjectType* baseObject_,
 	_domainLowerBound( NULL ), _domainUpperBound( NULL ),
 	_rangeLowerBound( NULL ), _rangeUpperBound( NULL ),
 	_formula( NULL ),
-	_detachedRendererActive( false ), _detachedRenderer()
-	{
+	_detachedRendererActive( false ), _detachedRenderer() {
 	M_PROLOG
 	Gtk::ToolButton* toolButton = NULL;
 	Gtk::MenuItem* menuItem = NULL;
@@ -253,27 +249,24 @@ HWindowMain::HWindowMain( BaseObjectType* baseObject_,
  */
 	return;
 	M_EPILOG
-	}
+}
 
-HWindowMain::~HWindowMain( void )
-	{
+HWindowMain::~HWindowMain( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::on_new( void )
-	{
+void HWindowMain::on_new( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 
 	_formulasListModel->clear();
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::on_open( void )
-	{
+void HWindowMain::on_open( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 	Gtk::FileFilter fileFilter;
@@ -290,10 +283,9 @@ void HWindowMain::on_open( void )
 
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::open( HString const& path_ )
-	{
+void HWindowMain::open( HString const& path_ ) {
 	M_PROLOG
 	if ( path_.is_empty() )
 		M_THROW( _( "Empty path." ), errno );
@@ -301,42 +293,35 @@ void HWindowMain::open( HString const& path_ )
 	int index = 0;
 	HString line;
 	Gtk::TreeModel::Row row;
-	try
-		{
+	try {
 		HFile file( path_, HFile::OPEN::READING );
-		if ( !!file )
-			{
+		if ( !!file ) {
 			_formulasListModel->clear();
-			while ( file.read_line( line ) >= 0 )
-				{
+			while ( file.read_line( line ) >= 0 ) {
 				row = *( _formulasListModel->append() );
 				row[ _formulasListFormulaColumn ] = plot_desc_from_string( line );
 				index ++;
-				}
 			}
 		}
-	catch ( HException const& e )
-		{
+	} catch ( HException const& e ) {
 		Gtk::MessageDialog info( *this, e.what(), true );
 		info.set_title( _( "Error loading file ..." ) );
 		Pango::FontDescription fontDesc( "Sans Bold 14" );
 		set_font_all( fontDesc, &info );
 		info.run();
-		}
-	if ( index )
-		{
+	}
+	if ( index ) {
 		_formulasListView->grab_focus();
 		Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
 		Gtk::TreeModel::Children rows = _formulasListModel->children();
 		Gtk::TreeIter iter = rows.begin();
 		_formulasListView->set_cursor ( _formulasListModel->get_path ( iter ) );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::on_save_as( void )
-	{
+void HWindowMain::on_save_as( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 	Gtk::FileFilter fileFilter;
@@ -352,39 +337,35 @@ void HWindowMain::on_save_as( void )
 		save( fileOpenDialog.get_filename().c_str() );
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::save( HString const& path_ )
-	{
+void HWindowMain::save( HString const& path_ ) {
 	M_PROLOG
 	if ( path_.is_empty() )
 		M_THROW( _( "Empty path." ), errno );
 
 	HFile file( path_, HFile::OPEN::WRITING );
-	if ( !!file )
-		{
+	if ( !!file ) {
 		Gtk::TreeModel::Children rows = _formulasListModel->children();
 		for ( Gtk::TreeIter iter = rows.begin(); iter != rows.end(); ++ iter )
 			file << iter->get_value( _formulasListFormulaColumn ) << endl;
 
 		file.close();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::on_quit( void )
-	{
+void HWindowMain::on_quit( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 
 	Gtk::Main::quit();
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::on_about( void )
-	{
+void HWindowMain::on_about( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 	HString msg;
@@ -396,10 +377,9 @@ void HWindowMain::on_about( void )
 	messageAbout.run();
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::on_add( void )
-	{
+void HWindowMain::on_add( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 	Gtk::TreeIter iter = _formulasListModel->append();
@@ -407,86 +387,72 @@ void HWindowMain::on_add( void )
 	_formulasListView->grab_focus();
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::on_remove( void )
-	{
+void HWindowMain::on_remove( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 
 	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
 	Gtk::TreeIter iter = selection->get_selected();
-	if ( iter )
-		{
+	if ( iter ) {
 		Gtk::TreeModel::Children rows = _formulasListModel->children();
 		Gtk::TreeIter iterNew = iter;
 		++ iterNew;
-		if ( iterNew == rows.end() )
-			{
-			if ( iter != rows.begin() )
-				{
+		if ( iterNew == rows.end() ) {
+			if ( iter != rows.begin() ) {
 				iterNew = iter;
 				-- iterNew;
-				}
 			}
+		}
 
 		_formulasListModel->erase( iter );
 		if ( iterNew )
 			_formulasListView->set_cursor( _formulasListModel->get_path( iterNew ) );
 
 		_formulasListView->grab_focus();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-HFunlab* HWindowMain::funlab( void )
-	{
+HFunlab* HWindowMain::funlab( void ) {
 	M_PROLOG
 	HFunlab* f = NULL;
-	if ( ! _lock && _detachedRendererActive )
-		{
+	if ( ! _lock && _detachedRendererActive ) {
 		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*_detachedRenderer );
 		if ( dr )
 			f = dynamic_cast<HFunlab*>( &( *dr->get_engine() ) );
-		}
-	else
-		{
+	} else {
 		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( _embeddedRenderer );
 		if ( er )
 			f = dynamic_cast<HFunlab*>( &( *er->get_engine() ) );
-		}
+	}
 	return ( f );
 	M_EPILOG
-	}
+}
 
-void HWindowMain::selected_row_callback( Gtk::TreeModel::iterator const& iter )
-	{
+void HWindowMain::selected_row_callback( Gtk::TreeModel::iterator const& iter ) {
 	M_PROLOG
 	HFunlab* f = NULL;
-	if ( iter && ( f = funlab() ) )
-		{
+	if ( iter && ( f = funlab() ) ) {
 		f->push_formula( iter->get_value( _formulasListFormulaColumn ) );
 		update_drawing( false );
-		}
-	M_EPILOG
 	}
+	M_EPILOG
+}
 
-void HWindowMain::on_sel_changed( void )
-	{
+void HWindowMain::on_sel_changed( void ) {
 	M_PROLOG
 	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
 	HFunlab* f = funlab();
-	if ( f )
-		{
+	if ( f ) {
 		f->clear();
 		if ( selection->get_mode() == Gtk::SELECTION_MULTIPLE )
 			selection->selected_foreach_iter( sigc::mem_fun( *this, &HWindowMain::selected_row_callback ) );
-		else
-			{
+		else {
 			Gtk::TreeIter iter = selection->get_selected();
-			if ( iter )
-				{
+			if ( iter ) {
 				OPlotDesc plot = iter->get_value( _formulasListFormulaColumn );
 				_formula->set_text( plot._formula.raw() );
 				f_po3D->set_active( plot._3d );
@@ -496,45 +462,37 @@ void HWindowMain::on_sel_changed( void )
 				_rangeUpperBound->set_value( static_cast<double>( plot._rangeUpperBound ) );
 				f->push_formula( plot );
 				update_drawing( false );
-				}
 			}
 		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::update_drawing( bool full )
-	{
-	if ( ! _lock && _detachedRendererActive )
-		{
+void HWindowMain::update_drawing( bool full ) {
+	if ( ! _lock && _detachedRendererActive ) {
 		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*_detachedRenderer );
 		M_ASSERT( dr );
-		}
-	else
-		{
+	} else {
 		HEmbeddedRenderer* er = dynamic_cast<HEmbeddedRenderer*>( _embeddedRenderer );
 		M_ASSERT( er );
 		er->invoke_refresh( full );
-		}
 	}
+}
 
-bool HWindowMain::on_key_press( GdkEventKey* eventKey_ )
-	{
+bool HWindowMain::on_key_press( GdkEventKey* eventKey_ ) {
 	M_PROLOG
-	switch ( eventKey_->keyval )
-		{
+	switch ( eventKey_->keyval ) {
 		case ( GDK_Delete ):
 			on_remove();
 		break;
 		case ( GDK_Insert ):
 			on_add();
 		break;
-		case ( ' ' ):
-			{
+		case ( ' ' ): {
 			Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
 			Gtk::TreeIter iter = selection->get_selected();
-			if ( iter )
-				{
+			if ( iter ) {
 				OPlotDesc const& plot = iter->get_value( _formulasListFormulaColumn );
 				_detachedRenderer = make_pointer<HDetachedRenderer>( this );
 				HDetachedRenderer* dr( static_cast<HDetachedRenderer*>( _detachedRenderer.get() ) );
@@ -546,35 +504,32 @@ bool HWindowMain::on_key_press( GdkEventKey* eventKey_ )
 				else
 					dr->render_surface();
 				_detachedRendererActive = true;
-				}
 			}
+		}
 		break;
 		default:
 		break;
-		}
+	}
 	return ( false );
 	M_EPILOG
-	}
+}
 
-void HWindowMain::shutdown_renderer( void )
-	{
+void HWindowMain::shutdown_renderer( void ) {
 	cout << __PRETTY_FUNCTION__ << endl;
 	dynamic_cast<HDetachedRenderer*>( &*_detachedRenderer )->shutdown();
 	_detachedRenderer = HDetachedRenderer::ptr_t();
 	_detachedRendererActive = false;
-	}
+}
 
-void HWindowMain::do_on_event( HKeyboardEvent const* e )
-	{
+void HWindowMain::do_on_event( HKeyboardEvent const* e ) {
 	cout << __PRETTY_FUNCTION__ << endl;
 	if ( e->get_code() == 'q' )
 		_dispatcher();
 	return;
-	}
+}
 
 void HWindowMain::show_error_message( char const* const formula_,
-	char const* const message_, int position_ )
-	{
+	char const* const message_, int position_ ) {
 	M_PROLOG
 	int ctr = 0;
 	HString error, arrow;
@@ -592,11 +547,10 @@ void HWindowMain::show_error_message( char const* const formula_,
 	info.run();
 	return;
 	M_EPILOG
-	}
+}
 
 void HWindowMain::set_font_all( Pango::FontDescription const& fontDesc_,
-	Gtk::Widget* widget_ )
-	{
+	Gtk::Widget* widget_ ) {
 	M_PROLOG
 	if ( !widget_ )
 		return;
@@ -607,20 +561,15 @@ void HWindowMain::set_font_all( Pango::FontDescription const& fontDesc_,
 	Gtk::Label* label = dynamic_cast<Gtk::Label*>( widget_ );
 	if ( label )
 		label->set_line_wrap( false );
-	if ( dialog )
-		{
+	if ( dialog ) {
 		set_font_all( fontDesc_, dialog->get_vbox() );
 		set_font_all( fontDesc_, dialog->get_action_area() );
-		}
-	else if ( window )
-		{
+	} else if ( window ) {
 		Glib::ListHandle<Widget*> children = window->get_children();
 		for ( Glib::ListHandle<Widget*>::iterator childIterator = children.begin();
 		      childIterator != children.end(); ++ childIterator )
 			set_font_all( fontDesc_, *childIterator );
-		}
-	else if ( box )
-		{
+	} else if ( box ) {
 		Gtk::Box_Helpers::BoxList& boxList = box->children();
 		for ( Gtk::Box_Helpers::BoxList::iterator boxIterator = boxList.begin();
 		      boxIterator != boxList.end(); ++ boxIterator )
@@ -630,47 +579,41 @@ void HWindowMain::set_font_all( Pango::FontDescription const& fontDesc_,
 		for ( Glib::ListHandle<Widget*>::iterator childIterator = children.begin();
 		      childIterator != children.end(); ++ childIterator )
 			set_font_all( fontDesc_, *childIterator );
-		}
+	}
 
 //	Gtk::MessageDialog o ( * this, widget_->get_name() );
 //	o.run();
 	return;
 	M_EPILOG
-	}
+}
 
-void HWindowMain::on_density_changed( void )
-	{
+void HWindowMain::on_density_changed( void ) {
 	setup._density = static_cast<int>( _density->get_value() );
 	update_drawing();
-	}
+}
 
-void HWindowMain::on_show_axis_changed( void )
-	{
+void HWindowMain::on_show_axis_changed( void ) {
 	setup._showAxis = _showAxis->get_active();
 	update_drawing();
-	}
+}
 
-void HWindowMain::on_stereo_changed( void )
-	{
+void HWindowMain::on_stereo_changed( void ) {
 	setup._stereo = _stereo->get_active();
 	update_drawing();
-	}
+}
 
-void HWindowMain::on_3d_changed( void )
-	{
+void HWindowMain::on_3d_changed( void ) {
 	on_plot_data_changed();
-	}
+}
 
-void HWindowMain::on_multi_changed( void )
-	{
+void HWindowMain::on_multi_changed( void ) {
 	setup._multiFormula = _multiFormula->get_active();
 	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
 	selection->set_mode( setup._multiFormula ? Gtk::SELECTION_MULTIPLE : Gtk::SELECTION_SINGLE );
 	update_drawing();
-	}
+}
 
-void HWindowMain::on_plot_data_changed( void )
-	{
+void HWindowMain::on_plot_data_changed( void ) {
 	OPlotDesc plot;
 	plot._3d = f_po3D->get_active();
 	plot._domainLowerBound = _domainLowerBound->get_value();
@@ -679,111 +622,94 @@ void HWindowMain::on_plot_data_changed( void )
 	plot._rangeUpperBound = _rangeUpperBound->get_value();
 	plot._formula = _formula->get_text().c_str();
 	Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
-	if ( selection->get_mode() != Gtk::SELECTION_MULTIPLE )
-		{
+	if ( selection->get_mode() != Gtk::SELECTION_MULTIPLE ) {
 		Gtk::TreeIter iter = selection->get_selected();
 		if ( iter )
 			iter->set_value( _formulasListFormulaColumn, plot );
-		}
+	}
 	HFunlab* f = funlab();
-	if ( f )
-		{
+	if ( f ) {
 		f->clear();
 		f->push_formula( plot );
 		update_drawing();
-		}
-	return;
 	}
+	return;
+}
 
-void HWindowMain::on_formula_changed( void )
-	{
+void HWindowMain::on_formula_changed( void ) {
 	HExpression e;
 	Glib::ustring s( _formula->get_text() );
-	try
-		{
+	try {
 		e.compile( s.c_str() );
 		on_plot_data_changed();
-		}
-	catch ( HExpressionException const& ex )
-		{
+	} catch ( HExpressionException const& ex ) {
 /*		_formula->select_region( e.get_error_token(), static_cast<int>( s.length() - 1 ) ); */
-		}
-	return;
 	}
+	return;
+}
 
-void HWindowMain::on_domain_lower_bound_changed( void )
-	{
+void HWindowMain::on_domain_lower_bound_changed( void ) {
 	double nval = _domainLowerBound->get_value();
 	if ( nval < setup._domainUpperBound )
 		setup._domainLowerBound = nval;
 	else
 		_domainLowerBound->set_value( static_cast<double>( setup._domainLowerBound ) );
 	on_plot_data_changed();
-	}
+}
 
-void HWindowMain::on_domain_upper_bound_changed( void )
-	{
+void HWindowMain::on_domain_upper_bound_changed( void ) {
 	double nval = _domainUpperBound->get_value();
 	if ( nval > setup._domainLowerBound )
 		setup._domainUpperBound = nval;
 	else
 		_domainUpperBound->set_value( static_cast<double>( setup._domainUpperBound ) );
 	on_plot_data_changed();
-	}
+}
 
-void HWindowMain::on_range_lower_bound_changed( void )
-	{
+void HWindowMain::on_range_lower_bound_changed( void ) {
 	double nval = _rangeLowerBound->get_value();
 	if ( nval < setup._rangeUpperBound )
 		setup._rangeLowerBound = nval;
 	else
 		_rangeLowerBound->set_value( static_cast<double>( setup._rangeLowerBound ) );
 	on_plot_data_changed();
-	}
+}
 
-void HWindowMain::on_range_upper_bound_changed( void )
-	{
+void HWindowMain::on_range_upper_bound_changed( void ) {
 	double nval = _rangeUpperBound->get_value();
 	if ( nval > setup._rangeLowerBound )
 		setup._rangeUpperBound = nval;
 	else
 		_rangeUpperBound->set_value( static_cast<double>( setup._rangeUpperBound ) );
 	on_plot_data_changed();
-	}
+}
 
-void HWindowMain::get_value_for_cell( Gtk::CellRenderer* cell, Gtk::TreeModel::iterator const& iter, Gtk::TreeModelColumn<OPlotDesc> const& col )
-	{
+void HWindowMain::get_value_for_cell( Gtk::CellRenderer* cell, Gtk::TreeModel::iterator const& iter, Gtk::TreeModelColumn<OPlotDesc> const& col ) {
 	Gtk::CellRendererText* pTextRenderer = dynamic_cast<Gtk::CellRendererText*>(cell);
 	if( ! ( pTextRenderer && ( !! iter ) ) )
 		g_warning( "gtkmm: TextView: bad usage of value_getter." );
 	else
 		pTextRenderer->property_text() = iter->get_value( col )._formula.raw();
-	}
+}
 
-int gui_start( int argc_, char* argv_[] )
-	{
+int gui_start( int argc_, char* argv_[] ) {
 	M_PROLOG
-	try
-		{
+	try {
 		Gtk::Main gUI( argc_, argv_ );
 		Glib::RefPtr<Gtk::Builder> resources( Gtk::Builder::create_from_file( setup._resourcePath.raw() ) );
 		HWindowMain* windowMain = NULL;
 		resources->get_widget_derived( "WINDOW_MAIN", windowMain );
 		gUI.run( *windowMain );
-		}
-	catch ( Glib::Exception& e )
-		{
+	} catch ( Glib::Exception& e ) {
 		std::cerr << "Glib::Exception: " << e.what() << std::endl;
 		return ( -1 );
-		}
-	catch ( std::exception& e )
-		{
+	} catch ( std::exception& e ) {
 		std::cerr << "std::exception: " << e.what() << std::endl;
 		return ( -1 );
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
 }
 

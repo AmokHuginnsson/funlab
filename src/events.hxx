@@ -29,16 +29,12 @@ Copyright:
 
 #include "heventlistener.hxx"
 
-namespace funlab
-{
+namespace funlab {
 
-class HKeyboardEvent
-	{
+class HKeyboardEvent {
 public:
-	struct MOD
-		{
-		typedef enum
-			{
+	struct MOD {
+		typedef enum {
 			NONE = 0x0000,
 			LSHIFT = 0x0001,
 			RSHIFT = 0x0002,
@@ -49,8 +45,8 @@ public:
 			LALT = 0x0010,
 			RALT = 0x0020,
 			ALT = LALT | RALT
-			} mod_t;
-		};
+		} mod_t;
+	};
 private:
 	int _code;
 	MOD::mod_t _mod;
@@ -58,25 +54,20 @@ public:
 	HKeyboardEvent( int code, MOD::mod_t const& mod_ = MOD::NONE ) : _code( code ), _mod( mod_ ) { }
 	int get_code( void ) const { return ( _code ); }
 	MOD::mod_t get_mod( void ) const { return ( _mod ); }
-	};
+};
 
-class HMouseEvent
-	{
+class HMouseEvent {
 public:
-	struct TYPE
-		{
-		typedef enum
-			{
+	struct TYPE {
+		typedef enum {
 			CLICK,
 			PRESS,
 			RELEASE,
 			MOVE
-			} type_t;
-		};
-	struct BUTTON
-		{
-		typedef enum
-			{
+		} type_t;
+	};
+	struct BUTTON {
+		typedef enum {
 			NONE = 0x00,
 			B_1 = 0x01,
 			B_2 = 0x02,
@@ -86,8 +77,8 @@ public:
 			B_6 = 0x20,
 			B_7 = 0x40,
 			B_8 = 0x80
-			} button_t;
-		};
+		} button_t;
+	};
 private:
 	TYPE::type_t _type;
 	BUTTON::button_t _button;
@@ -101,7 +92,7 @@ public:
 	int get_x( void ) const;
 	int get_y( void ) const;
 	BUTTON::button_t get_button( void ) const;
-	};
+};
 
 typedef HEventListener<HKeyboardEvent const*> HKeyboardEventListener;
 typedef HEventListener<HMouseEvent const*> HMouseEventListener;

@@ -33,8 +33,7 @@ M_VCSID( "$Id: "__ID__" $" )
 using namespace yaal;
 using namespace yaal::hcore;
 
-namespace funlab
-{
+namespace funlab {
 
 OPlotDesc::OPlotDesc( yaal::hcore::HString const& formula )
 	: _3d( setup.f_b3D ),
@@ -42,12 +41,10 @@ OPlotDesc::OPlotDesc( yaal::hcore::HString const& formula )
 	_domainUpperBound( setup._domainUpperBound ),
 	_rangeLowerBound( setup._rangeLowerBound ),
 	_rangeUpperBound( setup._domainUpperBound ),
-	_formula( formula )
-	{
-	}
+	_formula( formula ) {
+}
 
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream, OPlotDesc const& plot )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream, OPlotDesc const& plot ) {
 	M_PROLOG
 	stream << ( plot._3d ? "true" : "false" ) << ";"
 		<< plot._domainLowerBound << ";"
@@ -57,10 +54,9 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stre
 		<< plot._formula;
 	return ( stream );
 	M_EPILOG
-	}
+}
 
-OPlotDesc plot_desc_from_string( yaal::hcore::HString const& line )
-	{
+OPlotDesc plot_desc_from_string( yaal::hcore::HString const& line ) {
 	M_PROLOG
 	OPlotDesc plot;
 	HTokenizer t( line, ";" );
@@ -72,7 +68,7 @@ OPlotDesc plot_desc_from_string( yaal::hcore::HString const& line )
 	plot._formula = t[ 5 ];
 	return ( plot );
 	M_EPILOG
-	}
+}
 
 }
 

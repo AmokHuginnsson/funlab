@@ -40,39 +40,34 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-namespace funlab
-{
+namespace funlab {
 
 int HDetachedRenderer::_activeSurfaces = 0;
 
 HDetachedRenderer::HDetachedRenderer( HKeyboardEventListener* keyboardEventListener_ )
 	: _loop( false ), _handler( NULL ), _width( 0 ), _height( 0 ), _bPP( 0 ),
-	_semaphore(), _thread(), _keyboardEventListener( keyboardEventListener_ )
-	{
+	_semaphore(), _thread(), _keyboardEventListener( keyboardEventListener_ ) {
 	M_PROLOG
 	int error = 0;
 	HString message;
-	if ( _activeSurfaces < 1 )
-		{
+	if ( _activeSurfaces < 1 ) {
 		hcore::log << _( "Initializing SDL library " );
-		if ( ( error = SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD ) ) < 0 )
-			{
+		if ( ( error = SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD ) ) < 0 ) {
 			message = _( "Couldn't initialize SDL: " );
 			message += SDL_GetError();
 			M_THROW( message, error );
-			}
-		hcore::log << _( "ok." ) << endl;
 		}
+		hcore::log << _( "ok." ) << endl;
+	}
 	SDL_EventState( SDL_MOUSEMOTION, SDL_ENABLE );
 	SDL_EventState( SDL_MOUSEBUTTONDOWN, SDL_ENABLE );
 	SDL_EventState( SDL_MOUSEBUTTONUP, SDL_ENABLE );
 	SDL_EventState( SDL_VIDEOEXPOSE, SDL_ENABLE );
 	return;
 	M_EPILOG
-	}
+}
 
-HDetachedRenderer::~HDetachedRenderer( void )
-	{
+HDetachedRenderer::~HDetachedRenderer( void ) {
 	M_PROLOG
 	if ( _activeSurfaces )
 		_semaphore.wait();
@@ -82,18 +77,16 @@ HDetachedRenderer::~HDetachedRenderer( void )
 		SDL_Quit();
 	return;
 	M_EPILOG
-	}
+}
 
-bool HDetachedRenderer::render_surface( void )
-	{
+bool HDetachedRenderer::render_surface( void ) {
 	M_PROLOG
 	init( setup._resolutionX, setup._resolutionY );
 	return ( false );
 	M_EPILOG
-	}
+}
 
-int HDetachedRenderer::init( int width_, int height_, int bpp_ )
-	{
+int HDetachedRenderer::init( int width_, int height_, int bpp_ ) {
 	M_PROLOG
 	int error = 0;
 	HString message;
@@ -104,32 +97,29 @@ int HDetachedRenderer::init( int width_, int height_, int bpp_ )
 	_bPP = bpp_;
 	surface = SDL_SetVideoMode( _width, _height, _bPP,
 			SDL_HWSURFACE | SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_NOFRAME );
-	if ( surface == NULL )
-		{
+	if ( surface == NULL ) {
 		error = errno;
 		message = _( "Couldn't set 640x480x8 video mode: " );
 		message += SDL_GetError();
 		M_THROW( message, error );
-		}
+	}
 
-	if ( surface->flags != ( SDL_HWSURFACE | SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_NOFRAME ) )
-		{
+	if ( surface->flags != ( SDL_HWSURFACE | SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_NOFRAME ) ) {
 		hcore::log << _( "Requested video settings not satisfied: " ) << surface->flags;
 		hcore::log << " (" << SDL_HWSURFACE << '|' << SDL_ANYFORMAT << '|' << SDL_DOUBLEBUF << '|' << SDL_NOFRAME << ")" << endl;
-		}
+	}
 	_handler = surface;
 	_bPP = surface->format->BitsPerPixel;
 	if ( _bPP != bpp_ )
 		hcore::log << "BPP downgrade: " << bpp_ << " -> " << _bPP << endl;
 	hcore::log << "Set " << _width << 'x' << _height << " at " << _bPP << " bits-per-pixel mode" << endl;
-	if ( SDL_MUSTLOCK( surface ) )
-		{
+	if ( SDL_MUSTLOCK( surface ) ) {
 		hcore::log << "Locking surface ";
 		if ( SDL_LockSurface( surface ) < 0 )
 			hcore::log << "failed: " << SDL_GetError() << endl;
 		else
 			hcore::log << "ok." << endl;
-		}
+	}
 	_activeSurfaces ++;
 	SDL_WarpMouse( static_cast<Uint16>( setup._resolutionX >> 1 ),
 			static_cast<Uint16>( setup._resolutionY >> 1 ) );
@@ -137,29 +127,22 @@ int HDetachedRenderer::init( int width_, int height_, int bpp_ )
 	_thread.spawn( call( &HDetachedRenderer::run, this ) );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-void* HDetachedRenderer::run( void )
-	{
+void* HDetachedRenderer::run( void ) {
 	M_PROLOG
 	SDL_Event l_uEvent;
-	while ( _loop && _thread.is_alive() )
-		{
-		if ( SDL_WaitEvent( &l_uEvent ) )
-			{
-			switch ( l_uEvent.type )
-				{
-				case ( SDL_MOUSEMOTION ):
-					{
+	while ( _loop && _thread.is_alive() ) {
+		if ( SDL_WaitEvent( &l_uEvent ) ) {
+			switch ( l_uEvent.type ) {
+				case ( SDL_MOUSEMOTION ): {
 					int dx = yaal::abs( l_uEvent.motion.xrel );
 					int dy = yaal::abs( l_uEvent.motion.yrel );
-					if ( ( dx < ( setup._resolutionX >> 1 ) ) && ( dy < ( setup._resolutionY >> 1 ) ) )
-						{
+					if ( ( dx < ( setup._resolutionX >> 1 ) ) && ( dy < ( setup._resolutionY >> 1 ) ) ) {
 						HMouseEvent e( HMouseEvent::TYPE::MOVE );
 						e.set_pos( l_uEvent.motion.xrel, l_uEvent.motion.yrel );
 						bool skip = false;
-						switch ( l_uEvent.motion.state )
-							{
+						switch ( l_uEvent.motion.state ) {
 							case ( SDL_BUTTON( 1 ) ):
 								e.set_button( HMouseEvent::BUTTON::B_1 );
 							break;
@@ -172,18 +155,16 @@ void* HDetachedRenderer::run( void )
 							default:
 								skip = true;
 							break;
-							}
+						}
 						if ( ! skip )
 							_engine->on_event( &e );
-						}
-					break;
 					}
-				case ( SDL_MOUSEBUTTONDOWN ):
-					{
+					break;
+				}
+				case ( SDL_MOUSEBUTTONDOWN ): {
 					bool skip = false;
 					HMouseEvent e( HMouseEvent::TYPE::PRESS );
-					switch ( l_uEvent.button.button )
-						{
+					switch ( l_uEvent.button.button ) {
 						case ( 4 ):
 							e.set_button( HMouseEvent::BUTTON::B_4 );
 						break;
@@ -193,29 +174,23 @@ void* HDetachedRenderer::run( void )
 						default:
 							skip = true;
 						break;
-						}
+					}
 					if ( ! skip )
 						_engine->on_event( &e );
-					}
+				}
 				break;
-				case ( SDL_KEYUP ):
-					{
-					switch ( l_uEvent.key.keysym.sym )
-						{
-						case ( 'q' ):
-							{
-							if ( _keyboardEventListener )
-								{
+				case ( SDL_KEYUP ): {
+					switch ( l_uEvent.key.keysym.sym ) {
+						case ( 'q' ): {
+							if ( _keyboardEventListener ) {
 								HKeyboardEvent e( static_cast<int>( l_uEvent.key.keysym.sym ) );
 								_keyboardEventListener->on_event( &e );
-								}
-							else
-								{
+							} else {
 								_loop = false;
 								down();
 								_semaphore.signal();
-								}
 							}
+						}
 						break;
 						case ( 'f' ):
 							toggle_fullscreen();
@@ -226,44 +201,39 @@ void* HDetachedRenderer::run( void )
 										? HKeyboardEvent::MOD::SHIFT : HKeyboardEvent::MOD::NONE );
 							_engine->on_event( &e );
 						break;
-						}
-					break;
 					}
+					break;
+				}
 				break;
 				default:
 				break;
-				}
-			if ( _loop )
-				{
+			}
+			if ( _loop ) {
 				_engine->draw_frame();
 				while ( SDL_PollEvent( &l_uEvent ) )
 					;
-				}
 			}
 		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-void HDetachedRenderer::shutdown( void )
-	{
+void HDetachedRenderer::shutdown( void ) {
 	_thread.finish();
 	cout << __PRETTY_FUNCTION__ << endl;
 	down();
-	}
+}
 
-double HDetachedRenderer::do_get_width( void ) const
-	{
+double HDetachedRenderer::do_get_width( void ) const {
 	return ( _width );
-	}
+}
 
-double HDetachedRenderer::do_get_height( void ) const
-	{
+double HDetachedRenderer::do_get_height( void ) const {
 	return ( _height );
-	}
+}
 
-void HDetachedRenderer::down( void )
-	{
+void HDetachedRenderer::down( void ) {
 	M_PROLOG
 	cout << __PRETTY_FUNCTION__ << endl;
 	SDL_Surface* surface = static_cast<SDL_Surface*>( _handler );
@@ -276,10 +246,9 @@ void HDetachedRenderer::down( void )
 	_handler = NULL;
 	-- _activeSurfaces;
 	M_EPILOG
-	}
+}
 
-void HDetachedRenderer::do_commit( void )
-	{
+void HDetachedRenderer::do_commit( void ) {
 	M_PROLOG
 	SDL_Surface* surface = static_cast<SDL_Surface*>( _handler );
 
@@ -288,21 +257,19 @@ void HDetachedRenderer::do_commit( void )
 
 	while ( SDL_Flip( surface ) )
 		;
-	if ( SDL_MUSTLOCK( surface ) )
-		{
+	if ( SDL_MUSTLOCK( surface ) ) {
 		if ( SDL_LockSurface( surface ) < 0 )
 			hcore::log( LOG_TYPE::ERROR ) << "Can't lock screen: " << SDL_GetError() << endl;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 /*
  * Return the pixel value at (x, y)
  * NOTE: The surface must be locked before calling this!
  */
-u32_t HDetachedRenderer::do_get_pixel( double x, double y )
-	{
+u32_t HDetachedRenderer::do_get_pixel( double x, double y ) {
 	M_PROLOG
 	unsigned char* rawMemory = NULL;
 	SDL_Surface* surface = static_cast<SDL_Surface*>( _handler );
@@ -316,38 +283,32 @@ u32_t HDetachedRenderer::do_get_pixel( double x, double y )
 	rawMemory = static_cast<unsigned char*>( surface->pixels )
 	                + iy * surface->pitch + ix * surface->format->BytesPerPixel;
 
-	switch ( surface->format->BytesPerPixel )
-		{
-		case ( 1 ):
-			{
+	switch ( surface->format->BytesPerPixel ) {
+		case ( 1 ): {
 			return ( *rawMemory );
-			}
-		case ( 2 ):
-			{
+		}
+		case ( 2 ): {
 			return ( *reinterpret_cast<Uint16*>( rawMemory ) );
-			}
-		case ( 3 ):
-			{
+		}
+		case ( 3 ): {
 			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN )
 				return ( rawMemory[ 0 ] << 16 | rawMemory[ 1 ] << 8 | rawMemory[ 2 ] );
 			else
 				return ( rawMemory[ 0 ] | rawMemory[ 1 ] << 8 | rawMemory[ 2 ] << 16 );
-			}
-		case ( 4 ):
-			{
-			return ( *reinterpret_cast<u32_t*>( rawMemory ) );
-			}
 		}
+		case ( 4 ): {
+			return ( *reinterpret_cast<u32_t*>( rawMemory ) );
+		}
+	}
 	return ( 0 );       /* shouldn't happen, but avoids warnings */
 	M_EPILOG
-	}
+}
 
 /*
  * Set the pixel at (x, y) to the given value
  * NOTE: The surface must be locked before calling this!
  */
-void HDetachedRenderer::do_put_pixel( double x, double y, u32_t pixel )
-	{
+void HDetachedRenderer::do_put_pixel( double x, double y, u32_t pixel ) {
 	M_PROLOG
 	unsigned char* rawMemory = NULL;
 	SDL_Surface* surface = static_cast<SDL_Surface*>( _handler );
@@ -361,29 +322,24 @@ void HDetachedRenderer::do_put_pixel( double x, double y, u32_t pixel )
 	rawMemory = static_cast<unsigned char*>( surface->pixels )
 	                + iy * surface->pitch + ix * surface->format->BytesPerPixel;
 
-	switch ( surface->format->BytesPerPixel )
-		{
+	switch ( surface->format->BytesPerPixel ) {
 		case ( 1 ):
 			( *rawMemory ) = static_cast<char>( pixel );
 		break;
 		case ( 2 ):
 			( *reinterpret_cast<Uint16*>( rawMemory ) ) = static_cast<Uint16>( pixel );
 		break;
-		case ( 3 ):
-			{
-			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN )
-				{
+		case ( 3 ): {
+			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN ) {
 				rawMemory[ 0 ] = static_cast<char>( ( pixel >> 16 ) & 0xff );
 				rawMemory[ 1 ] = static_cast<char>( ( pixel >> 8 ) & 0xff );
 				rawMemory[ 2 ] = static_cast<char>( pixel & 0xff );
-				}
-			else
-				{
+			} else {
 				rawMemory[ 0 ] = static_cast<char>( pixel & 0xff );
 				rawMemory[ 1 ] = static_cast<char>( ( pixel >> 8 ) & 0xff );
 				rawMemory[ 2 ] = static_cast<char>( ( pixel >> 16 ) & 0xff );
-				}
 			}
+		}
 		break;
 		case ( 4 ):
 			( *reinterpret_cast<u32_t*>( rawMemory ) ) = pixel;
@@ -391,13 +347,12 @@ void HDetachedRenderer::do_put_pixel( double x, double y, u32_t pixel )
 		default:
 			M_ASSERT( ! "color plane not supported" );
 		break;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32_t color )
-	{
+void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32_t color ) {
 	M_PROLOG
 /*
  * Implementation ripped from http://www.cs.unc.edu/~mcmillan/comp136/Lecture6/Lines.html
@@ -422,8 +377,7 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 
 	int edges0 = 0, edges1 = 0, edges = 0;
 
-	do
-		{
+	do {
 		edges0 = edges1 = edges = 0;
 		edges0 |= ( x0 < 0 ) ? EDGE_LEFT : 0;
 		edges0 |= ( y0 < 0 ) ? EDGE_TOP : 0;
@@ -442,32 +396,24 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 		else
 			break;
 
-		if ( edges & EDGE_LEFT )
-			{
+		if ( edges & EDGE_LEFT ) {
 			cx = 0;
 			cy = y0 + ( y1 - y0 ) * ( 0 - x0 ) / ( x1 - x0 );
-			}
-		else if ( edges & EDGE_TOP )
-			{
+		} else if ( edges & EDGE_TOP ) {
 			cx = x0 + ( x1 - x0 ) * ( 0 - y0 ) / ( y1 - y0 );
 			cy = 0;
-			}
-		else if ( edges & EDGE_RIGHT )
-			{
+		} else if ( edges & EDGE_RIGHT ) {
 			cx = _width - 1;
 			cy = y0 + ( y1 - y0 ) * ( cx - x0 ) / ( x1 - x0 );
-			}
-		else if ( edges & EDGE_BOTTOM )
-			{
+		} else if ( edges & EDGE_BOTTOM ) {
 			cy = _height - 1;
 			cx = x0 + ( x1 - x0 ) * ( cy - y0 ) / ( y1 - y0 );
-			}
+		}
 		if ( edges0 )
 			x0 = cx, y0 = cy;
 		else
 			x1 = cx, y1 = cy;
-		}
-	while ( edges0 | edges1 );
+	} while ( edges0 | edges1 );
 	
 	dx = x1 - x0;
 	dy = y1 - y0;
@@ -488,73 +434,63 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 		put_pixel( static_cast<int>( x0 ), static_cast<int>( y0 ), color );
 	else
 		return;
-	if ( dx > dy )
-		{
+	if ( dx > dy ) {
 		fraction = dy - ( dx / 2 );
-		while ( ( ( stepx > 0 ) && ( x0 <= x1 ) ) || ( ( stepx < 0 ) && ( x0 >= x1 ) ) )
-			{
-			if ( fraction >= 0 )
-				{
+		while ( ( ( stepx > 0 ) && ( x0 <= x1 ) ) || ( ( stepx < 0 ) && ( x0 >= x1 ) ) ) {
+			if ( fraction >= 0 ) {
 				y0 += stepy;
 				fraction -= dx;
-				}
+			}
 			x0 += stepx;
 			fraction += dy;
 			if ( ( x0 >= 0 ) && ( x0 < _width ) && ( y0 >= 0 ) && ( y0 < _height ) )
 				put_pixel( static_cast<int>( x0 ), static_cast<int>( y0 ), color );
 			else
 				return;
-			}
 		}
-	else
-		{
+	} else {
 		fraction = dx - ( dy / 2 );
-		while ( ( ( stepy > 0 ) && ( y0 <= y1 ) ) || ( ( stepy < 0 ) && ( y0 >= y1 ) ) )
-			{
-			if ( fraction >= 0 )
-				{
+		while ( ( ( stepy > 0 ) && ( y0 <= y1 ) ) || ( ( stepy < 0 ) && ( y0 >= y1 ) ) ) {
+			if ( fraction >= 0 ) {
 				x0 += stepx;
 				fraction -= dy;
-				}
+			}
 			y0 += stepy;
 			fraction += dx;
 			if ( ( x0 >= 0 ) && ( x0 < _width ) && ( y0 >= 0 ) && ( y0 < _height ) )
 				put_pixel( static_cast<int>( x0 ), static_cast<int>( y0 ), color );
 			else
 				return;
-			}
 		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-u32_t HDetachedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue )
-	{
+u32_t HDetachedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue ) {
 	M_PROLOG
 	u32_t value = 0;
 	SDL_Surface* surface = static_cast<SDL_Surface*>( _handler );
 	value = SDL_MapRGB( surface->format, red, green, blue );
 	return ( value );
 	M_EPILOG
-	}
+}
 
-void HDetachedRenderer::do_fill_rect( double, double, double, double, u32_t color )
-	{
+void HDetachedRenderer::do_fill_rect( double, double, double, double, u32_t color ) {
 	M_PROLOG
 	SDL_Surface* surface = static_cast<SDL_Surface*>( _handler );
 	SDL_FillRect( surface, NULL, color );
 	return;
 	M_EPILOG
-	}
+}
 
-void HDetachedRenderer::toggle_fullscreen( void )
-	{
+void HDetachedRenderer::toggle_fullscreen( void ) {
 	M_PROLOG
 	SDL_WM_ToggleFullScreen( static_cast<SDL_Surface*>( _handler ) );
 
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

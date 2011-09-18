@@ -32,11 +32,9 @@ Copyright:
 #include "hrenderer.hxx"
 #include "oplotdesc.hxx"
 
-namespace funlab
-{
+namespace funlab {
 
-class HFunlab : public HRendererEngineInterface
-	{
+class HFunlab : public HRendererEngineInterface {
 	int _red;
 	int _green;
 	int _blue;
@@ -50,15 +48,13 @@ class HFunlab : public HRendererEngineInterface
 	double long* _xVariable;
 	double long* _yVariable;
 
-	class HMesh
-		{
+	class HMesh {
 	public:
-		struct OValue
-			{
+		struct OValue {
 			bool _valid;
 			double long _value;
 			OValue( void ) : _valid( false ), _value( 0 ) {}
-			};
+		};
 	private:
 		int _size;
 		int _surfaces;
@@ -69,15 +65,14 @@ class HFunlab : public HRendererEngineInterface
 		void set_size( int, int );
 		int get_size( void ) const;
 		OValue** fast( int );
-		};
+	};
 	HMesh _mesh;
-	struct ONode
-		{
+	struct ONode {
 		int _col;
 		int _row;
 		int _valid;
 		ONode( void ) : _col( 0 ), _row( 0 ), _valid( 0 ) {}
-		};
+	};
 	yaal::hcore::HChunk _node;
 	yaal::u32_t _color;
 	double _cosAlpha;
@@ -86,13 +81,12 @@ class HFunlab : public HRendererEngineInterface
 	double _sinBeta;
 	double _cosGamma;
 	double _sinGamma;
-	struct OCache
-		{
+	struct OCache {
 		OCache( double a, double b, double c ) : _preCalcA( a ), _preCalcB( b ), _preCalcC( c ) {}
 		double _preCalcA;
 		double _preCalcB;
 		double _preCalcC;
-		} _cache;
+	} _cache;
 	double* _trygo;
 	typedef yaal::hcore::HList<OPlotDesc> plots_t;
 	plots_t _plots;
@@ -118,7 +112,7 @@ private:
 	void generate_surface( void );
 	void draw_axis( void );
 	virtual void do_draw_frame( void );
-	};
+};
 
 }
 

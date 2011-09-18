@@ -32,23 +32,19 @@ Copyright:
 
 #include "hrenderer.hxx"
 
-namespace funlab
-{
+namespace funlab {
 
-class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea
-	{
-	struct OMove
-		{
+class HEmbeddedRenderer : public HRendererSurfaceBase, public Gtk::DrawingArea {
+	struct OMove {
 		OMove( void ) : _x( 0 ), _y( 0 ) {}
 		int _x;
 		int _y;
-		} _move;
-	struct OLineBuffer
-		{
+	} _move;
+	struct OLineBuffer {
 		bool _empty;
 		yaal::u32_t _lastColor;
 		OLineBuffer( void ) : _empty( true ), _lastColor( 0 ) {}
-		};
+	};
 	OLineBuffer _lineBuffer;
 	Cairo::RefPtr<Cairo::Context> _context;
 public:
@@ -74,7 +70,7 @@ private:
 	double green( yaal::u32_t );
 	double blue( yaal::u32_t );
 	double alpha( yaal::u32_t );
-	};
+};
 
 }
 

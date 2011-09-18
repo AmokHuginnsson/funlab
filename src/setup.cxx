@@ -33,8 +33,7 @@ M_VCSID( "$Id: "__ID__" $" )
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-namespace funlab
-{
+namespace funlab {
 OSetup::OSetup( void )
 	: _quiet( false ), _verbose( false ),
 		_stereo( false ),
@@ -49,15 +48,14 @@ OSetup::OSetup( void )
 		_iconPath()
 	{}
 
-void OSetup::test_setup( void )
-	{
+void OSetup::test_setup( void ) {
 	M_PROLOG
 	if ( _quiet && _verbose )
 		yaal::tools::util::failure( 1,
 				_( "quiet and verbose options are exclusive\n" ) );
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

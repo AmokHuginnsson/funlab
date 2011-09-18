@@ -43,15 +43,13 @@ using namespace yaal::tools;
 using namespace yaal::tools::util;
 using namespace funlab;
 
-namespace funlab
-{
+namespace funlab {
 
 OSetup setup;
 
 }
 
-int main ( int argc_, char * argv_ [ ] )
-	{
+int main ( int argc_, char * argv_ [ ] ) {
 	M_AT_END_OF_SCOPE( HSignalService::get_instance().stop(); );
 	M_PROLOG
 /* variables declarations for main loop: */
@@ -59,8 +57,7 @@ int main ( int argc_, char * argv_ [ ] )
 	int ctr = 0, position = 0;
 	HString arrow;
 /* end. */
-	try
-		{
+	try {
 /* TO-DO: enter main loop code here */
 		HSignalService::get_instance();
 		setup._programName = argv_ [ 0 ];
@@ -69,42 +66,35 @@ int main ( int argc_, char * argv_ [ ] )
 		setup.test_setup();
 /*		if ( ! console::is_enabled() )enter_curses (); / * enabling ncurses ablilities*/
 /* *BOOM* */
-		if ( !! setup._formula )
-			{
+		if ( !! setup._formula ) {
 			HDetachedRenderer renderer;
 			HFunlab::ptr_t f( make_pointer<HFunlab>( &renderer ) );
 			HFunlab* pf( static_cast<HFunlab*>( f.get() ) );
 			opt = pf->push_formula( setup._formula ) ? 1 : 0;
-			if ( opt )
-				{
+			if ( opt ) {
 				position = pf->error_position();
 				for ( ctr = 0; ctr < position; ctr ++ )
 					arrow += '-';
 				arrow += 'v';
 				cerr << _( "Formula syntax error ...\n" ) << pf->error() << _( " at this place:\n" ) << arrow << "\n" << setup._formula << endl;
-				}
-			else
-				{
+			} else {
 				renderer.set_engine( f );
 				renderer.render_surface();
-				}
 			}
-		else
+		} else
 			opt = gui_start ( argc_, argv_ );
 		HConsole& cons = HConsole::get_instance();
 		if ( cons.is_enabled() )
 			cons.leave_curses (); /* ending ncurses sesion */
 /* ... there is the place main loop ends. :OD-OT */
-		}
-	catch ( ... )
-		{
+	} catch ( ... ) {
 		HConsole& cons = HConsole::get_instance();
 		if ( cons.is_enabled() )
 			cons.leave_curses (); /* ending ncurses sesion */
 		throw;
-		}
+	}
 	cerr << _( "Done" ) << endl;
 	return ( opt );
 	M_FINAL
-	}
+}
 

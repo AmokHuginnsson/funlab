@@ -31,11 +31,9 @@ Copyright:
 
 #include "events.hxx"
 
-namespace funlab
-{
+namespace funlab {
 
-class HRendererEngineInterface : public HKeyboardEventListener, public HMouseEventListener
-	{
+class HRendererEngineInterface : public HKeyboardEventListener, public HMouseEventListener {
 public:
 	using HKeyboardEventListener::on_event;
 	using HMouseEventListener::on_event;
@@ -43,10 +41,9 @@ public:
 	typedef yaal::hcore::HPointer<HRendererEngineInterface> ptr_t;
 protected:
 	virtual void do_draw_frame( void ) = 0;
-	};
+};
 
-class HRendererSurfaceInterface
-	{
+class HRendererSurfaceInterface {
 public:
 	typedef yaal::hcore::HPointer<HRendererSurfaceInterface> ptr_t;
 	virtual ~HRendererSurfaceInterface( void ) {}
@@ -69,10 +66,9 @@ protected:
 	virtual void do_line( double, double, double, double, yaal::u32_t ) = 0;
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t ) = 0;
 	virtual void do_clear( yaal::u32_t );
-	};
+};
 
-class HRendererSurfaceBase : public HRendererSurfaceInterface
-	{
+class HRendererSurfaceBase : public HRendererSurfaceInterface {
 protected:
 	HRendererEngineInterface::ptr_t _engine;
 public:
@@ -80,7 +76,7 @@ public:
 	void set_engine( HRendererEngineInterface::ptr_t );
 protected:
 	virtual HRendererEngineInterface::ptr_t do_get_engine( void );
-	};
+};
 
 }
 

@@ -27,8 +27,7 @@ Copyright:
 #ifndef OPTIONS_HXX_INCLUDED
 #define OPTIONS_HXX_INCLUDED
 
-namespace funlab
-{
+namespace funlab {
 
 int handle_program_options( int, char** );
 

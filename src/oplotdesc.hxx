@@ -31,11 +31,9 @@ Copyright:
 #include <yaal/tools/hexpression.hxx>
 #include <yaal/hcore/hstreaminterface.hxx>
 
-namespace funlab
-{
+namespace funlab {
 
-struct OPlotDesc
-	{
+struct OPlotDesc {
 	bool _3d;
 	double long _domainLowerBound;
 	double long _domainUpperBound;
@@ -44,7 +42,7 @@ struct OPlotDesc
 	yaal::hcore::HString _formula;
 	yaal::tools::HExpression _expression;
 	OPlotDesc( yaal::hcore::HString const& = yaal::hcore::HString() );
-	};
+};
 
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, OPlotDesc const& );
 OPlotDesc plot_desc_from_string( yaal::hcore::HString const& );

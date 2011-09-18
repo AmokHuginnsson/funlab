@@ -32,13 +32,11 @@ Copyright:
 #include "hrenderer.hxx"
 #include "events.hxx"
 
-namespace funlab
-{
+namespace funlab {
 
 class HDetachedRenderer;
 
-class HDetachedRenderer : public HRendererSurfaceBase
-	{
+class HDetachedRenderer : public HRendererSurfaceBase {
 protected:
 	/*{*/
 	bool _loop;
@@ -77,7 +75,7 @@ protected:
 private:
 	HDetachedRenderer( const HDetachedRenderer& );
 	HDetachedRenderer& operator = ( const HDetachedRenderer& );
-	};
+};
 
 }
 
