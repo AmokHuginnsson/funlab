@@ -83,7 +83,7 @@ HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 	int i = 0;
 	_trygo = memory::calloc<double>( TRYGO_BASE );
 	for ( i = 0; i < TRYGO_BASE; i ++ )
-		_trygo[ i ] = sin( ( ( double ) i * M_PI ) / static_cast<double>( 2 * TRYGO_BASE ) );
+		_trygo[ i ] = sin( static_cast<double>( i ) * M_PI ) / static_cast<double>( 2 * TRYGO_BASE );
 }
 
 HFunlab::~HFunlab( void ) {
@@ -178,8 +178,8 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 		return ( false );
 	if ( y == 0 )
 		return ( false );
-	_c = ( int ) ( -( x * _fOV ) / y );
-	_r = ( int ) ( -( z * _fOV ) / y );
+	_c = static_cast<int>( -( x * _fOV ) / y );
+	_r = static_cast<int>( -( z * _fOV ) / y );
 	_c = -_c;
 	_c += ( setup._resolutionX >> 1 );
 	_r = -_r;

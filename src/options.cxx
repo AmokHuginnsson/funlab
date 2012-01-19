@@ -41,11 +41,15 @@ using namespace yaal::tools;
 using namespace yaal::tools::util;
 
 namespace funlab {
+ 
+namespace {
 
 bool set_variables( HString& option_, HString& value_ ) {
 	::fprintf( stdout, "option: [%s], value: [%s]\n",
 			option_.raw(), value_.raw() );
 	return ( false );
+}
+
 }
 
 void version( void* ) __attribute__ ( ( __noreturn__ ) );

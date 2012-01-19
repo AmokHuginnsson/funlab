@@ -684,10 +684,21 @@ void HWindowMain::on_range_upper_bound_changed( void ) {
 	on_plot_data_changed();
 }
 
+namespace {
+
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+void fwd_g_warning( char const* msg_ ) {
+	g_warning( "%s", msg_ );
+	return;
+}
+#pragma GCC diagnostic error "-Wold-style-cast"
+
+}
+
 void HWindowMain::get_value_for_cell( Gtk::CellRenderer* cell, Gtk::TreeModel::iterator const& iter, Gtk::TreeModelColumn<OPlotDesc> const& col ) {
 	Gtk::CellRendererText* pTextRenderer = dynamic_cast<Gtk::CellRendererText*>(cell);
 	if( ! ( pTextRenderer && ( !! iter ) ) )
-		g_warning( "gtkmm: TextView: bad usage of value_getter." );
+		fwd_g_warning( "gtkmm: TextView: bad usage of value_getter." );
 	else
 		pTextRenderer->property_text() = iter->get_value( col )._formula.raw();
 }
