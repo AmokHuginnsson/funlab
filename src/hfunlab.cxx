@@ -26,7 +26,7 @@ Copyright:
 
 #include <iostream>
 
-#include <yaal/yaal.hxx>
+#include <yaal/tools/hexpression.hxx>
 M_VCSID( "$Id: "__ID__" $" )
 #include "hfunlab.hxx"
 
@@ -39,7 +39,7 @@ using namespace yaal::tools;
 
 namespace funlab {
 
-#define TRYGO_BASE 8192
+static int const TRYGO_BASE = 8192;
 
 HFunlab::HMesh::HMesh( void )
 	: _size( 0 ), _surfaces( 0 ),
@@ -261,7 +261,6 @@ void HFunlab::do_draw_frame( void ) {
 			}
 		}
 	}
-	usleep( 1000 );
 	_renderer->commit();
 	return;
 	M_EPILOG
