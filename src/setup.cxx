@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <libintl.h>
+#include <cstdio>
 
 #include <yaal/yaal.hxx>
 M_VCSID( "$Id: "__ID__" $" )
@@ -53,6 +54,10 @@ void OSetup::test_setup( void ) {
 	if ( _quiet && _verbose )
 		yaal::tools::util::failure( 1,
 				_( "quiet and verbose options are exclusive\n" ) );
+	if ( _verbose )
+		clog.reset( make_pointer<HFile>( stdout ) );
+	if ( _quiet )
+		cout.reset();
 	return;
 	M_EPILOG
 }

@@ -52,7 +52,11 @@ HDetachedRenderer::HDetachedRenderer( HKeyboardEventListener* keyboardEventListe
 	HString message;
 	if ( _activeSurfaces < 1 ) {
 		hcore::log << _( "Initializing SDL library " );
-		if ( ( error = SDL_Init( SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD ) ) < 0 ) {
+		u32_t flag( 0 );
+#ifdef SDL_INIT_EVENTTHREAD
+		flag = SDL_INIT_EVENTTHREAD;
+#endif /* #ifdef SDL_INIT_EVENTTHREAD */
+		if ( ( error = SDL_Init( SDL_INIT_VIDEO | flag ) ) < 0 ) {
 			message = _( "Couldn't initialize SDL: " );
 			message += SDL_GetError();
 			M_THROW( message, error );
@@ -352,7 +356,7 @@ void HDetachedRenderer::do_put_pixel( double x, double y, u32_t pixel ) {
 	M_EPILOG
 }
 
-void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32_t color ) {
+void HDetachedRenderer::do_line( double x1, double y1, double x2, double y2, u32_t color ) {
 	M_PROLOG
 /*
  * Implementation ripped from http://www.cs.unc.edu/~mcmillan/comp136/Lecture6/Lines.html
@@ -379,14 +383,14 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 
 	do {
 		edges0 = edges1 = edges = 0;
-		edges0 |= ( x0 < 0 ) ? EDGE_LEFT : 0;
-		edges0 |= ( y0 < 0 ) ? EDGE_TOP : 0;
-		edges0 |= ( x0 >= _width ) ? EDGE_RIGHT : 0;
-		edges0 |= ( y0 >= _height ) ? EDGE_BOTTOM : 0;
-		edges1 |= ( x1 < 0 ) ? EDGE_LEFT : 0;
-		edges1 |= ( y1 < 0 ) ? EDGE_TOP : 0;
-		edges1 |= ( x1 >= _width ) ? EDGE_RIGHT : 0;
-		edges1 |= ( y1 >= _height ) ? EDGE_BOTTOM : 0;
+		edges0 |= ( x1 < 0 ) ? EDGE_LEFT : 0;
+		edges0 |= ( y1 < 0 ) ? EDGE_TOP : 0;
+		edges0 |= ( x1 >= _width ) ? EDGE_RIGHT : 0;
+		edges0 |= ( y1 >= _height ) ? EDGE_BOTTOM : 0;
+		edges1 |= ( x2 < 0 ) ? EDGE_LEFT : 0;
+		edges1 |= ( y2 < 0 ) ? EDGE_TOP : 0;
+		edges1 |= ( x2 >= _width ) ? EDGE_RIGHT : 0;
+		edges1 |= ( y2 >= _height ) ? EDGE_BOTTOM : 0;
 		if ( edges0 & edges1 )
 			return;
 		if ( edges0 )
@@ -398,25 +402,25 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 
 		if ( edges & EDGE_LEFT ) {
 			cx = 0;
-			cy = y0 + ( y1 - y0 ) * ( 0 - x0 ) / ( x1 - x0 );
+			cy = y1 + ( y2 - y1 ) * ( 0 - x1 ) / ( x2 - x1 );
 		} else if ( edges & EDGE_TOP ) {
-			cx = x0 + ( x1 - x0 ) * ( 0 - y0 ) / ( y1 - y0 );
+			cx = x1 + ( x2 - x1 ) * ( 0 - y1 ) / ( y2 - y1 );
 			cy = 0;
 		} else if ( edges & EDGE_RIGHT ) {
 			cx = _width - 1;
-			cy = y0 + ( y1 - y0 ) * ( cx - x0 ) / ( x1 - x0 );
+			cy = y1 + ( y2 - y1 ) * ( cx - x1 ) / ( x2 - x1 );
 		} else if ( edges & EDGE_BOTTOM ) {
 			cy = _height - 1;
-			cx = x0 + ( x1 - x0 ) * ( cy - y0 ) / ( y1 - y0 );
+			cx = x1 + ( x2 - x1 ) * ( cy - y1 ) / ( y2 - y1 );
 		}
 		if ( edges0 )
-			x0 = cx, y0 = cy;
-		else
 			x1 = cx, y1 = cy;
+		else
+			x2 = cx, y2 = cy;
 	} while ( edges0 | edges1 );
 	
-	dx = x1 - x0;
-	dy = y1 - y0;
+	dx = x2 - x1;
+	dy = y2 - y1;
 
 	if ( dx < 0 )
 		dx = -dx, stepx = -1;
@@ -430,35 +434,35 @@ void HDetachedRenderer::do_line( double x0, double y0, double x1, double y1, u32
 	dx *= 2;
 	dy *= 2;
 
-	if ( ( x0 >= 0 ) && ( x0 < _width ) && ( y0 >= 0 ) && ( y0 < _height ) )
-		put_pixel( static_cast<int>( x0 ), static_cast<int>( y0 ), color );
+	if ( ( x1 >= 0 ) && ( x1 < _width ) && ( y1 >= 0 ) && ( y1 < _height ) )
+		put_pixel( static_cast<int>( x1 ), static_cast<int>( y1 ), color );
 	else
 		return;
 	if ( dx > dy ) {
 		fraction = dy - ( dx / 2 );
-		while ( ( ( stepx > 0 ) && ( x0 <= x1 ) ) || ( ( stepx < 0 ) && ( x0 >= x1 ) ) ) {
+		while ( ( ( stepx > 0 ) && ( x1 <= x2 ) ) || ( ( stepx < 0 ) && ( x1 >= x2 ) ) ) {
 			if ( fraction >= 0 ) {
-				y0 += stepy;
+				y1 += stepy;
 				fraction -= dx;
 			}
-			x0 += stepx;
+			x1 += stepx;
 			fraction += dy;
-			if ( ( x0 >= 0 ) && ( x0 < _width ) && ( y0 >= 0 ) && ( y0 < _height ) )
-				put_pixel( static_cast<int>( x0 ), static_cast<int>( y0 ), color );
+			if ( ( x1 >= 0 ) && ( x1 < _width ) && ( y1 >= 0 ) && ( y1 < _height ) )
+				put_pixel( static_cast<int>( x1 ), static_cast<int>( y1 ), color );
 			else
 				return;
 		}
 	} else {
 		fraction = dx - ( dy / 2 );
-		while ( ( ( stepy > 0 ) && ( y0 <= y1 ) ) || ( ( stepy < 0 ) && ( y0 >= y1 ) ) ) {
+		while ( ( ( stepy > 0 ) && ( y1 <= y2 ) ) || ( ( stepy < 0 ) && ( y1 >= y2 ) ) ) {
 			if ( fraction >= 0 ) {
-				x0 += stepx;
+				x1 += stepx;
 				fraction -= dy;
 			}
-			y0 += stepy;
+			y1 += stepy;
 			fraction += dx;
-			if ( ( x0 >= 0 ) && ( x0 < _width ) && ( y0 >= 0 ) && ( y0 < _height ) )
-				put_pixel( static_cast<int>( x0 ), static_cast<int>( y0 ), color );
+			if ( ( x1 >= 0 ) && ( x1 < _width ) && ( y1 >= 0 ) && ( y1 < _height ) )
+				put_pixel( static_cast<int>( x1 ), static_cast<int>( y1 ), color );
 			else
 				return;
 		}

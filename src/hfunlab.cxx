@@ -32,7 +32,6 @@ M_VCSID( "$Id: "__ID__" $" )
 
 #include "setup.hxx"
 
-using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -82,8 +81,9 @@ HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 	_error(), _errorIndex( 0 ) {
 	int i = 0;
 	_trygo = memory::calloc<double>( TRYGO_BASE );
-	for ( i = 0; i < TRYGO_BASE; i ++ )
-		_trygo[ i ] = sin( static_cast<double>( i ) * M_PI ) / static_cast<double>( 2 * TRYGO_BASE );
+	for ( i = 0; i < TRYGO_BASE; ++ i ) {
+		_trygo[ i ] = sin( static_cast<double>( i ) * static_cast<double>( math::PI ) / static_cast<double>( 2 * TRYGO_BASE ) );
+	}
 }
 
 HFunlab::~HFunlab( void ) {
@@ -93,10 +93,10 @@ HFunlab::~HFunlab( void ) {
 
 void HFunlab::generate_surface( void ) {
 	M_PROLOG
-	int size = _mesh.get_size();
+	int size( _mesh.get_size() );
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
 	if ( size && setup.f_b3D ) {
-		int formula = 0;
+		int formula( 0 );
 		for ( plots_t::iterator it = _plots.begin(); it != _plots.end(); ++ it, ++ formula ) {
 			double long* variables = it->_expression.variables();
 			_xVariable = ( variables + 'X' ) - 'A';
@@ -155,7 +155,9 @@ double HFunlab::cosq( int unsigned angle_ ) {
 
 bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _r ) {
 	M_PROLOG
-	double long x = 0, y = 0, z = 0;
+	double long x( 0 );
+	double long y( 0 );
+	double long z( 0 );
 	x = _x * _cosBeta * _cosGamma - _y * _sinGamma * _cosBeta - _z * _sinBeta;
 	y = _x * ( _cache._preCalcA - _cache._preCalcB * _cosGamma )
 		+ _y * ( _cache._preCalcC + _cache._preCalcB * _sinGamma )
@@ -168,7 +170,7 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 	z += _dZ;
 
 	if ( setup._stereo ) {
-		int alpha = ( _dX > 0 ) ? 3 : - 3;
+		int alpha( ( _dX > 0 ) ? 3 : - 3 );
 		double long ox = x;
 		x = x * cosq( alpha ) - y * sinq( alpha );
 		y = y * cosq( alpha ) + ox * sinq( alpha );

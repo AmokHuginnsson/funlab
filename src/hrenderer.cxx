@@ -29,6 +29,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hrenderer.hxx"
 
 using namespace yaal;
+using namespace yaal::hcore;
 
 namespace funlab {
 
