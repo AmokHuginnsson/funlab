@@ -82,7 +82,7 @@ HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 	int i = 0;
 	_trygo = memory::calloc<double>( TRYGO_BASE );
 	for ( i = 0; i < TRYGO_BASE; ++ i ) {
-		_trygo[ i ] = sin( static_cast<double>( i ) * static_cast<double>( math::PI ) / static_cast<double>( 2 * TRYGO_BASE ) );
+		_trygo[ i ] = sin( ( static_cast<double>( i ) * static_cast<double>( math::PI ) ) / static_cast<double>( 2 * TRYGO_BASE ) );
 	}
 }
 
