@@ -44,7 +44,7 @@ class HFunlab : public HRendererEngineInterface {
 	double _dX;
 	double _dY;
 	double _dZ;
-	double _fOV;
+	double _fov;
 	double long* _xVariable;
 	double long* _yVariable;
 
@@ -81,6 +81,8 @@ class HFunlab : public HRendererEngineInterface {
 	double _sinBeta;
 	double _cosGamma;
 	double _sinGamma;
+	double _cosParalax;
+	double _sinParalax;
 	struct OCache {
 		OCache( double a, double b, double c ) : _preCalcA( a ), _preCalcB( b ), _preCalcC( c ) {}
 		double _preCalcA;

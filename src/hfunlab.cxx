@@ -70,12 +70,13 @@ HFunlab::HMesh::OValue** HFunlab::HMesh::fast( int surface ) {
 HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 	: _red( 0 ), _green( 0 ), _blue( 0 ),
 	_angleX( 0 ), _angleY( 0 ), _angleZ( 0 ),
-	_dX( 0 ), _dY( 0 ), _dZ( 0 ), _fOV( 0 ),
+	_dX( 0 ), _dY( 0 ), _dZ( 0 ), _fov( 0 ),
 	_xVariable( NULL ), _yVariable( NULL ),
 	_mesh(), _node(),
 	_color( 0 ), _cosAlpha( 0 ), _sinAlpha( 0 ),
 	_cosBeta( 0 ), _sinBeta( 0 ),
 	_cosGamma( 0 ), _sinGamma( 0 ),
+	_cosParalax( 0 ), _sinParalax( 0 ),
 	_cache( 0, 0, 0 ), _trygo( NULL ),
 	_plots(), _renderer( renderer_ ),
 	_error(), _errorIndex( 0 ) {
@@ -127,8 +128,10 @@ void HFunlab::precalculate( int angle_ ) {
 	_sinAlpha = sinq( static_cast<int unsigned>( _angleX ) );
 	_cosBeta = cosq( static_cast<int unsigned>( _angleY ) );
 	_sinBeta = sinq( static_cast<int unsigned>( _angleY ) );
-	_cosGamma = cosq( static_cast<int unsigned>( _angleZ + angle_ ) );
-	_sinGamma = sinq( static_cast<int unsigned>( _angleZ + angle_ ) );
+	_cosGamma = cosq( static_cast<int unsigned>( _angleZ ) );
+	_sinGamma = sinq( static_cast<int unsigned>( _angleZ ) );
+	_cosParalax = cosq( angle_ );
+	_sinParalax = sinq( angle_ );
 	_cache._preCalcA = _cosAlpha * _sinGamma;
 	_cache._preCalcB = _sinAlpha * _sinBeta;
 	_cache._preCalcC = _cosAlpha * _cosGamma;
@@ -165,23 +168,23 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 	z = _x * ( _sinAlpha * _sinGamma + _sinBeta * _cache._preCalcC )
 		+ _y * ( _sinAlpha * _cosGamma - _sinBeta * _cache._preCalcA )
 		+ _z * _cosAlpha * _cosBeta;
+
+	if ( setup._stereo ) {
+		double long ox( x );
+		x = x * _cosParalax - y * _sinParalax;
+		y = y * _cosParalax + ox * _sinParalax;
+	}
+
 	x += _dX;
 	y += _dY;
 	z += _dZ;
-
-	if ( setup._stereo ) {
-		int alpha( ( _dX > 0 ) ? 3 : - 3 );
-		double long ox = x;
-		x = x * cosq( alpha ) - y * sinq( alpha );
-		y = y * cosq( alpha ) + ox * sinq( alpha );
-	}
 	
 	if ( y > 0 )
 		return ( false );
 	if ( y == 0 )
 		return ( false );
-	_c = static_cast<int>( -( x * _fOV ) / y );
-	_r = static_cast<int>( -( z * _fOV ) / y );
+	_c = static_cast<int>( -( x * _fov ) / y );
+	_r = static_cast<int>( -( z * _fov ) / y );
 	_c = -_c;
 	_c += ( setup._resolutionX >> 1 );
 	_r = -_r;
@@ -193,13 +196,16 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 void HFunlab::do_draw_frame( void ) {
 	M_PROLOG
 	int size = _mesh.get_size();
-	_fOV = 240.0;
-	_renderer->clear( _renderer->RGB( 0, 0, 0 ) );
+	_fov = setup._stereo ? 360.0 : 240.0;
+	if ( setup._stereo )
+		_renderer->clear( _renderer->RGB( 0xff, 0xff, 0xff ) );
+	else
+		_renderer->clear( _renderer->RGB( 0, 0, 0 ) );
 	precalculate();
 	u32_t red = 0, blue = 0;
 	if ( setup._stereo ) {
-		red = _renderer->RGB( 0x38, 0, 0 );
-		blue = _renderer->RGB( 0, 0, 0x80 );
+		red = _renderer->RGB( 0xff, 0x80, 0x80 );
+		blue = _renderer->RGB( 0, 0xff, 0xff );
 	}
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
 	if ( setup.f_b3D ) {
@@ -216,8 +222,8 @@ void HFunlab::do_draw_frame( void ) {
 				yaal::fill( nodes, nodes + size, ONode() );
 
 				for ( f = 0; f < ( setup._stereo ? 2 : 1 ); f ++ ) {
-					precalculate( setup._stereo ? ( f ? 320 : -320 ) : 0 );
-					_dX = setup._stereo ? ( f ? .5 : -.5 ) : 0;
+					precalculate( setup._stereo ? ( f ? -280 : 280 ) : 0 );
+//					_dX = setup._stereo ? ( f ? -.5 : .5 ) : 0;
 					y = setup._domainLowerBound;
 					for ( j = 0; j < size; ++ j ) {
 						x = setup._domainLowerBound;
