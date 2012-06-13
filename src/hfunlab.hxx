@@ -108,7 +108,7 @@ private:
 	double sinq( int unsigned );
 	double cosq( int unsigned );
 	bool T( double long, double long, double long, int&, int& );
-	void precalculate( void );
+	void precalculate( int = 0 );
 	void generate_surface( void );
 	void draw_axis( void );
 	virtual void do_draw_frame( void );

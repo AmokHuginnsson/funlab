@@ -122,13 +122,13 @@ void HFunlab::generate_surface( void ) {
 	M_EPILOG
 }
 
-void HFunlab::precalculate( void ) {
+void HFunlab::precalculate( int angle_ ) {
 	_cosAlpha = cosq( static_cast<int unsigned>( _angleX ) );
 	_sinAlpha = sinq( static_cast<int unsigned>( _angleX ) );
 	_cosBeta = cosq( static_cast<int unsigned>( _angleY ) );
 	_sinBeta = sinq( static_cast<int unsigned>( _angleY ) );
-	_cosGamma = cosq( static_cast<int unsigned>( _angleZ ) );
-	_sinGamma = sinq( static_cast<int unsigned>( _angleZ ) );
+	_cosGamma = cosq( static_cast<int unsigned>( _angleZ + angle_ ) );
+	_sinGamma = sinq( static_cast<int unsigned>( _angleZ + angle_ ) );
 	_cache._preCalcA = _cosAlpha * _sinGamma;
 	_cache._preCalcB = _sinAlpha * _sinBeta;
 	_cache._preCalcC = _cosAlpha * _cosGamma;
@@ -198,8 +198,8 @@ void HFunlab::do_draw_frame( void ) {
 	precalculate();
 	u32_t red = 0, blue = 0;
 	if ( setup._stereo ) {
-		red = _renderer->RGB( 0xff, 0, 0 );
-		blue = _renderer->RGB( 0, 0, 0xff );
+		red = _renderer->RGB( 0x38, 0, 0 );
+		blue = _renderer->RGB( 0, 0, 0x80 );
 	}
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
 	if ( setup.f_b3D ) {
@@ -216,7 +216,8 @@ void HFunlab::do_draw_frame( void ) {
 				yaal::fill( nodes, nodes + size, ONode() );
 
 				for ( f = 0; f < ( setup._stereo ? 2 : 1 ); f ++ ) {
-					_dX = setup._stereo ? ( f ? - 4 : 4 ) : 0;
+					precalculate( setup._stereo ? ( f ? 320 : -320 ) : 0 );
+					_dX = setup._stereo ? ( f ? .5 : -.5 ) : 0;
 					y = setup._domainLowerBound;
 					for ( j = 0; j < size; ++ j ) {
 						x = setup._domainLowerBound;
