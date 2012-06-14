@@ -58,7 +58,6 @@ bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event_ ) {
 		
 		_context->scale( allocation.get_width() / static_cast<double>( setup._resolutionX ),
 				allocation.get_height() / static_cast<double>( setup._resolutionY ) );
-		_context->set_line_width( 0.5 );
 //		_context->set_antialias( Cairo::ANTIALIAS_NONE );
 //		_context->set_line_cap( Cairo::LINE_CAP_ROUND );
 		_engine->draw_frame();
@@ -98,11 +97,13 @@ void HEmbeddedRenderer::do_clear( yaal::u32_t c ) {
 	if ( ! _lineBuffer._empty )
 		stroke_line_buffer();
 	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
-	if ( setup._stereo )
-		_context->set_operator( Cairo::OPERATOR_OVER );
-	else
-		_context->set_operator( Cairo::OPERATOR_SOURCE );
+	_context->set_operator( Cairo::OPERATOR_SOURCE );
 	_context->paint();
+	if ( setup._stereo ) {
+		_context->set_line_width( 1 );
+		_context->set_operator( static_cast<Cairo::Operator>( CAIRO_OPERATOR_MULTIPLY ) );
+	} else
+		_context->set_line_width( 0.5 );
 }
 
 void HEmbeddedRenderer::do_commit( void ) {

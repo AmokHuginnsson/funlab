@@ -196,7 +196,7 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 void HFunlab::do_draw_frame( void ) {
 	M_PROLOG
 	int size = _mesh.get_size();
-	_fov = setup._stereo ? 380.0 : 240.0;
+	_fov = setup._stereo ? 600.0 : 240.0;
 	if ( setup._stereo )
 		_renderer->clear( _renderer->RGB( 0xff, 0xff, 0xff ) );
 	else
@@ -204,8 +204,8 @@ void HFunlab::do_draw_frame( void ) {
 	precalculate();
 	u32_t red = 0, blue = 0;
 	if ( setup._stereo ) {
-		red = _renderer->RGB( 0xff, 0x80, 0x80 );
-		blue = _renderer->RGB( 0, 0xff, 0xff );
+		red = _renderer->RGB( 0xff, 0xb0, 0xb0 );
+		blue = _renderer->RGB( 0x50, 0xff, 0xff );
 	}
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
 	if ( setup.f_b3D ) {
@@ -219,9 +219,8 @@ void HFunlab::do_draw_frame( void ) {
 				double long x = 0, y = 0;
 				HMesh::OValue** values = _mesh.fast( sf );
 				ONode* nodes = _node.get<ONode>();
-				yaal::fill( nodes, nodes + size, ONode() );
-
 				for ( f = 0; f < ( setup._stereo ? 2 : 1 ); f ++ ) {
+					yaal::fill( nodes, nodes + size, ONode() );
 					precalculate( setup._stereo ? ( f ? -280 : 280 ) : 0 );
 					y = setup._domainLowerBound;
 					for ( j = 0; j < size; ++ j ) {

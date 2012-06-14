@@ -70,8 +70,8 @@ class HFunlab : public HRendererEngineInterface {
 	struct ONode {
 		int _col;
 		int _row;
-		int _valid;
-		ONode( void ) : _col( 0 ), _row( 0 ), _valid( 0 ) {}
+		bool _valid;
+		ONode( void ) : _col( 0 ), _row( 0 ), _valid( true ) {}
 	};
 	yaal::hcore::HChunk _node;
 	yaal::u32_t _color;
