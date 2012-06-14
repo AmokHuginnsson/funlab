@@ -100,7 +100,7 @@ void HEmbeddedRenderer::do_clear( yaal::u32_t c ) {
 	_context->set_operator( Cairo::OPERATOR_SOURCE );
 	_context->paint();
 	if ( setup._stereo ) {
-		_context->set_line_width( 1 );
+		_context->set_line_width( 0.8 );
 		_context->set_operator( static_cast<Cairo::Operator>( CAIRO_OPERATOR_MULTIPLY ) );
 	} else
 		_context->set_line_width( 0.5 );
@@ -180,6 +180,9 @@ bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev ) {
 			break;
 			case ( GDK_BUTTON3_MASK ):
 				e.set_button( HMouseEvent::BUTTON::B_3 );
+			break;
+			case ( GDK_BUTTON1_MASK | GDK_BUTTON3_MASK ):
+				e.set_button( static_cast<HMouseEvent::BUTTON::button_t>( HMouseEvent::BUTTON::B_1 | HMouseEvent::BUTTON::B_3 ) );
 			break;
 			default:
 				skip = true;

@@ -41,6 +41,7 @@ class HFunlab : public HRendererEngineInterface {
 	double _angleX;
 	double _angleY;
 	double _angleZ;
+	int _paralax;
 	double _dX;
 	double _dY;
 	double _dZ;

@@ -70,6 +70,7 @@ HFunlab::HMesh::OValue** HFunlab::HMesh::fast( int surface ) {
 HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
 	: _red( 0 ), _green( 0 ), _blue( 0 ),
 	_angleX( 0 ), _angleY( 0 ), _angleZ( 0 ),
+	_paralax( 160 ),
 	_dX( 0 ), _dY( 0 ), _dZ( 0 ), _fov( 0 ),
 	_xVariable( NULL ), _yVariable( NULL ),
 	_mesh(), _node(),
@@ -221,7 +222,7 @@ void HFunlab::do_draw_frame( void ) {
 				ONode* nodes = _node.get<ONode>();
 				for ( f = 0; f < ( setup._stereo ? 2 : 1 ); f ++ ) {
 					yaal::fill( nodes, nodes + size, ONode() );
-					precalculate( setup._stereo ? ( f ? -280 : 280 ) : 0 );
+					precalculate( setup._stereo ? ( f ? -_paralax : _paralax ) : 0 );
 					y = setup._domainLowerBound;
 					for ( j = 0; j < size; ++ j ) {
 						x = setup._domainLowerBound;
@@ -349,7 +350,7 @@ void HFunlab::do_on_event( HMouseEvent const* e ) {
 		}
 		break;
 		case ( HMouseEvent::TYPE::MOVE ): {
-			switch ( e->get_button() ) {
+			switch ( static_cast<int>( e->get_button() ) ) {
 				case ( HMouseEvent::BUTTON::B_1 ):
 					_angleZ += e->get_x() << 2;
 					_angleX -= e->get_y() << 2;
@@ -361,6 +362,13 @@ void HFunlab::do_on_event( HMouseEvent const* e ) {
 				break;
 				case ( HMouseEvent::BUTTON::B_3 ):
 					_angleY += e->get_x() << 2;
+				break;
+				case ( HMouseEvent::BUTTON::B_1 | HMouseEvent::BUTTON::B_3 ):
+					_paralax += e->get_y() << 2;
+					if ( _paralax < 0 )
+						_paralax = 0;
+					else if ( _paralax > 1024 )
+						_paralax = 1024;
 				break;
 				default:
 				break;
