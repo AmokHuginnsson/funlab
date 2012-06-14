@@ -196,7 +196,7 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 void HFunlab::do_draw_frame( void ) {
 	M_PROLOG
 	int size = _mesh.get_size();
-	_fov = setup._stereo ? 360.0 : 240.0;
+	_fov = setup._stereo ? 380.0 : 240.0;
 	if ( setup._stereo )
 		_renderer->clear( _renderer->RGB( 0xff, 0xff, 0xff ) );
 	else
@@ -223,7 +223,6 @@ void HFunlab::do_draw_frame( void ) {
 
 				for ( f = 0; f < ( setup._stereo ? 2 : 1 ); f ++ ) {
 					precalculate( setup._stereo ? ( f ? -280 : 280 ) : 0 );
-//					_dX = setup._stereo ? ( f ? -.5 : .5 ) : 0;
 					y = setup._domainLowerBound;
 					for ( j = 0; j < size; ++ j ) {
 						x = setup._domainLowerBound;

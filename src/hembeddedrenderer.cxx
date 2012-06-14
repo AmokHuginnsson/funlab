@@ -98,6 +98,10 @@ void HEmbeddedRenderer::do_clear( yaal::u32_t c ) {
 	if ( ! _lineBuffer._empty )
 		stroke_line_buffer();
 	_context->set_source_rgba( red( c ), green( c ), blue( c ), alpha( c ) );
+	if ( setup._stereo )
+		_context->set_operator( Cairo::OPERATOR_OVER );
+	else
+		_context->set_operator( Cairo::OPERATOR_SOURCE );
 	_context->paint();
 }
 
