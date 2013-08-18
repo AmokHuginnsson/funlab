@@ -25,7 +25,7 @@ Copyright:
 */
 
 #include <yaal/yaal.hxx>
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "oplotdesc.hxx"
 
 #include "setup.hxx"
@@ -41,7 +41,7 @@ OPlotDesc::OPlotDesc( yaal::hcore::HString const& formula )
 	_domainUpperBound( setup._domainUpperBound ),
 	_rangeLowerBound( setup._rangeLowerBound ),
 	_rangeUpperBound( setup._domainUpperBound ),
-	_formula( formula ) {
+	_formula( formula ), _expression() {
 }
 
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream, OPlotDesc const& plot ) {

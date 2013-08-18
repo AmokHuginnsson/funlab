@@ -27,7 +27,7 @@ Copyright:
 #include <iostream>
 
 #include <yaal/tools/hexpression.hxx>
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "hfunlab.hxx"
 
 #include "setup.hxx"

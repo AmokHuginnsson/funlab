@@ -25,10 +25,16 @@ Copyright:
 */
 
 #include <iostream>
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Weffc++"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
 #include <gtkmm.h>
+#pragma GCC diagnostic error "-Wredundant-decls"
+#pragma GCC diagnostic error "-Weffc++"
+#pragma GCC diagnostic error "-Wold-style-cast"
 
 #include <yaal/yaal.hxx>
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "hembeddedrenderer.hxx"
 #include "setup.hxx"
 #include "hfunlab.hxx"
@@ -39,7 +45,7 @@ using namespace yaal;
 namespace funlab {
 
 HEmbeddedRenderer::HEmbeddedRenderer( BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& )
-	: Gtk::DrawingArea( obj ), _lineBuffer(), _context() {
+	: Gtk::DrawingArea( obj ), _move(), _lineBuffer(), _context() {
 }
 
 HEmbeddedRenderer::~HEmbeddedRenderer( void ) {

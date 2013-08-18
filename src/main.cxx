@@ -28,7 +28,7 @@ Copyright:
 #include <libintl.h>
 #include <unistd.h>
 #include <yaal/yaal.hxx> /* all hAPI headers */
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 
 #include "setup.hxx"
 #include "options.hxx"

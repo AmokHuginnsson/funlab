@@ -39,6 +39,7 @@ DO_@DO_TARGET@=1
 EXEC_NAME    = 1exec
 CTAGS        = @CTAGS@
 GITID        = @GITID@
+override CXX_STANDARD=@CXX_STANDARD@
 
 include $(DIR_ROOT)/_aux/inc-helper-pre.mk
 
@@ -46,7 +47,7 @@ override CXXFLAGS += @EXTRA_CXXFLAGS@ @GUI_COMPILER_FLAGS@ @DEFS@
 override LXXFLAGS += @EXTRA_LXXFLAGS@ @GUI_LINKER_FLAGS@
 START_GROUP  = @START_GROUP@
 END_GROUP    = @END_GROUP@
-override CXXFLAGS := $(filter-out -Weffc++,$(filter-out -Werror,$(filter-out -Wredundant-decls,$(CXXFLAGS)))) # kurwa gtkmm ma problem z TimeVal::as_double()
+#override CXXFLAGS := $(filter-out -Weffc++,$(filter-out -Werror,$(filter-out -Wredundant-decls,$(CXXFLAGS)))) # kurwa gtkmm ma problem z TimeVal::as_double()
 
 include $(DIR_ROOT)/_aux/inc-helper-post.mk
 

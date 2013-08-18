@@ -115,6 +115,8 @@ private:
 	void generate_surface( void );
 	void draw_axis( void );
 	virtual void do_draw_frame( void );
+	HFunlab( HFunlab const& );
+	HFunlab& operator = ( HFunlab const& );
 };
 
 }

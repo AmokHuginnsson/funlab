@@ -72,6 +72,7 @@ class HRendererSurfaceBase : public HRendererSurfaceInterface {
 protected:
 	HRendererEngineInterface::ptr_t _engine;
 public:
+	HRendererSurfaceBase( void );
 	virtual ~HRendererSurfaceBase( void ) {}
 	void set_engine( HRendererEngineInterface::ptr_t );
 protected:

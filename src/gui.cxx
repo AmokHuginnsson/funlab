@@ -24,12 +24,18 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Weffc++"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
 #include <gtkmm.h>
 #include <cairomm/context.h>
+#pragma GCC diagnostic error "-Wredundant-decls"
+#pragma GCC diagnostic error "-Weffc++"
+#pragma GCC diagnostic error "-Wold-style-cast"
 #include <libintl.h>
 
 #include <yaal/yaal.hxx>
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "gui.hxx"
 
 #include "setup.hxx"
@@ -58,7 +64,7 @@ protected:
 	Gtk::TreeModelColumn<OPlotDesc> _formulasListFormulaColumn;
 	Gtk::TreeView* _formulasListView;
 	Gtk::Scale* _density;
-	Gtk::CheckButton* f_po3D;
+	Gtk::CheckButton* _3D;
 	Gtk::CheckButton* _multiFormula;
 	Gtk::CheckButton* _showAxis;
 	Gtk::CheckButton* _stereo;
@@ -81,8 +87,8 @@ protected:
 	void on_save_as( void );
 	void on_quit( void );
 	void on_about( void );
-	void on_add( void );
-	void on_remove( void );
+	void on_add_new( void );
+	void on_remove_existing( void );
 	void on_sel_changed( void );
 	void on_density_changed( void );
 	void on_show_axis_changed( void );
@@ -105,16 +111,21 @@ protected:
 	HFunlab* funlab( void );
 	void open( HString const& );
 	void save( HString const& );
+private:
+	HWindowMain( HWindowMain const& );
+	HWindowMain& operator = ( HWindowMain const& );
 };
 
 HWindowMain::HWindowMain( BaseObjectType* baseObject_,
 	Glib::RefPtr<Gtk::Builder> const& resources_ ) : Gtk::Window( baseObject_ ),
-	_lock( false ), _formulasListView( NULL ), _density( NULL ),
-	f_po3D( NULL ), _multiFormula( NULL ), _showAxis( NULL ),
+	_lock( false ), _formulasListModel(), _formulasListColumns(), _formulasListFormulaColumn(),
+	_formulasListView( NULL ), _density( NULL ),
+	_3D( NULL ), _multiFormula( NULL ), _showAxis( NULL ),
+	_stereo( NULL ),
 	_domainLowerBound( NULL ), _domainUpperBound( NULL ),
 	_rangeLowerBound( NULL ), _rangeUpperBound( NULL ),
-	_formula( NULL ),
-	_detachedRendererActive( false ), _detachedRenderer() {
+	_formula( NULL ), _dispatcher(),
+	_detachedRendererActive( false ), _embeddedRenderer( NULL ), _detachedRenderer() {
 	M_PROLOG
 	Gtk::ToolButton* toolButton = NULL;
 	Gtk::MenuItem* menuItem = NULL;
@@ -197,9 +208,9 @@ HWindowMain::HWindowMain( BaseObjectType* baseObject_,
 	resources_->get_widget( "FORMULA", _formula );
 	_formula->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_formula_changed ) );
 
-	resources_->get_widget( "MODE_3D", f_po3D );
-	f_po3D->set_active( setup.f_b3D );
-	f_po3D->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_3d_changed ) );
+	resources_->get_widget( "MODE_3D", _3D );
+	_3D->set_active( setup.f_b3D );
+	_3D->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_3d_changed ) );
 
 	_dispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );
 
@@ -234,18 +245,18 @@ HWindowMain::HWindowMain( BaseObjectType* baseObject_,
 
 	/* ADD */
 	resources_->get_widget( "ID_TOOLBAR_ADD", toolButton );
-	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_add ) );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_add_new ) );
 /*
    resources_->get_widget ( "ID_MENU_ADD", menuItem );
-   menuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_add ) );
+   menuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_add_new ) );
  */
 
 	/* REMOVE */
 	resources_->get_widget( "ID_TOOLBAR_REMOVE", toolButton );
-	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_remove ) );
+	toolButton->signal_clicked().connect( sigc::mem_fun( *this, &HWindowMain::on_remove_existing ) );
 /*
    resources_->get_widget ( "ID_MENU_REMOVE", menuItem );
-   menuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_remove ) );
+   menuItem->signal_activate().connect ( sigc::mem_fun ( * this, & HWindowMain::on_remove_existing ) );
  */
 	return;
 	M_EPILOG
@@ -379,7 +390,7 @@ void HWindowMain::on_about( void ) {
 	M_EPILOG
 }
 
-void HWindowMain::on_add( void ) {
+void HWindowMain::on_add_new( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 	Gtk::TreeIter iter = _formulasListModel->append();
@@ -389,7 +400,7 @@ void HWindowMain::on_add( void ) {
 	M_EPILOG
 }
 
-void HWindowMain::on_remove( void ) {
+void HWindowMain::on_remove_existing( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 
@@ -455,7 +466,7 @@ void HWindowMain::on_sel_changed( void ) {
 			if ( iter ) {
 				OPlotDesc plot = iter->get_value( _formulasListFormulaColumn );
 				_formula->set_text( plot._formula.raw() );
-				f_po3D->set_active( plot._3d );
+				_3D->set_active( plot._3d );
 				_domainLowerBound->set_value( static_cast<double>( plot._domainLowerBound ) );
 				_domainUpperBound->set_value( static_cast<double>( plot._domainUpperBound ) );
 				_rangeLowerBound->set_value( static_cast<double>( plot._rangeLowerBound ) );
@@ -484,10 +495,10 @@ bool HWindowMain::on_key_press( GdkEventKey* eventKey_ ) {
 	M_PROLOG
 	switch ( eventKey_->keyval ) {
 		case ( GDK_Delete ):
-			on_remove();
+			on_remove_existing();
 		break;
 		case ( GDK_Insert ):
-			on_add();
+			on_add_new();
 		break;
 		case ( ' ' ): {
 			Glib::RefPtr<Gtk::TreeSelection> selection = _formulasListView->get_selection();
@@ -615,7 +626,7 @@ void HWindowMain::on_multi_changed( void ) {
 
 void HWindowMain::on_plot_data_changed( void ) {
 	OPlotDesc plot;
-	plot._3d = f_po3D->get_active();
+	plot._3d = _3D->get_active();
 	plot._domainLowerBound = _domainLowerBound->get_value();
 	plot._domainUpperBound = _domainUpperBound->get_value();
 	plot._rangeLowerBound = _rangeLowerBound->get_value();
