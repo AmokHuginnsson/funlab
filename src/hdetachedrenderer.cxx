@@ -133,7 +133,7 @@ int HDetachedRenderer::init( int width_, int height_, int bpp_ ) {
 	M_EPILOG
 }
 
-void* HDetachedRenderer::run( void ) {
+void HDetachedRenderer::run( void ) {
 	M_PROLOG
 	SDL_Event l_uEvent;
 	while ( _loop && _thread.is_alive() ) {
@@ -219,7 +219,7 @@ void* HDetachedRenderer::run( void ) {
 			}
 		}
 	}
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

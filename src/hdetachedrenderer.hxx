@@ -54,7 +54,7 @@ public:
 	HDetachedRenderer( HKeyboardEventListener* = NULL );
 	virtual ~HDetachedRenderer ( void );
 	bool render_surface( void );
-	void* run( void );
+	void run( void );
 	void shutdown( void );
 	/*}*/
 private:
