@@ -27,8 +27,10 @@ Copyright:
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Weffc++"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #include <gtkmm.h>
 #include <cairomm/context.h>
+#pragma GCC diagnostic error "-Wnon-virtual-dtor"
 #pragma GCC diagnostic error "-Wredundant-decls"
 #pragma GCC diagnostic error "-Weffc++"
 #pragma GCC diagnostic error "-Wold-style-cast"
