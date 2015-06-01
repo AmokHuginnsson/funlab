@@ -211,7 +211,7 @@ HWindowMain::HWindowMain( BaseObjectType* baseObject_,
 	_formula->signal_changed().connect( sigc::mem_fun( *this, &HWindowMain::on_formula_changed ) );
 
 	resources_->get_widget( "MODE_3D", _3D );
-	_3D->set_active( setup.f_b3D );
+	_3D->set_active( setup._3D );
 	_3D->signal_toggled().connect( sigc::mem_fun( *this, &HWindowMain::on_3d_changed ) );
 
 	_dispatcher.connect( sigc::mem_fun( *this, &HWindowMain::shutdown_renderer ) );

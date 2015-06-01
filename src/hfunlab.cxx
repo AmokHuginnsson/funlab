@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hfunlab.cxx - this file is integral part of `funlab' project.
+  hfunlab.cxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -97,7 +97,7 @@ void HFunlab::generate_surface( void ) {
 	M_PROLOG
 	int size( _mesh.get_size() );
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
-	if ( size && setup.f_b3D ) {
+	if ( size && setup._3D ) {
 		int formula( 0 );
 		for ( plots_t::iterator it = _plots.begin(); it != _plots.end(); ++ it, ++ formula ) {
 			double long* variables = it->_expression.variables();
@@ -209,7 +209,7 @@ void HFunlab::do_draw_frame( void ) {
 		blue = _renderer->RGB( 0x50, 0xff, 0xff );
 	}
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
-	if ( setup.f_b3D ) {
+	if ( setup._3D ) {
 		if ( size ) {
 			if ( ! setup._stereo && setup._showAxis )
 				draw_axis();

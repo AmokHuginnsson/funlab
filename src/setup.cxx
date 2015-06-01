@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	setup.cxx - this file is integral part of `funlab' project.
+  setup.cxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -38,7 +38,7 @@ namespace funlab {
 OSetup::OSetup( void )
 	: _quiet( false ), _verbose( false ),
 		_stereo( false ),
-		f_b3D( true ), _showAxis( false ),
+		_3D( true ), _showAxis( false ),
 		_multiFormula( false ),
 		_density( 32 ), _resolutionX( 640 ),
 		_resolutionY( 480 ), _aspect( 1 ),

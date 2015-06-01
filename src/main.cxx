@@ -1,7 +1,7 @@
 /*
 ---            `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
 
-	main.cxx - this file is integral part of `funlab' project.
+  main.cxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -81,19 +81,14 @@ int main ( int argc_, char * argv_ [ ] ) {
 				renderer.set_engine( f );
 				renderer.render_surface();
 			}
-		} else
+		} else {
 			opt = gui_start ( argc_, argv_ );
-		HConsole& cons = HConsole::get_instance();
-		if ( cons.is_enabled() )
-			cons.leave_curses (); /* ending ncurses sesion */
+		}
+		cerr << _( "Done" ) << endl;
 /* ... there is the place main loop ends. :OD-OT */
-	} catch ( ... ) {
-		HConsole& cons = HConsole::get_instance();
-		if ( cons.is_enabled() )
-			cons.leave_curses (); /* ending ncurses sesion */
-		throw;
+	} catch ( int err ) {
+		opt = err;
 	}
-	cerr << _( "Done" ) << endl;
 	return ( opt );
 	M_FINAL
 }

@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	oplotdesc.cxx - this file is integral part of `funlab' project.
+  oplotdesc.cxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -36,7 +36,7 @@ using namespace yaal::hcore;
 namespace funlab {
 
 OPlotDesc::OPlotDesc( yaal::hcore::HString const& formula )
-	: _3d( setup.f_b3D ),
+	: _3d( setup._3D ),
 	_domainLowerBound( setup._domainLowerBound ),
 	_domainUpperBound( setup._domainUpperBound ),
 	_rangeLowerBound( setup._rangeLowerBound ),

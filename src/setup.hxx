@@ -1,7 +1,7 @@
 /*
 ---            `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski             ---
 
-	setup.hxx - this file is integral part of `funlab' project.
+  setup.hxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -43,7 +43,7 @@ struct OSetup {
 	bool _quiet;			/* --quiet, --silent */
 	bool _verbose;		/* --verbose */
 	bool _stereo;
-	bool f_b3D;
+	bool _3D;
 	bool _showAxis;
 	bool _multiFormula;
 	int _density;
