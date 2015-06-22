@@ -1,12 +1,12 @@
 /*
 ---             `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
 
-	gui.hxx - this file is integral part of `funlab' project.
+  gui.hxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
       of this software.
-	
+
 Copyright:
 
  You can use this software free of charge and you can redistribute its binary
@@ -29,7 +29,7 @@ Copyright:
 
 namespace funlab {
 
-int gui_start ( int, char * [] );
+int gui_start( int, char** );
 
 }
 

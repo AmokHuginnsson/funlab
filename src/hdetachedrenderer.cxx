@@ -1,12 +1,12 @@
 /*
 ---             `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski              ---
 
-	renderer.cxx - this file is integral part of `funlab' project.
+  renderer.cxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
       of this software.
-	
+
 Copyright:
 
  You can use this software free of charge and you can redistribute its binary
@@ -31,14 +31,13 @@ Copyright:
 #include <libintl.h>
 #include <SDL/SDL.h>
 
-#include <yaal/yaal.hxx>
+#include <yaal/hcore/hlog.hxx>
 M_VCSID( "$Id: " __ID__ " $" )
 #include "hdetachedrenderer.hxx"
 #include "setup.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
-using namespace yaal::tools;
 
 namespace funlab {
 
@@ -295,10 +294,11 @@ u32_t HDetachedRenderer::do_get_pixel( double x, double y ) {
 			return ( *reinterpret_cast<Uint16*>( rawMemory ) );
 		}
 		case ( 3 ): {
-			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN )
-				return ( rawMemory[ 0 ] << 16 | rawMemory[ 1 ] << 8 | rawMemory[ 2 ] );
-			else
-				return ( rawMemory[ 0 ] | rawMemory[ 1 ] << 8 | rawMemory[ 2 ] << 16 );
+			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN ) {
+				return ( static_cast<int unsigned>( rawMemory[ 0 ] ) << 16u | static_cast<int unsigned>( rawMemory[ 1 ] ) << 8u | rawMemory[ 2 ] );
+			} else {
+				return ( static_cast<int unsigned>( rawMemory[ 0 ] ) | static_cast<int unsigned>( rawMemory[ 1 ] ) << 8u | static_cast<int unsigned>( rawMemory[ 2 ] ) << 16u );
+			}
 		}
 		case ( 4 ): {
 			return ( *reinterpret_cast<u32_t*>( rawMemory ) );
@@ -328,20 +328,20 @@ void HDetachedRenderer::do_put_pixel( double x, double y, u32_t pixel ) {
 
 	switch ( surface->format->BytesPerPixel ) {
 		case ( 1 ):
-			( *rawMemory ) = static_cast<char>( pixel );
+			( *rawMemory ) = static_cast<u8_t>( pixel );
 		break;
 		case ( 2 ):
 			( *reinterpret_cast<Uint16*>( rawMemory ) ) = static_cast<Uint16>( pixel );
 		break;
 		case ( 3 ): {
 			if ( SDL_BYTEORDER == SDL_BIG_ENDIAN ) {
-				rawMemory[ 0 ] = static_cast<char>( ( pixel >> 16 ) & 0xff );
-				rawMemory[ 1 ] = static_cast<char>( ( pixel >> 8 ) & 0xff );
-				rawMemory[ 2 ] = static_cast<char>( pixel & 0xff );
+				rawMemory[ 0 ] = static_cast<u8_t>( ( pixel >> 16 ) & 0xff );
+				rawMemory[ 1 ] = static_cast<u8_t>( ( pixel >> 8 ) & 0xff );
+				rawMemory[ 2 ] = static_cast<u8_t>( pixel & 0xff );
 			} else {
-				rawMemory[ 0 ] = static_cast<char>( pixel & 0xff );
-				rawMemory[ 1 ] = static_cast<char>( ( pixel >> 8 ) & 0xff );
-				rawMemory[ 2 ] = static_cast<char>( ( pixel >> 16 ) & 0xff );
+				rawMemory[ 0 ] = static_cast<u8_t>( pixel & 0xff );
+				rawMemory[ 1 ] = static_cast<u8_t>( ( pixel >> 8 ) & 0xff );
+				rawMemory[ 2 ] = static_cast<u8_t>( ( pixel >> 16 ) & 0xff );
 			}
 		}
 		break;

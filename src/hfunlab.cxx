@@ -24,9 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <iostream>
+#include <cmath>
 
 #include <yaal/tools/hexpression.hxx>
+#include <yaal/hcore/math.hxx>
 M_VCSID( "$Id: " __ID__ " $" )
 #include "hfunlab.hxx"
 
@@ -131,8 +132,8 @@ void HFunlab::precalculate( int angle_ ) {
 	_sinBeta = sinq( static_cast<int unsigned>( _angleY ) );
 	_cosGamma = cosq( static_cast<int unsigned>( _angleZ ) );
 	_sinGamma = sinq( static_cast<int unsigned>( _angleZ ) );
-	_cosParalax = cosq( angle_ );
-	_sinParalax = sinq( angle_ );
+	_cosParalax = cosq( static_cast<int unsigned>( angle_ ) );
+	_sinParalax = sinq( static_cast<int unsigned>( angle_ ) );
 	_cache._preCalcA = _cosAlpha * _sinGamma;
 	_cache._preCalcB = _sinAlpha * _sinBeta;
 	_cache._preCalcC = _cosAlpha * _cosGamma;

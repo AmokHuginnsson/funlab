@@ -1,7 +1,7 @@
 /*
 ---           `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hembeddedrenderer.cxx - this file is integral part of `funlab' project.
+  hembeddedrenderer.cxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -35,7 +35,7 @@ Copyright:
 #pragma GCC diagnostic error "-Weffc++"
 #pragma GCC diagnostic error "-Wold-style-cast"
 
-#include <yaal/yaal.hxx>
+#include <yaal/hcore/base.hxx>
 M_VCSID( "$Id: " __ID__ " $" )
 #include "hembeddedrenderer.hxx"
 #include "setup.hxx"
@@ -63,7 +63,7 @@ bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event_ ) {
 			_context->clip();
 		}
 		Gtk::Allocation allocation = get_allocation();
-		
+
 		_context->scale( allocation.get_width() / static_cast<double>( setup._resolutionX ),
 				allocation.get_height() / static_cast<double>( setup._resolutionY ) );
 //		_context->set_antialias( Cairo::ANTIALIAS_NONE );

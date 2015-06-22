@@ -28,20 +28,18 @@ Copyright:
 #define SETUP_HXX_INCLUDED
 
 #include <iostream>
-#include <yaal/yaal.hxx>
+#include <yaal/hcore/hfile.hxx>
+#include <yaal/hcore/hfile.hxx>
 
 #include "config.hxx"
 
-#define out ( cout << __FILE__ + OSetup::PATH_OFFSET << ":" << __LINE__ << ": " )
+#define out ( yaal::hcore::cout << __FILE__ + OSetup::PATH_OFFSET << ":" << __LINE__ << ": " )
 
 namespace funlab {
 
-inline std::ostream& operator << ( std::ostream& o, yaal::hcore::HString const& s )
-	{ return ( o << s.raw() ); }
-
 struct OSetup {
-	bool _quiet;			/* --quiet, --silent */
-	bool _verbose;		/* --verbose */
+	bool _quiet;   /* --quiet, --silent */
+	bool _verbose; /* --verbose */
 	bool _stereo;
 	bool _3D;
 	bool _showAxis;

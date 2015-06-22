@@ -1,7 +1,7 @@
 /*
 ---       `funlab' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski         ---
 
-	gui.c.gtkmm - this file is integral part of `funlab' project.
+  gui.cxx - this file is integral part of `funlab' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -35,10 +35,11 @@ Copyright:
 #pragma GCC diagnostic error "-Weffc++"
 #pragma GCC diagnostic error "-Wold-style-cast"
 #include <libintl.h>
+#include <iostream>
 
-#include <yaal/yaal.hxx>
-M_VCSID( "$Id: " __ID__ " $" )
 #include "gui.hxx"
+#include <yaal/hcore/base.hxx>
+M_VCSID( "$Id: " __ID__ " $" )
 
 #include "setup.hxx"
 #include "hdetachedrenderer.hxx"
@@ -716,7 +717,7 @@ void HWindowMain::get_value_for_cell( Gtk::CellRenderer* cell, Gtk::TreeModel::i
 		pTextRenderer->property_text() = iter->get_value( col )._formula.raw();
 }
 
-int gui_start( int argc_, char* argv_[] ) {
+int gui_start( int argc_, char** argv_ ) {
 	M_PROLOG
 	try {
 		Gtk::Main gUI( argc_, argv_ );

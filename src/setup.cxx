@@ -27,9 +27,9 @@ Copyright:
 #include <libintl.h>
 #include <cstdio>
 
-#include <yaal/yaal.hxx>
-M_VCSID( "$Id: " __ID__ " $" )
 #include "setup.hxx"
+M_VCSID( "$Id: " __ID__ " $" )
+#include <yaal/tools/util.hxx>
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
