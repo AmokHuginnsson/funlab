@@ -262,7 +262,7 @@ void HDetachedRenderer::do_commit( void ) {
 		;
 	if ( SDL_MUSTLOCK( surface ) ) {
 		if ( SDL_LockSurface( surface ) < 0 )
-			hcore::log( LOG_TYPE::ERROR ) << "Can't lock screen: " << SDL_GetError() << endl;
+			hcore::log( LOG_LEVEL::ERROR ) << "Can't lock screen: " << SDL_GetError() << endl;
 	}
 	return;
 	M_EPILOG
