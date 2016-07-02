@@ -469,7 +469,6 @@ void HWindowMain::on_sel_changed( void ) {
 			if ( iter ) {
 				OPlotDesc plot = iter->get_value( _formulasListFormulaColumn );
 				_formula->set_text( plot._formula.raw() );
-				_3D->set_active( plot._3d );
 				_domainLowerBound->set_value( static_cast<double>( plot._domainLowerBound ) );
 				_domainUpperBound->set_value( static_cast<double>( plot._domainUpperBound ) );
 				_rangeLowerBound->set_value( static_cast<double>( plot._rangeLowerBound ) );
@@ -629,7 +628,7 @@ void HWindowMain::on_multi_changed( void ) {
 
 void HWindowMain::on_plot_data_changed( void ) {
 	OPlotDesc plot;
-	plot._3d = _3D->get_active();
+	setup._3D = _3D->get_active();
 	plot._domainLowerBound = _domainLowerBound->get_value();
 	plot._domainUpperBound = _domainUpperBound->get_value();
 	plot._rangeLowerBound = _rangeLowerBound->get_value();

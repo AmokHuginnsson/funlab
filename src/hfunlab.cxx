@@ -180,7 +180,7 @@ bool HFunlab::T( double long _x, double long _y, double long _z, int& _c, int& _
 	x += _dX;
 	y += _dY;
 	z += _dZ;
-	
+
 	if ( y > 0 )
 		return ( false );
 	if ( y == 0 )
@@ -210,10 +210,11 @@ void HFunlab::do_draw_frame( void ) {
 		blue = _renderer->RGB( 0x50, 0xff, 0xff );
 	}
 	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
+	if ( ! setup._stereo && setup._showAxis ) {
+		draw_axis();
+	}
 	if ( setup._3D ) {
 		if ( size ) {
-			if ( ! setup._stereo && setup._showAxis )
-				draw_axis();
 			int sfSize = static_cast<int>( _plots.size() );
 			for ( int sf = 0; sf < sfSize; ++ sf ) {
 				bool valid = false, oldvalid = false;
@@ -257,12 +258,13 @@ void HFunlab::do_draw_frame( void ) {
 			_xVariable = ( variables + 'X' ) - 'A';
 			( *_xVariable ) = it->_domainLowerBound;
 			gridSize = ( it->_domainUpperBound - it->_domainLowerBound ) / static_cast<double long>( setup._resolutionX );
-			double long oldVal = 0;
-			for ( int x = 0; x < setup._resolutionX; ++ x ) {
+			double long oldVal( 0 );
+			for ( int x( 0 ); x < setup._resolutionX; ++ x ) {
 				try {
-					double long val = static_cast<double long>( it->_expression.evaluate() ) * setup._resolutionY;
-					if ( x )
+					double long val = static_cast<double long>( it->_expression.evaluate() ) * ( it->_rangeUpperBound - it->_rangeLowerBound );
+					if ( x ) {
 						_renderer->line( x, - static_cast<double>( val ) + setup._resolutionY / 2, x - 1, - static_cast<double>( oldVal ) + setup._resolutionY / 2, _color );
+					}
 					oldVal = val;
 				} catch ( HExpressionException& ) {
 				}
@@ -277,62 +279,69 @@ void HFunlab::do_draw_frame( void ) {
 
 void HFunlab::draw_axis( void ) {
 	u32_t WHITE = 0xffffffff;
-	double long frac = 4.;
-	int x1, x2, y1, y2;
-	x1 = x2 = y1 = y2 = 0;
-	if ( T( 0, 0, 0, x1, y1 ) && T( 0, 0, setup._domainUpperBound, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( 0, 0, 0, x1, y1 ) && T( 0, setup._domainUpperBound, 0, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( 0, 0, 0, x1, y1 ) && T( setup._domainUpperBound, 0, 0, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	int size = _mesh.get_size();
-	double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
-	double long x = setup._domainLowerBound;
-	double long a = gridSize / frac;
-	for ( int i = 0; i < size; ++ i ) {
-		if ( T( x, - a, 0, x1, y1 ) && T( x, a, 0, x2, y2 ) )
+	if ( setup._3D ) {
+		double long frac( 4. );
+		int x1( 0 );
+		int x2( 0 );
+		int y1( 0 );
+		int y2( 0 );
+		if ( T( 0, 0, 0, x1, y1 ) && T( 0, 0, setup._domainUpperBound, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
-		if ( T( x, 0, - a, x1, y1 ) && T( x, 0, a, x2, y2 ) )
+		if ( T( 0, 0, 0, x1, y1 ) && T( 0, setup._domainUpperBound, 0, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
-		if ( T( - a, x, 0, x1, y1 ) && T( a, x, 0, x2, y2 ) )
+		if ( T( 0, 0, 0, x1, y1 ) && T( setup._domainUpperBound, 0, 0, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
-		if ( T( 0, x, - a, x1, y1 ) && T( 0, x, a, x2, y2 ) )
+		int size = _mesh.get_size();
+		double long gridSize = ( setup._domainUpperBound - setup._domainLowerBound ) / static_cast<double long>( size );
+		double long x = setup._domainLowerBound;
+		double long a = gridSize / frac;
+		for ( int i = 0; i < size; ++ i ) {
+			if ( T( x, - a, 0, x1, y1 ) && T( x, a, 0, x2, y2 ) )
+				_renderer->line( x1, y1, x2, y2, WHITE );
+			if ( T( x, 0, - a, x1, y1 ) && T( x, 0, a, x2, y2 ) )
+				_renderer->line( x1, y1, x2, y2, WHITE );
+			if ( T( - a, x, 0, x1, y1 ) && T( a, x, 0, x2, y2 ) )
+				_renderer->line( x1, y1, x2, y2, WHITE );
+			if ( T( 0, x, - a, x1, y1 ) && T( 0, x, a, x2, y2 ) )
+				_renderer->line( x1, y1, x2, y2, WHITE );
+			if ( T( - a, 0, x, x1, y1 ) && T( a, 0, x, x2, y2 ) )
+				_renderer->line( x1, y1, x2, y2, WHITE );
+			if ( T( 0, - a, x, x1, y1 ) && T( 0, a, x, x2, y2 ) )
+				_renderer->line( x1, y1, x2, y2, WHITE );
+			x += gridSize;
+		}
+		double long t = setup._domainUpperBound + a;
+		double long d = setup._domainUpperBound - a;
+		if ( T( t, 0, 0, x1, y1 ) && T( d, a, 0, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
-		if ( T( - a, 0, x, x1, y1 ) && T( a, 0, x, x2, y2 ) )
+		if ( T( t, 0, 0, x1, y1 ) && T( d, - a, 0, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
-		if ( T( 0, - a, x, x1, y1 ) && T( 0, a, x, x2, y2 ) )
+		if ( T( t, 0, 0, x1, y1 ) && T( d, 0, a, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
-		x += gridSize;
+		if ( T( t, 0, 0, x1, y1 ) && T( d, 0, - a, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+
+		if ( T( 0, t, 0, x1, y1 ) && T( a, d, 0, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+		if ( T( 0, t, 0, x1, y1 ) && T( - a, d, 0, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+		if ( T( 0, t, 0, x1, y1 ) && T( 0, d, a, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+		if ( T( 0, t, 0, x1, y1 ) && T( 0, d, - a, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+
+		if ( T( 0, 0, t, x1, y1 ) && T( a, 0, d, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+		if ( T( 0, 0, t, x1, y1 ) && T( - a, 0, d, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+		if ( T( 0, 0, t, x1, y1 ) && T( 0, a, d, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+		if ( T( 0, 0, t, x1, y1 ) && T( 0, - a, d, x2, y2 ) )
+			_renderer->line( x1, y1, x2, y2, WHITE );
+	} else {
+		_renderer->line( 0, setup._resolutionY / 2, setup._resolutionX, setup._resolutionY / 2, WHITE );
+		_renderer->line( setup._resolutionX / 2, 0, setup._resolutionX / 2, setup._resolutionY, WHITE );
 	}
-	double long t = setup._domainUpperBound + a;
-	double long d = setup._domainUpperBound - a;
-	if ( T( t, 0, 0, x1, y1 ) && T( d, a, 0, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( t, 0, 0, x1, y1 ) && T( d, - a, 0, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( t, 0, 0, x1, y1 ) && T( d, 0, a, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( t, 0, 0, x1, y1 ) && T( d, 0, - a, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-
-	if ( T( 0, t, 0, x1, y1 ) && T( a, d, 0, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( 0, t, 0, x1, y1 ) && T( - a, d, 0, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( 0, t, 0, x1, y1 ) && T( 0, d, a, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( 0, t, 0, x1, y1 ) && T( 0, d, - a, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-
-	if ( T( 0, 0, t, x1, y1 ) && T( a, 0, d, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( 0, 0, t, x1, y1 ) && T( - a, 0, d, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( 0, 0, t, x1, y1 ) && T( 0, a, d, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
-	if ( T( 0, 0, t, x1, y1 ) && T( 0, - a, d, x2, y2 ) )
-		_renderer->line( x1, y1, x2, y2, WHITE );
 }
 
 void HFunlab::do_on_event( HMouseEvent const* e ) {

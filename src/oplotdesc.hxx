@@ -34,7 +34,6 @@ Copyright:
 namespace funlab {
 
 struct OPlotDesc {
-	bool _3d;
 	double long _domainLowerBound;
 	double long _domainUpperBound;
 	double long _rangeLowerBound;
