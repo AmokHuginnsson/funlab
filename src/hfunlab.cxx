@@ -261,7 +261,7 @@ void HFunlab::do_draw_frame( void ) {
 			double long oldVal( 0 );
 			for ( int x( 0 ); x < setup._resolutionX; ++ x ) {
 				try {
-					double long val = static_cast<double long>( it->_expression.evaluate() ) * ( it->_rangeUpperBound - it->_rangeLowerBound );
+					double long val( static_cast<double long>( it->_expression.evaluate() ) * setup._resolutionY / ( it->_rangeUpperBound - it->_rangeLowerBound ) );
 					if ( x ) {
 						_renderer->line( x, - static_cast<double>( val ) + setup._resolutionY / 2, x - 1, - static_cast<double>( oldVal ) + setup._resolutionY / 2, _color );
 					}
@@ -278,8 +278,8 @@ void HFunlab::do_draw_frame( void ) {
 }
 
 void HFunlab::draw_axis( void ) {
-	u32_t WHITE = 0xffffffff;
 	if ( setup._3D ) {
+		u32_t WHITE = 0xffffffff;
 		double long frac( 4. );
 		int x1( 0 );
 		int x2( 0 );
@@ -339,8 +339,18 @@ void HFunlab::draw_axis( void ) {
 		if ( T( 0, 0, t, x1, y1 ) && T( 0, - a, d, x2, y2 ) )
 			_renderer->line( x1, y1, x2, y2, WHITE );
 	} else {
-		_renderer->line( 0, setup._resolutionY / 2, setup._resolutionX, setup._resolutionY / 2, WHITE );
-		_renderer->line( setup._resolutionX / 2, 0, setup._resolutionX / 2, setup._resolutionY, WHITE );
+		u32_t AXIS_COLOR( 0xdddddddd );
+		u32_t GRID_COLOR( 0x88888888 );
+		int stepX( static_cast<int>( setup._resolutionX / ( setup._domainUpperBound - setup._domainLowerBound ) ) );
+		for ( int i( 0 ); i < setup._resolutionX; i += stepX ) {
+			_renderer->line( i, 0, i, setup._resolutionY, GRID_COLOR );
+		}
+		int stepY( static_cast<int>( setup._resolutionY / ( setup._rangeUpperBound - setup._rangeLowerBound ) ) );
+		for ( int i( 0 ); i < setup._resolutionY; i += stepY ) {
+			_renderer->line( 0, i, setup._resolutionX, i, GRID_COLOR );
+		}
+		_renderer->line( 0, setup._resolutionY / 2, setup._resolutionX, setup._resolutionY / 2, AXIS_COLOR );
+		_renderer->line( setup._resolutionX / 2, 0, setup._resolutionX / 2, setup._resolutionY, AXIS_COLOR );
 	}
 }
 
