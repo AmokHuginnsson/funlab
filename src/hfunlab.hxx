@@ -100,7 +100,7 @@ public:
 	HFunlab( HRendererSurfaceInterface* );
 	virtual ~HFunlab( void );
 	bool push_formula( OPlotDesc );
-	char const* error( void ) const;
+	yaal::hcore::HString const& error( void ) const;
 	int error_position( void ) const;
 	void regen_cache( int );
 	void clear( void );

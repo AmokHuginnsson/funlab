@@ -39,6 +39,7 @@ Copyright:
 
 #include "gui.hxx"
 #include <yaal/hcore/base.hxx>
+#include <yaal/hcore/hformat.hxx>
 M_VCSID( "$Id: " __ID__ " $" )
 
 #include "setup.hxx"
@@ -107,7 +108,7 @@ protected:
 	void update_drawing( bool = true );
 	bool on_key_press( GdkEventKey* );
 	virtual void do_on_event( HKeyboardEvent const* );
-	void show_error_message( char const* const, char const* const, int );
+	void show_error_message( HString const&, HString const&, int );
 	void set_font_all( Pango::FontDescription const&, Gtk::Widget* );
 	void selected_row_callback( Gtk::TreeModel::iterator const& );
 	static void get_value_for_cell( Gtk::CellRenderer*, Gtk::TreeModel::iterator const&, Gtk::TreeModelColumn<OPlotDesc> const& );
@@ -383,10 +384,11 @@ void HWindowMain::on_about( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
 	HString msg;
-	msg.format( _( "The funlab program, very fancy GUI application that\n"
+	msg = format( _( "The funlab program, very fancy GUI application that\n"
 			"can be used for rendering function surfaces.\n"
 			"Welcome to funlab %s" ), PACKAGE_STRING );
-	Gtk::MessageDialog messageAbout( *this, msg.raw() );
+	HUTF8String utf8( msg );
+	Gtk::MessageDialog messageAbout( *this, utf8.c_str() );
 	messageAbout.set_title( _( "About funlab" ) );
 	messageAbout.run();
 	return;
@@ -462,13 +464,14 @@ void HWindowMain::on_sel_changed( void ) {
 	HFunlab* f = funlab();
 	if ( f ) {
 		f->clear();
-		if ( selection->get_mode() == Gtk::SELECTION_MULTIPLE )
+		if ( selection->get_mode() == Gtk::SELECTION_MULTIPLE ) {
 			selection->selected_foreach_iter( sigc::mem_fun( *this, &HWindowMain::selected_row_callback ) );
-		else {
+		} else {
 			Gtk::TreeIter iter = selection->get_selected();
 			if ( iter ) {
 				OPlotDesc plot = iter->get_value( _formulasListFormulaColumn );
-				_formula->set_text( plot._formula.raw() );
+				HUTF8String utf8( plot._formula );
+				_formula->set_text( utf8.c_str() );
 				_domainLowerBound->set_value( static_cast<double>( plot._domainLowerBound ) );
 				_domainUpperBound->set_value( static_cast<double>( plot._domainUpperBound ) );
 				_rangeLowerBound->set_value( static_cast<double>( plot._rangeLowerBound ) );
@@ -512,10 +515,11 @@ bool HWindowMain::on_key_press( GdkEventKey* eventKey_ ) {
 				HRendererEngineInterface::ptr_t dre( make_pointer<HFunlab>( &*_detachedRenderer ) );
 				dr->set_engine( dre );
 				HFunlab* f = dynamic_cast<HFunlab*>( &(*dr->get_engine() ) );
-				if ( f && f->push_formula( plot ) )
-					show_error_message( plot._formula.raw(), f->error(), f->error_position() );
-				else
+				if ( f && f->push_formula( plot ) ) {
+					show_error_message( plot._formula, f->error(), f->error_position() );
+				} else {
 					dr->render_surface();
+				}
 				_detachedRendererActive = true;
 			}
 		}
@@ -541,19 +545,22 @@ void HWindowMain::do_on_event( HKeyboardEvent const* e ) {
 	return;
 }
 
-void HWindowMain::show_error_message( char const* const formula_,
-	char const* const message_, int position_ ) {
+void HWindowMain::show_error_message( HString const& formula_,
+	HString const& message_, int position_ ) {
 	M_PROLOG
 	int ctr = 0;
 	HString error, arrow;
-	for ( ctr = 0; ctr < position_; ctr ++ )
+	for ( ctr = 0; ctr < position_; ctr ++ ) {
 		arrow += '-';
+	}
 	arrow += 'v';
-	error.format( "<b>%s at this place:<tt>\n\n%s\n%s</tt></b>",
-		message_, arrow.raw(),
-		formula_ );
-	Gtk::MessageDialog info( *this,
-			error.raw(), true );
+	error = format(
+		"<b>%s at this place:<tt>\n\n%s\n%s</tt></b>",
+		message_, arrow,
+		formula_
+	);
+	HUTF8String utf8( error );
+	Gtk::MessageDialog info( *this, utf8.c_str(), true );
 	info.set_title( _( "Formula syntax error ..." ) );
 	Pango::FontDescription fontDesc( "Sans Bold 14" );
 	set_font_all( fontDesc, &info );
@@ -710,17 +717,20 @@ void fwd_g_warning( char const* msg_ ) {
 
 void HWindowMain::get_value_for_cell( Gtk::CellRenderer* cell, Gtk::TreeModel::iterator const& iter, Gtk::TreeModelColumn<OPlotDesc> const& col ) {
 	Gtk::CellRendererText* pTextRenderer = dynamic_cast<Gtk::CellRendererText*>(cell);
-	if( ! ( pTextRenderer && ( !! iter ) ) )
+	if( ! ( pTextRenderer && ( !! iter ) ) ) {
 		fwd_g_warning( "gtkmm: TextView: bad usage of value_getter." );
-	else
-		pTextRenderer->property_text() = iter->get_value( col )._formula.raw();
+	} else {
+		HUTF8String utf8( iter->get_value( col )._formula );
+		pTextRenderer->property_text() = utf8.c_str();
+	}
 }
 
 int gui_start( int argc_, char** argv_ ) {
 	M_PROLOG
 	try {
 		Gtk::Main gUI( argc_, argv_ );
-		Glib::RefPtr<Gtk::Builder> resources( Gtk::Builder::create_from_file( setup._resourcePath.raw() ) );
+		HUTF8String utf8( setup._resourcePath );
+		Glib::RefPtr<Gtk::Builder> resources( Gtk::Builder::create_from_file( utf8.c_str() ) );
 		HWindowMain* windowMain = NULL;
 		resources->get_widget_derived( "WINDOW_MAIN", windowMain );
 		gUI.run( *windowMain );

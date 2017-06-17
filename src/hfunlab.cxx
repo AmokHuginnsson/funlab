@@ -42,8 +42,10 @@ namespace funlab {
 static int const TRYGO_BASE = 8192;
 
 HFunlab::HMesh::HMesh( void )
-	: _size( 0 ), _surfaces( 0 ),
-	_values(), _valuesBackbone() {
+	: _size( 0 )
+	, _surfaces( 0 )
+	, _values()
+	, _valuesBackbone() {
 }
 
 void HFunlab::HMesh::set_size( int size, int surfaces ) {
@@ -467,9 +469,9 @@ void HFunlab::regen_cache( int size ) {
 	M_EPILOG
 }
 
-char const* HFunlab::error( void ) const {
+HString const& HFunlab::error( void ) const {
 	M_PROLOG
-	return ( _error.raw() );
+	return ( _error );
 	M_EPILOG
 }
 
