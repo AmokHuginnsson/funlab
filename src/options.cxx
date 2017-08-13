@@ -67,7 +67,8 @@ void version( void ) {
 int handle_program_options( int argc_, char** argv_ ) {
 	M_PROLOG
 	HProgramOptionsHandler po;
-	OOptionInfo info( po, setup._programName, "renders three dimensional function surfaces", NULL );
+	HOptionInfo info( po );
+	info.name( setup._programName ).intro( "renders three dimensional function surfaces" );
 	bool help( false );
 	bool conf( false );
 	bool vers( false );
