@@ -24,20 +24,17 @@ namespace funlab {
 
 HEmbeddedRenderer::HEmbeddedRenderer( BaseObjectType* obj, Glib::RefPtr<Gtk::Builder> const& )
 	: Gtk::DrawingArea( obj ), _move(), _lineBuffer(), _context() {
+	clog << __PRETTY_FUNCTION__ << endl;
 }
 
 HEmbeddedRenderer::~HEmbeddedRenderer( void ) {
+	clog << __PRETTY_FUNCTION__ << endl;
 }
 
-bool HEmbeddedRenderer::on_expose_event( GdkEventExpose* event_ ) {
+bool HEmbeddedRenderer::on_draw( Cairo::RefPtr<Cairo::Context> const& event_ ) {
 	Glib::RefPtr<Gdk::Window> window = get_window();
 	if ( window ) {
-		_context = window->create_cairo_context();
-		if ( event_ ) {
-			_context->rectangle( event_->area.x, event_->area.y,
-					event_->area.width, event_->area.height );
-			_context->clip();
-		}
+		_context = event_;
 		Gtk::Allocation allocation = get_allocation();
 
 		_context->scale( allocation.get_width() / static_cast<double>( setup._resolutionX ),

@@ -260,12 +260,12 @@ void HWindowMain::on_new( void ) {
 void HWindowMain::on_open( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
-	Gtk::FileFilter fileFilter;
+	Glib::RefPtr<Gtk::FileFilter> fileFilter( Gtk::FileFilter::create() );
 	Gtk::FileChooserDialog fileOpenDialog( *this, _( "Select formulas file to open ..." ), Gtk::FILE_CHOOSER_ACTION_OPEN );
 	fileOpenDialog.set_local_only( true );
 	fileOpenDialog.set_select_multiple( false );
-	fileFilter.set_name( _( "Function formulas." ) );
-	fileFilter.add_pattern( "*.fun" );
+	fileFilter->set_name( _( "Function formulas." ) );
+	fileFilter->add_pattern( "*.fun" );
 	fileOpenDialog.add_filter( fileFilter );
 	fileOpenDialog.add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
 	fileOpenDialog.add_button( Gtk::Stock::OPEN, Gtk::RESPONSE_OK );
@@ -315,12 +315,12 @@ void HWindowMain::open( HString const& path_ ) {
 void HWindowMain::on_save_as( void ) {
 	M_PROLOG
 	HLocker lock( _lock );
-	Gtk::FileFilter fileFilter;
+	Glib::RefPtr<Gtk::FileFilter> fileFilter( Gtk::FileFilter::create() );
 	Gtk::FileChooserDialog fileOpenDialog( *this, _( "Enter file name to save Your formulas ..." ), Gtk::FILE_CHOOSER_ACTION_SAVE );
 	fileOpenDialog.set_local_only( true );
 	fileOpenDialog.set_select_multiple( false );
-	fileFilter.set_name( _( "Function formulas." ) );
-	fileFilter.add_pattern( "*.fun" );
+	fileFilter->set_name( _( "Function formulas." ) );
+	fileFilter->add_pattern( "*.fun" );
 	fileOpenDialog.add_filter( fileFilter );
 	fileOpenDialog.add_button( Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL );
 	fileOpenDialog.add_button( Gtk::Stock::SAVE, Gtk::RESPONSE_OK );
@@ -475,10 +475,10 @@ void HWindowMain::update_drawing( bool full ) {
 bool HWindowMain::on_key_press( GdkEventKey* eventKey_ ) {
 	M_PROLOG
 	switch ( eventKey_->keyval ) {
-		case ( GDK_Delete ):
+		case ( GDK_KEY_Delete ):
 			on_remove_existing();
 		break;
-		case ( GDK_Insert ):
+		case ( GDK_KEY_Insert ):
 			on_add_new();
 		break;
 		case ( ' ' ): {
@@ -550,7 +550,7 @@ void HWindowMain::set_font_all( Pango::FontDescription const& fontDesc_,
 	M_PROLOG
 	if ( !widget_ )
 		return;
-	widget_->modify_font( fontDesc_ );
+	widget_->override_font( fontDesc_ );
 	Gtk::Dialog* dialog = dynamic_cast<Gtk::Dialog*>( widget_ );
 	Gtk::Box* box = dynamic_cast<Gtk::Box*>( widget_ );
 	Gtk::Window* window = dynamic_cast<Gtk::Window*>( widget_ );
@@ -566,10 +566,11 @@ void HWindowMain::set_font_all( Pango::FontDescription const& fontDesc_,
 		      childIterator != children.end(); ++ childIterator )
 			set_font_all( fontDesc_, *childIterator );
 	} else if ( box ) {
-		Gtk::Box_Helpers::BoxList& boxList = box->children();
-		for ( Gtk::Box_Helpers::BoxList::iterator boxIterator = boxList.begin();
+		typedef std::vector<Gtk::Widget*> children_t;
+		children_t boxList = box->get_children();
+		for ( children_t::iterator boxIterator = boxList.begin();
 		      boxIterator != boxList.end(); ++ boxIterator )
-			set_font_all( fontDesc_, boxIterator->get_widget() );
+			set_font_all( fontDesc_, *boxIterator );
 
 		Glib::ListHandle<Widget*> children = box->get_children();
 		for ( Glib::ListHandle<Widget*>::iterator childIterator = children.begin();

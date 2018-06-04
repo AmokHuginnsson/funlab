@@ -28,7 +28,7 @@ public:
 	virtual ~HEmbeddedRenderer( void );
 	void invoke_refresh( bool );
 protected:
-	virtual bool on_expose_event( GdkEventExpose* );
+	virtual bool on_draw( Cairo::RefPtr<Cairo::Context> const& );
 	virtual bool on_button_press_event( GdkEventButton* );
 	virtual bool on_scroll_event( GdkEventScroll* );
 	virtual bool on_motion_notify_event( GdkEventMotion* );
