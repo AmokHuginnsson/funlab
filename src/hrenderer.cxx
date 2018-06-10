@@ -33,10 +33,6 @@ void HRendererSurfaceInterface::commit( void ) {
 	do_commit();
 }
 
-void HRendererSurfaceInterface::put_pixel( double x, double y, u32_t c ) {
-	do_put_pixel( x, y, c );
-}
-
 void HRendererSurfaceInterface::line( double x1, double y1, double x2, double y2, u32_t c ) {
 	do_line( x1, y1, x2, y2, c );
 }

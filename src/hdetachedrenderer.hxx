@@ -8,18 +8,26 @@
 #include "hrenderer.hxx"
 #include "events.hxx"
 
+struct SDL_Window;
+struct SDL_Renderer;
+struct SDL_Texture;
+
 namespace funlab {
 
 class HDetachedRenderer;
 
 class HDetachedRenderer : public HRendererSurfaceBase {
+public:
+	typedef yaal::hcore::HResource<SDL_Window, void (*)(SDL_Window*)> sdl_window_t;
+	typedef yaal::hcore::HResource<SDL_Renderer, void (*)(SDL_Renderer*)> sdl_renderer_t;
 protected:
 	/*{*/
 	bool _loop;
-	void* _handler;
+	bool _fullscreen;
+	sdl_window_t _window;
+	sdl_renderer_t _renderer;
 	int	_width;
 	int _height;
-	int _bPP;
 	yaal::hcore::HSemaphore _semaphore;
 	yaal::hcore::HThread _thread;
 	HKeyboardEventListener* _keyboardEventListener;
@@ -34,7 +42,7 @@ public:
 	void shutdown( void );
 	/*}*/
 private:
-	int init( int, int, int = 32 );
+	int init( int, int );
 	void down( void );
 	void toggle_fullscreen( void );
 protected:
@@ -42,8 +50,6 @@ protected:
 	virtual double do_get_width( void ) const;
 	virtual double do_get_height( void ) const;
 	virtual void do_commit( void );
-	virtual void do_put_pixel( double, double, yaal::u32_t );
-	virtual yaal::u32_t do_get_pixel( double, double );
 	virtual void do_line( double, double, double, double, yaal::u32_t );
 	virtual void do_fill_rect( double, double, double, double, yaal::u32_t );
 	virtual yaal::u32_t do_RGB( yaal::u8_t, yaal::u8_t, yaal::u8_t );

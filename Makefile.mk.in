@@ -26,7 +26,7 @@ include $(DIR_ROOT)/_aux/mk/10_basic.mk
 LIBS           = yaal_hcore$(LIB_INFIX) yaal_tools$(LIB_INFIX) yaal_dbwrapper$(LIB_INFIX) \
 								 yaal_hconsole$(LIB_INFIX) yaal_hdata$(LIB_INFIX) yaal_hconsole$(LIB_INFIX) \
 								 yaal_dbwrapper$(LIB_INFIX) yaal_tools$(LIB_INFIX) yaal_hcore$(LIB_INFIX) \
-                 SDL @GUI_LIBS@ pthread
+                 @SDL2_LIBS@ @GTKMM_LIBS@ pthread
 $(eval $(call NEW_TARGET,funlab,src))
 DO_@DO_TARGET@=1
 EXEC_NAME    = 1exec
@@ -40,8 +40,7 @@ EXTRA_INCLUDE_PATHS=@EXTRA_INCLUDE_PATHS@
 EXTRA_LIBRARY_PATHS=@EXTRA_LIBRARY_PATHS@
 override EXTRA_CXXFLAGS+=@EXTRA_CXXFLAGS@
 override EXTRA_LXXFLAGS+=@EXTRA_LXXFLAGS@
-override CXXFLAGS += @GUI_COMPILER_FLAGS@ @DEFS@
-override LXXFLAGS += @GUI_LINKER_FLAGS@
+override CXXFLAGS += @GTKMM_CFLAGS@ @DEFS@
 START_GROUP  = @START_GROUP@
 END_GROUP    = @END_GROUP@
 

@@ -5,10 +5,14 @@ dnl This macro has to be here due to primitivism of libtoolize.
 AC_CONFIG_AUX_DIR([_aux])
 m4_include([_aux/client-configure.m4])
 YAAL_CONFIGURE_CLIENT_INIT(funlab,MY_PACKAGE_VERSION)
-GUI_LIBS=$(pkg-config --list-all | awk '/gtkmm/{print $1}' | xargs pkg-config --libs-only-l)
-GUI_COMPILER_FLAGS=$(pkg-config --list-all | awk '/gtkmm/{print $1}' | xargs pkg-config --cflags --libs-only-other)
-GUI_LINKER_FLAGS=$(pkg-config --list-all | awk '/gtkmm/{print $1}' | xargs pkg-config --libs-only-other --libs-only-L)
-AC_SUBST([GUI_LIBS],$GUI_LIBS)
-AC_SUBST([GUI_COMPILER_FLAGS],$GUI_COMPILER_FLAGS)
-AC_SUBST([GUI_LINKER_FLAGS],$GUI_LINKER_FLAGS)
+
+m4_ifndef([PKG_PROG_PKG_CONFIG], [m4_fatal([Cannot self-test for pkg-config, macro PKG_PROG_PKG_CONFIG is not available.])])
+PKG_PROG_PKG_CONFIG()
+if test ["x${PKG_CONFIG}"] = ["x"] ; then
+	AC_MSG_ERROR([Cannot continue without pkg-config.])
+fi
+PKG_CHECK_MODULES(GTKMM, [gtkmm-3.0],,[AC_MSG_ERROR([Cannot continue without gtkmm library.])])
+PKG_CHECK_MODULES(SDL2, [sdl2],,[AC_MSG_ERROR([Cannot continue without SDL2 library.])])
+
 YAAL_CONFIGURE_CLIENT_FINALIZE
+
