@@ -148,8 +148,8 @@ void HDetachedRenderer::run( void ) {
 		if ( SDL_WaitEvent( &l_uEvent ) ) {
 			switch ( l_uEvent.type ) {
 				case ( SDL_MOUSEMOTION ): {
-					int dx = yaal::abs( l_uEvent.motion.xrel );
-					int dy = yaal::abs( l_uEvent.motion.yrel );
+					int dx = yaal::math::abs( l_uEvent.motion.xrel );
+					int dy = yaal::math::abs( l_uEvent.motion.yrel );
 					if ( ( dx < ( setup._resolutionX >> 1 ) ) && ( dy < ( setup._resolutionY >> 1 ) ) ) {
 						HMouseEvent e( HMouseEvent::TYPE::MOVE );
 						e.set_pos( l_uEvent.motion.xrel, l_uEvent.motion.yrel );

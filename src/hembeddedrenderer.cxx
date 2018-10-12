@@ -146,8 +146,8 @@ bool HEmbeddedRenderer::on_scroll_event( GdkEventScroll* ev ) {
 bool HEmbeddedRenderer::on_motion_notify_event( GdkEventMotion* ev ) {
 	int nx = static_cast<int>( ev->x );
 	int ny = static_cast<int>( ev->y );
-	int dx = yaal::abs( nx - _move._x );
-	int dy = yaal::abs( ny - _move._y );
+	int dx = yaal::math::abs( nx - _move._x );
+	int dy = yaal::math::abs( ny - _move._y );
 
 	if ( ( dx < ( setup._resolutionX >> 1 ) ) && ( dy < ( setup._resolutionY >> 1 ) ) ) {
 		HMouseEvent e( HMouseEvent::TYPE::MOVE );
