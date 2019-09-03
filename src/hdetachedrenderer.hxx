@@ -35,7 +35,7 @@ protected:
 	/*}*/
 public:
 	/*{*/
-	HDetachedRenderer( HKeyboardEventListener* = NULL );
+	HDetachedRenderer( HKeyboardEventListener* = nullptr );
 	virtual ~HDetachedRenderer ( void );
 	bool render_surface( void );
 	void run( void );

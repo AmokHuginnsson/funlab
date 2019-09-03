@@ -47,19 +47,36 @@ HFunlab::HMesh::OValue** HFunlab::HMesh::fast( int surface ) {
 }
 
 HFunlab::HFunlab( HRendererSurfaceInterface* renderer_ )
-	: _red( 0 ), _green( 0 ), _blue( 0 ),
-	_angleX( 0 ), _angleY( 0 ), _angleZ( 0 ),
-	_paralax( 160 ),
-	_dX( 0 ), _dY( 0 ), _dZ( 0 ), _fov( 0 ),
-	_xVariable( NULL ), _yVariable( NULL ),
-	_mesh(), _node(),
-	_color( 0 ), _cosAlpha( 0 ), _sinAlpha( 0 ),
-	_cosBeta( 0 ), _sinBeta( 0 ),
-	_cosGamma( 0 ), _sinGamma( 0 ),
-	_cosParalax( 0 ), _sinParalax( 0 ),
-	_cache( 0, 0, 0 ), _trygo( NULL ),
-	_plots(), _renderer( renderer_ ),
-	_error(), _errorIndex( 0 ) {
+	: _red( 0 )
+	, _green( 0 )
+	, _blue( 0 )
+	, _angleX( 0 )
+	, _angleY( 0 )
+	, _angleZ( 0 )
+	, _paralax( 160 )
+	, _dX( 0 )
+	, _dY( 0 )
+	, _dZ( 0 )
+	, _fov( 0 )
+	, _xVariable( nullptr )
+	, _yVariable( nullptr )
+	, _mesh()
+	, _node()
+	, _color( 0 )
+	, _cosAlpha( 0 )
+	, _sinAlpha( 0 )
+	, _cosBeta( 0 )
+	, _sinBeta( 0 )
+	, _cosGamma( 0 )
+	, _sinGamma( 0 )
+	, _cosParalax( 0 )
+	, _sinParalax( 0 )
+	, _cache( 0, 0, 0 )
+	, _trygo( nullptr )
+	, _plots()
+	, _renderer( renderer_ )
+	, _error()
+	, _errorIndex( 0 ) {
 	int i = 0;
 	_trygo = memory::calloc<double>( TRYGO_BASE );
 	for ( i = 0; i < TRYGO_BASE; ++ i ) {

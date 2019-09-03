@@ -12,17 +12,25 @@ using namespace yaal::tools;
 
 namespace funlab {
 OSetup::OSetup( void )
-	: _quiet( false ), _verbose( false ),
-		_stereo( false ),
-		_3D( true ), _showAxis( false ),
-		_multiFormula( false ),
-		_density( 32 ), _resolutionX( 640 ),
-		_resolutionY( 480 ), _aspect( 1 ),
-		_domainLowerBound( -1 ), _domainUpperBound( 1 ),
-		_rangeLowerBound( -1 ), _rangeUpperBound( 1 ),
-		_programName( NULL ), _logPath(),
-		_formula(), _resourcePath(),
-		_iconPath() {
+	: _quiet( false )
+	, _verbose( false )
+	, _stereo( false )
+	, _3D( true )
+	, _showAxis( false )
+	, _multiFormula( false )
+	, _density( 32 )
+	, _resolutionX( 640 )
+	, _resolutionY( 480 )
+	, _aspect( 1 )
+	, _domainLowerBound( -1 )
+	, _domainUpperBound( 1 )
+	, _rangeLowerBound( -1 )
+	, _rangeUpperBound( 1 )
+	, _programName( nullptr )
+	, _logPath()
+	, _formula()
+	, _resourcePath()
+	, _iconPath() {
 }
 
 void OSetup::test_setup( void ) {

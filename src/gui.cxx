@@ -96,19 +96,30 @@ private:
 	HWindowMain& operator = ( HWindowMain const& );
 };
 
-HWindowMain::HWindowMain( BaseObjectType* baseObject_,
-	Glib::RefPtr<Gtk::Builder> const& resources_ ) : Gtk::Window( baseObject_ ),
-	_lock( false ), _formulasListModel(), _formulasListColumns(), _formulasListFormulaColumn(),
-	_formulasListView( NULL ), _density( NULL ),
-	_3D( NULL ), _multiFormula( NULL ), _showAxis( NULL ),
-	_stereo( NULL ),
-	_domainLowerBound( NULL ), _domainUpperBound( NULL ),
-	_rangeLowerBound( NULL ), _rangeUpperBound( NULL ),
-	_formula( NULL ), _dispatcher(),
-	_detachedRendererActive( false ), _embeddedRenderer( NULL ), _detachedRenderer() {
+HWindowMain::HWindowMain( BaseObjectType* baseObject_, Glib::RefPtr<Gtk::Builder> const& resources_ )
+	: Gtk::Window( baseObject_ )
+	, _lock( false )
+	, _formulasListModel()
+	, _formulasListColumns()
+	, _formulasListFormulaColumn()
+	, _formulasListView( nullptr )
+	, _density( nullptr )
+	, _3D( nullptr )
+	, _multiFormula( nullptr )
+	, _showAxis( nullptr )
+	, _stereo( nullptr )
+	, _domainLowerBound( nullptr )
+	, _domainUpperBound( nullptr )
+	, _rangeLowerBound( nullptr )
+	, _rangeUpperBound( nullptr )
+	, _formula( nullptr )
+	, _dispatcher()
+	, _detachedRendererActive( false )
+	, _embeddedRenderer( nullptr )
+	, _detachedRenderer() {
 	M_PROLOG
-	Gtk::ToolButton* toolButton = NULL;
-	Gtk::MenuItem* menuItem = NULL;
+	Gtk::ToolButton* toolButton = nullptr;
+	Gtk::MenuItem* menuItem = nullptr;
 
 	resources_->get_widget_derived( "RENDERER", _embeddedRenderer );
 	HRendererEngineInterface::ptr_t ere( make_pointer<HFunlab>( _embeddedRenderer ) );
@@ -410,7 +421,7 @@ void HWindowMain::on_remove_existing( void ) {
 
 HFunlab* HWindowMain::funlab( void ) {
 	M_PROLOG
-	HFunlab* f = NULL;
+	HFunlab* f = nullptr;
 	if ( ! _lock && _detachedRendererActive ) {
 		HDetachedRenderer* dr = dynamic_cast<HDetachedRenderer*>( &*_detachedRenderer );
 		if ( dr )
@@ -426,7 +437,7 @@ HFunlab* HWindowMain::funlab( void ) {
 
 void HWindowMain::selected_row_callback( Gtk::TreeModel::iterator const& iter ) {
 	M_PROLOG
-	HFunlab* f = NULL;
+	HFunlab* f = nullptr;
 	if ( iter && ( f = funlab() ) ) {
 		f->push_formula( iter->get_value( _formulasListFormulaColumn ) );
 		update_drawing( false );
@@ -708,7 +719,7 @@ int gui_start( int argc_, char** argv_ ) {
 		Gtk::Main gUI( argc_, argv_ );
 		HUTF8String utf8( setup._resourcePath );
 		Glib::RefPtr<Gtk::Builder> resources( Gtk::Builder::create_from_file( utf8.c_str() ) );
-		HWindowMain* windowMain = NULL;
+		HWindowMain* windowMain = nullptr;
 		resources->get_widget_derived( "WINDOW_MAIN", windowMain );
 		gUI.run( *windowMain );
 	} catch ( Glib::Exception& e ) {
