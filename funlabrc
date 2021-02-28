@@ -1,11 +1,11 @@
 # .funlabrc is an `funlab' 0.0.0 configuration file,
 # this file ought to be in /etc/ and/or your home dirctory.
 
-log_path ${HOME}/src/funlab/x_funlab.log
-icon_path ${HOME}/src/funlab/res/funlab.xpm
-resource_path ${HOME}/src/funlab/res/funlab.ui
-resolution_x 800
-resolution_y 600
+log-path ${HOME}/src/funlab/x_funlab.log
+icon-path ${HOME}/src/funlab/res/funlab.xpm
+resource-path ${HOME}/src/funlab/res/funlab.ui
+resolution-x 800
+resolution-y 600
 aspect 1
 density 32
 # stereo false
