@@ -15,11 +15,11 @@ HMouseEvent::HMouseEvent( TYPE::type_t const& type )
 }
 
 int HMouseEvent::get_x( void ) const {
-	return ( f_iX );
+	return f_iX;
 }
 
 int HMouseEvent::get_y( void ) const {
-	return ( f_iY );
+	return f_iY;
 }
 
 HMouseEvent::TYPE::type_t HMouseEvent::get_type( void ) const {

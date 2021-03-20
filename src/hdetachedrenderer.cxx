@@ -272,7 +272,7 @@ u32_t HDetachedRenderer::do_RGB( u8_t red, u8_t green, u8_t blue ) {
 	color |= ( static_cast<u32_t>( red ) << 24 );
 	color |= ( static_cast<u32_t>( green ) << 16 );
 	color |= ( static_cast<u32_t>( blue ) << 8 );
-	return ( color );
+	return color;
 	M_EPILOG
 }
 

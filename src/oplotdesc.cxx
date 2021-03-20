@@ -26,7 +26,7 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stre
 		<< plot._rangeLowerBound << ";"
 		<< plot._rangeUpperBound << ";"
 		<< plot._formula;
-	return ( stream );
+	return stream;
 	M_EPILOG
 }
 
@@ -39,7 +39,7 @@ OPlotDesc plot_desc_from_string( yaal::hcore::HString const& line ) {
 	plot._rangeLowerBound = lexical_cast<double long>( t[ 2 ] );
 	plot._rangeUpperBound = lexical_cast<double long>( t[ 3 ] );
 	plot._formula = t[ 4 ];
-	return ( plot );
+	return plot;
 	M_EPILOG
 }
 

@@ -431,7 +431,7 @@ HFunlab* HWindowMain::funlab( void ) {
 		if ( er )
 			f = dynamic_cast<HFunlab*>( &( *er->get_engine() ) );
 	}
-	return ( f );
+	return f;
 	M_EPILOG
 }
 

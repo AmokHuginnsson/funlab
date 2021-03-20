@@ -69,7 +69,7 @@ int main ( int argc_, char * argv_ [ ] ) {
 	} catch ( int err ) {
 		opt = err;
 	}
-	return ( opt );
+	return opt;
 	M_FINAL
 }
 
