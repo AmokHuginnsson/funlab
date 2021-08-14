@@ -299,7 +299,7 @@ void HWindowMain::open( HString const& path_ ) {
 		HFile file( path_, HFile::OPEN::READING );
 		if ( !!file ) {
 			_formulasListModel->clear();
-			while ( file.read_line( line ).good() ) {
+			while ( getline( file, line ).good() ) {
 				row = *( _formulasListModel->append() );
 				row[ _formulasListFormulaColumn ] = plot_desc_from_string( line );
 				index ++;
